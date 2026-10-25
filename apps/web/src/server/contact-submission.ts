@@ -14,7 +14,7 @@ export async function sharedContactSubmission(input:{token:string;payloadHash:st
     const existing=await client.query<{payload_hash:string;result:ContactResult}>('SELECT payload_hash,result FROM contact_receipts WHERE token_hash=$1',[tokenHash]);
     let result:ContactResult;
     if(existing.rows[0])result=existing.rows[0].payload_hash===input.payloadHash?existing.rows[0].result:{ok:false,status:409,message:'Ce formulaire a déjà été utilisé. Rechargez la page pour une nouvelle demande.'};
-    else if(!await consumeRateLimit(`contact:${input.addressHash}`,input.maximum,900))result={ok:false,status:429,message:'Trop de tentatives rapprochées. Patientez 15 minutes ou contactez-nous directement.'};
+    else if(!await consumeRateLimit(`contact:${input.addressHash}`,input.maximum,900,client))result={ok:false,status:429,message:'Trop de tentatives rapprochées. Patientez 15 minutes ou contactez-nous directement.'};
     else{
       result=await input.deliver();
       if(result.ok)await client.query("INSERT INTO contact_receipts (token_hash,payload_hash,result,expires_at) VALUES ($1,$2,$3,now()+interval '1 hour')",[tokenHash,input.payloadHash,JSON.stringify(result)]);
