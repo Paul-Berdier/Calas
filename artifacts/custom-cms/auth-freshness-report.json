@@ -1,6 +1,6 @@
 {
   "environment": "http://localhost:4336",
-  "existingStaleSession": true,
+  "existingStaleSession": false,
   "checks": [
     "Real server refuses an old session while editorial access remains valid",
     "Old-session UI explains reconnection without a failed GET, at 390 and 1440px",

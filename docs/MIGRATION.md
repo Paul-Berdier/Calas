@@ -17,7 +17,7 @@ Base vérifiée : `ece27bda5bcb53219d03c1e44a15e8bc7bc39d9c`, dépôt propre, br
 | E | Administration, édition structurée, aperçu et historique | Vérifié : 53 états responsive et 15 aperçus, zéro défaut axe/console/débordement |
 | F | Tiptap, médias S3 privés, PDF/OCR | Vérifié : 20 étapes réelles, 6 cas OCR, médiathèque privée, remplacement et suppression protégée |
 | G | Étude des trois enroulements, comparaison et mouvement final | 48 contrôles logo, 26 contrôles éditoriaux et 1 515 états géométriques réussis ; initialisation différée et coût géométrique réduit, contours finaux exacts |
-| H | Nettoyage, CI, sauvegarde/restauration, recette et PR | Sauvegarde chiffrée PG+S3 et restauration isolée vérifiées ; Sanity retiré, conteneur Linux vérifié ; PR1 ouverte, dernières validations de performance et de session en cours |
+| H | Nettoyage, CI, sauvegarde/restauration, recette et PR | Terminé : sauvegarde/restauration vérifiée, Sanity retiré, CI complète verte sur 48ade34a, mobile 96/100, conteneur vérifié ; PR 1 ouverte en brouillon pour relecture |
 
 ## Conservation et correspondance
 
@@ -46,3 +46,5 @@ Concurrence des sauvegardes : version attendue et transaction. Fuite de brouillo
 - Commits logiques : données et sauvegardes `8223de3`, administration et sécurité `31625cd`, médias/PDF `24b8c8c`, raccordement Astro/retrait Sanity `71dcb69`, logo `183f3ce`.
 - CI : l’image MinIO historique n’était plus récupérable ; une construction depuis source officielle vérifiée remplace cette dépendance de recette. Sur Ubuntu, migrations, S3, sauvegarde/restauration,44 tests CMS locaux,15 de domaine,38 d’intégration,38 publics, OCR, authentification et parcours PDF réussissent. Le dernier défaut de contraste concernait un instant de transition dans l’iframe ; l’audit attend maintenant la stabilité sans désactiver l’animation.
 - Pull request de migration : https://github.com/Paul-Berdier/Calas/pull/1, branche `codex/custom-cms-migration`, sans fusion ni déploiement.
+- Livraison vérifiée : [CI 40186258008](https://github.com/Paul-Berdier/Calas/actions/runs/40186258008), branche `48ade34a` et fusion synthétique GitHub `37d040ec`. Deux jobs réussis ; cinq scénarios de fraîcheur de session ajoutés et réussis. Performance mobile Linux 96, accessibilité 100, TBT 0, CLS 0,00008. Les rapports Windows variables restent disponibles et ne sont pas présentés comme une mesure comparable du runner Linux.
+- Le site local reste accessible sur `http://localhost:4321/` et `/admin/`, avec `CONTENT_MODE=database`. Les serveurs temporaires 4336/4338 ont été arrêtés. Restent uniquement les raccordements externes et les validations de production décrits dans `VALIDATION.md` ; aucun déploiement public n’a été effectué.

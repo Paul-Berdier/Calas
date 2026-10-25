@@ -144,7 +144,7 @@ Le suivi d’exploitation doit couvrir mises à jour Node/dépendances, migratio
 
 Les parcours CMS, PDF, Tiptap, médias privés, SMTP local et sécurité Better Auth ont été exécutés avec PostgreSQL 17 et MinIO/Mailpit locaux. La sauvegarde/restauration sur ressources isolées est décrite dans `BACKUP.md`. Les rapports se trouvent dans `artifacts/custom-cms/`.
 
-Une image Linux de recette, incluant le chargement différé de l’authentification pour la preview, a été construite puis exécutée avec un système de fichiers en lecture seule et l’utilisateur `node` (UID 1000). Le smoke a confirmé Node 24.19.0, la génération WebP par Sharp natif, l’accueil en mode démo explicite, la vivacité 200 et la disponibilité 503 sans configuration privée. Le message de démarrage a également confirmé le chargement du logger Astro JSON filtré. Aucun fichier `.env` ni source applicative n’était présent dans cette image. Le conteneur de recette a été arrêté automatiquement. Le rapport `artifacts/custom-cms/docker-smoke-report.json` contient l’identifiant exact de l’image et les empreintes vérifiées des sources clés.
+Une image Linux de recette, incluant le chargement différé de l’authentification pour la preview, a été construite puis exécutée avec un système de fichiers en lecture seule et l’utilisateur `node` (UID 1000). Le smoke a confirmé Node 24.19.0, la génération WebP par Sharp natif, l’accueil en mode démo explicite, la vivacité 200 et la disponibilité 503 sans configuration privée. Le message de démarrage a également confirmé le chargement du logger Astro JSON filtré. Aucun fichier `.env` ni source applicative n’était présent dans cette image. Le conteneur de recette a été arrêté automatiquement. Le rapport `artifacts/custom-cms/docker-local-smoke-report.json` contient l’identifiant exact de l’image et les empreintes vérifiées des sources clés.
 
 Ce contrôle local précède le dernier ajustement de l’écran de sécurité concernant une session trop ancienne (`SessionNotFresh`) ; il ne valide pas cette modification ultérieure. Le job CI `container` reconstruit l’image et exécute le même smoke pour la révision du run. Consulter le résultat de la CI de la révision livrée, puis refaire ce contrôle après tout nouveau build destiné à l’hébergement :
 
@@ -152,6 +152,8 @@ Ce contrôle local précède le dernier ajustement de l’écran de sécurité c
 docker build --tag calas-cms:local-check --build-arg SITE_URL=http://localhost:4321 .
 node scripts/docker-smoke-check.mjs
 ```
+
+La révision applicative finale `48ade34a`, incluant le correctif de fraîcheur des sessions, a ensuite été reconstruite et vérifiée dans le job `container` de la [CI 40186258008](https://github.com/Paul-Berdier/Calas/actions/runs/40186258008). Ses cinq groupes passent ; le rapport correspondant est `artifacts/custom-cms/docker-smoke-report.json`. Le job `validate` a également vérifié les services privés et tous les parcours authentifiés sur cette révision.
 
 Ce test utilise uniquement le port loopback 14321 et aucun secret, serveur de données ou transport de courrier. Il ne remplace pas la recette d’une image raccordée à ses services privés.
 

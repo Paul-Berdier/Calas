@@ -1,0 +1,12 @@
+{
+  "environment": "http://localhost:4336",
+  "existingStaleSession": true,
+  "checks": [
+    "Real server refuses an old session while editorial access remains valid",
+    "Old-session UI explains reconnection without a failed GET, at 390 and 1440px",
+    "Verified sign-out, password, real TOTP, return to security, and list-sessions 200",
+    "An open tab stops displaying its session list when the client freshness timer expires",
+    "A real server expiry between SSR and GET becomes the reconnection state"
+  ],
+  "errors": []
+}
