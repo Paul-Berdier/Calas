@@ -34,6 +34,30 @@
       "lcpMs": 2665.812425,
       "cls": 0.0316384445346052,
       "tbtMs": 258
+    },
+    {
+      "stage": "Après suppression du reflow forcé, IPv4 direct ; réponse locale anormalement lente à investiguer",
+      "date": "2026-10-25T10:07:38.107Z",
+      "performance": 85,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "lcpMs": 2586.116,
+      "cls": 0.00036572940070124385,
+      "tbtMs": 2,
+      "speedIndexMs": 30989.72378564497,
+      "serverResponseMs": 20155
+    },
+    {
+      "stage": "Build final : animations optimisées, authentification serveur différée, aucune compilation concurrente, navigation neuve",
+      "date": "2026-10-25T10:25:35.352Z",
+      "performance": 46,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "lcpMs": 4258.9335,
+      "cls": 0.030125381888474207,
+      "tbtMs": 1216.7832500000004,
+      "speedIndexMs": 8271.602061427953,
+      "serverResponseMs": 2742
     }
   ]
 }

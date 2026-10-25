@@ -55,6 +55,7 @@ jobs:
           path: |
             playwright-report/
             artifacts/resource-budget.json
+            artifacts/lighthouse-custom-cms-ci.report.html
             artifacts/custom-cms/*report.json
             artifacts/custom-cms/dashboard-authenticated.png
             artifacts/custom-cms/admin/report.json

@@ -26,13 +26,42 @@ function observe(page) {
     if (entry.type() === "error") consoleErrors.push(entry.text());
   });
 }
+async function settleFrames(page) {
+  // The preview is the real public page. Keep normal motion, but audit its
+  // settled colours rather than a translucent intermediate GSAP frame.
+  for (const frame of page.frames()) {
+    await frame.evaluate(async () => {
+      await document.fonts.ready;
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      );
+    });
+    await frame.waitForFunction(() => {
+      const reveals = [...document.querySelectorAll("[data-reveal]")]
+        .flatMap((element) => [element, ...element.children]);
+      const textSettled = reveals.every((element) => {
+        const opacity = element.style?.opacity;
+        return !opacity || Number(opacity) === 1;
+      });
+      const logoSettled = [...document.querySelectorAll("[data-shell-animate]")]
+        .every((element) => {
+          const progress = element.getAttribute("data-motion-progress");
+          return progress === null || Number(progress) === 0 || Number(progress) === 1;
+        });
+      return textSettled && logoSettled;
+    }, undefined, { timeout: 10000 });
+  }
+}
 async function inspect(page, name, width, { axe = true } = {}) {
   await page.setViewportSize({ width, height: 960 });
-  await page.evaluate(() => document.fonts.ready);
+  await settleFrames(page);
   await page.screenshot({
     path: resolve(output, `${name}-${width}.png`),
     fullPage: true,
   });
+  // Capturing a full document can expose another reveal in the iframe.
+  // Let that effect finish before axe reads the resulting foreground colour.
+  await settleFrames(page);
   const layout = await page.evaluate(() => ({
     width: innerWidth,
     documentWidth: document.documentElement.scrollWidth,
@@ -50,7 +79,10 @@ async function inspect(page, name, width, { axe = true } = {}) {
         id: item.id,
         impact: item.impact,
         description: item.description,
-        nodes: item.nodes.map((node) => node.target),
+        nodes: item.nodes.map((node) => ({
+          target: node.target,
+          failureSummary: node.failureSummary,
+        })),
       }))
     : [];
   report.cases.push({ name, width, layout, violations });

@@ -27,6 +27,7 @@ Une API simulée est employée uniquement dans les tests unitaires de frontière
 | Administration | 53 états contrôlés aux largeurs 360/390/768/1280/1440 ; zéro violation axe A/AA, erreur console ou débordement horizontal |
 | Aperçu public dans l’administration | 15 combinaisons : viewport interne ordinateur/tablette/mobile exact, mise à l’échelle sans rognage, zéro violation axe |
 | Cadrage réel d’image |Zone asymétrique vérifiée dans Astro par échantillonnage de9 pixels et descripteurs srcset exacts |
+| Mouvement final | 48 contrôles du logo et 26 des effets éditoriaux réussis dans Chromium/Firefox ; chargement différé contrôlé à 390/1440 px |
 
 Les groupes de sécurité couvrent invitations à usage unique, email vérifié, mauvais mot de passe/compte inconnu, TOTP, refus d’une ancienne session pré-MFA, secours à usage unique, rôle éditeur, CSRF, inscription publique interdite, révocation de sessions, vrai lien de récupération Mailpit, jeton consommé et suspension du seul compte créé pour la recette.
 
@@ -41,8 +42,25 @@ Les groupes de sécurité couvrent invitations à usage unique, email vérifié,
 - CI : migration explicite avec `--apply` et chemins de tests vérifiés.
 - Contact : réutiliser la connexion transactionnelle pour la limitation de débit, afin de fonctionner avec un pool limité à une connexion.
 - Exécution Windows : une relance des tests locaux a été bloquée par les droits de lecture du bac à sable dans esbuild ; la même commande hors de cette restriction réussit ses 44 contrôles, sans modification du code.
+- Première CI : image communautaire MinIO indisponible. Remplacement par une construction depuis source officielle verrouillée ; compilation, santé et intégration PostgreSQL/S3 réussies sur Ubuntu dans l’exécution `40183929033`.
+- Deuxième CI : axe a mesuré les statistiques pendant une transition translucide de l’iframe. La capture montre l’animation en cours ; le contraste final est 6,43:1. La recette attend maintenant la fin des révélations avant capture et audit, sans désactiver le mouvement ni exclure de règle axe.
 
 Ces échecs initiaux sont conservés comme constats de recette ; les scénarios concernés ont été corrigés et relancés. Les résultats du build final et la mesure Lighthouse sont consignés ci-dessous après leur exécution.
+
+## Performance et protocole
+
+Les mesures locales emploient Lighthouse 13.5.0, Chromium 156, viewport mobile et ralentissement simulé par défaut (CPU×4), navigateur neuf, Astro standalone et PostgreSQL local. Le build final passe TypeScript (90 fichiers, zéro erreur/avertissement, 18 indications de dépréciation), ESLint et compilation. L’administration, Tiptap et les moteurs PDF/OCR restent absents du JavaScript public initial.
+
+| Mesure Windows | Performance | Accessibilité | LCP | TBT | CLS |
+| --- | --- | --- | --- | --- | --- |
+| Première migration | 78 | 100 | 3,33 s | 359 ms | <0,001 |
+| Initialisation différée | 80 | 100 | 2,67 s | 258 ms | 0,032 |
+| Reflow supprimé | 85 | 100 | 2,59 s | 2 ms | <0,001 |
+| Authentification serveur différée, dernière mesure locale | 46 | 100 | 4,3 s | 1 220 ms | 0,03 |
+
+Ces résultats ne satisfont pas la cible locale de 90 et leur variabilité est conservée, pas remplacée par le meilleur score. Certaines réponses observées par Lighthouse duraient 10–20 s, alors que les lectures PostgreSQL isolées étaient inférieures à une seconde. L’instrumentation temporaire a observé des rendus ultérieurs autour de 20–40 ms ; le poste disposait d’environ 1,2 Go de mémoire libre pendant la recette. Cela ne démontre pas à lui seul la cause de la variation. L’import privé différé et la suppression du reflow sont des corrections vérifiées, sans garantie tirée d’une mesure isolée.
+
+`scripts/performance-check.mjs` reproduit le même profil de laboratoire dans la CI Ubuntu et impose performance ≥90, accessibilité100 et CLS≤0,1. Le système d’exploitation est différent : son score doit être présenté séparément de la comparaison Windows historique. Le résumé `performance-ci-report.json` et le rapport HTML sont conservés avec les artefacts de chaque exécution. Les mesures détaillées intermédiaires sont dans `artifacts/custom-cms/performance.json`. Aucune donnée Web Vitals de terrain n’est revendiquée.
 
 ## Captures et rapports
 

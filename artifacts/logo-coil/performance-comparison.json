@@ -1,0 +1,46 @@
+{
+  "samples": [
+    {
+      "time": 0.12,
+      "changedPixelPercent": 0.05973881633787163,
+      "meanChannelDifference": 0.025807168657960546
+    },
+    {
+      "time": 0.35,
+      "changedPixelPercent": 0.34426229508196726,
+      "meanChannelDifference": 0.13275724738353245
+    },
+    {
+      "time": 0.7,
+      "changedPixelPercent": 0.3089747151986663,
+      "meanChannelDifference": 0.12498934889321107
+    },
+    {
+      "time": 1.1,
+      "changedPixelPercent": 0.13531536537927202,
+      "meanChannelDifference": 0.06971195702509957
+    },
+    {
+      "time": 1.4,
+      "changedPixelPercent": 0.02917477076965824,
+      "meanChannelDifference": 0.03386681485597851
+    },
+    {
+      "time": 1.8,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0.005243123089747152
+    },
+    {
+      "time": 2.2,
+      "changedPixelPercent": 0,
+      "meanChannelDifference": 0
+    }
+  ],
+  "benchmark": {
+    "frames": 360,
+    "ribbons": 5,
+    "oldMs": 769.3298,
+    "newMs": 153.78199999999993,
+    "reductionPercent": 80.01091339500954
+  }
+}

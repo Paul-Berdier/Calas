@@ -34,6 +34,8 @@ Le SHA-256 de l’archive est vérifié par Docker avant compilation ; Go 1.24.1
 
 Le premier `docker compose up -d --wait` prend plusieurs minutes pour télécharger et compiler les dépendances ; les lancements suivants réutilisent les couches locales. La CI sépare explicitement la compilation et le démarrage pour identifier un incident de téléchargement. La santé HTTP est vérifiée avant les tests S3 ; les ports restent liés à `127.0.0.1` et les volumes locaux ne sont pas supprimés. Les digests PostgreSQL et Mailpit ont été vérifiés auprès de leurs registres publics et restent inchangés.
 
+Vérification exécutée : le [run Linux 40183929033](https://github.com/Paul-Berdier/Calas/actions/runs/40183929033), commit `afdf2a6e749c52d06ccc62b4543c9d9b1f542f1c`, a compilé cette source, attendu la santé des services, créé le bucket privé et réussi la suite d’intégration PostgreSQL/S3. Ce résultat provient de GitHub Actions sous Ubuntu 24.04. L’ancienne instance MinIO du poste et ses volumes n’ont pas été remplacés pour ce test ; aucun second test local de cette nouvelle image n’est revendiqué.
+
 Cette version historique sert à reproduire une recette, elle ne constitue pas un service de stockage de production maintenu. Le déploiement final doit utiliser le bucket S3 privé et le fournisseur approuvés par Calas Conseil, avec maintenance et sauvegardes configurées.
 
 ## Construire et lancer l’application

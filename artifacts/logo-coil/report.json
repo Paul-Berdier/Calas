@@ -1,9 +1,9 @@
 {
-  "at": "2026-10-25T09:36:07.369Z",
+  "at": "2026-10-25T10:12:17.962Z",
   "runs": [
     {
       "base": "http://127.0.0.1:4336",
-      "at": "2026-10-25T09:34:07.161Z",
+      "at": "2026-10-25T10:11:19.940Z",
       "reports": [
         {
           "browser": "chromium",
@@ -11,7 +11,7 @@
           "base": "http://127.0.0.1:4336",
           "duration": 2.2,
           "checks": 12,
-          "frames": 66,
+          "frames": 76,
           "result": "passed",
           "errors": []
         },
@@ -21,7 +21,7 @@
           "base": "http://127.0.0.1:4336",
           "duration": 2.2,
           "checks": 12,
-          "frames": 123,
+          "frames": 132,
           "result": "passed",
           "errors": []
         }
@@ -30,7 +30,7 @@
     },
     {
       "base": "http://127.0.0.1:4336",
-      "at": "2026-10-25T09:36:06.360Z",
+      "at": "2026-10-25T10:12:15.291Z",
       "reports": [
         {
           "browser": "firefox",
@@ -38,7 +38,7 @@
           "base": "http://127.0.0.1:4336",
           "duration": 2.2,
           "checks": 12,
-          "frames": 18,
+          "frames": 90,
           "result": "passed",
           "errors": []
         },
@@ -48,7 +48,7 @@
           "base": "http://127.0.0.1:4336",
           "duration": 2.2,
           "checks": 12,
-          "frames": 56,
+          "frames": 93,
           "result": "passed",
           "errors": []
         }
