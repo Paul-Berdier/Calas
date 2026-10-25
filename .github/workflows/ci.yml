@@ -29,6 +29,8 @@ jobs:
       - run: npm install --global pnpm@11.25.0
       - run: pnpm install --frozen-lockfile
       - run: pnpm cms:prepare
+      - name: Build the pinned local S3 fixture from official source
+        run: docker compose build storage
       - run: docker compose up -d --wait
       - run: pnpm db:migrate --apply
       - run: node scripts/media-storage-setup.mjs --local

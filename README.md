@@ -20,6 +20,8 @@ pnpm content:seed --apply --publish-initial
 
 `cms:prepare` complète les fichiers `.env` ignorés sans remplacer les valeurs existantes et génère des secrets aléatoires. Aucun compte n’est créé. Le seed ci-dessus publie explicitement les contenus initiaux **dans la recette locale seulement** ; il ne modifie jamais les documents déjà présents. Sans `--publish-initial`, il crée des brouillons.
 
+Le premier démarrage compile le stockage MinIO depuis une source officielle épinglée ; prévoir plusieurs minutes et un accès Internet. Cette image est réservée à la recette locale/CI : voir [son origine et ses limites](docs/DEPLOYMENT.md#stockage-s3-de-recette). Les volumes existants sont conservés.
+
 Dans `apps/web/.env`, choisir `CONTENT_MODE=database`, `SITE_ENV=development`, et garder `SITE_URL` et `BETTER_AUTH_URL` identiques, normalement `http://localhost:4321`. Puis :
 
 ```powershell

@@ -24,6 +24,18 @@ Le seed crée seulement les contenus absents et conserve les modifications exist
 
 Arrêter les services locaux avec `docker compose stop`. Ne pas supprimer les volumes PostgreSQL/MinIO pour une simple relance. Ne pas reconstruire `dist` tant qu’un serveur de recette utilise ses fichiers.
 
+### Stockage S3 de recette
+
+L’ancienne image communautaire `minio/minio` n’est plus téléchargeable anonymement depuis les registres vérifiés le 25 octobre 2026. Le [dépôt officiel](https://github.com/minio/minio) est archivé et décrit désormais une distribution depuis les sources. Le service `storage` de Compose compile donc `infra/minio/Dockerfile`, uniquement pour les tests locaux et la CI. Aucun changement du fournisseur S3 de production n’est imposé.
+
+La source correspond au [tag officiel RELEASE.2025-09-07T16-13-09Z](https://github.com/minio/minio/tree/RELEASE.2025-09-07T16-13-09Z), dont le commit réel est `07c3a429bfed433e49018cb0f78a52145d4bedeb`. L’image précédemment présente sur le poste annonçait ce numéro de version mais une autre révision dans ses labels (`32d8e520…`), introuvable dans le dépôt public : aucune identité des sources ou des binaires avec cette ancienne image n’est revendiquée. La nouvelle recette utilise la version officielle vérifiable et fait l’objet d’un nouveau test S3.
+
+Le SHA-256 de l’archive est vérifié par Docker avant compilation ; Go 1.24.13 et Alpine 3.24.3 sont verrouillés par digest public. Les modules utilisent `go.sum` et `-mod=readonly`, sans modification du code amont. Le binaire porte un suffixe `calas-local` pour identifier cette construction. L’archive source, sa licence AGPL et la recette de construction restent dans `/usr/share/minio-source/` dans l’image.
+
+Le premier `docker compose up -d --wait` prend plusieurs minutes pour télécharger et compiler les dépendances ; les lancements suivants réutilisent les couches locales. La CI sépare explicitement la compilation et le démarrage pour identifier un incident de téléchargement. La santé HTTP est vérifiée avant les tests S3 ; les ports restent liés à `127.0.0.1` et les volumes locaux ne sont pas supprimés. Les digests PostgreSQL et Mailpit ont été vérifiés auprès de leurs registres publics et restent inchangés.
+
+Cette version historique sert à reproduire une recette, elle ne constitue pas un service de stockage de production maintenu. Le déploiement final doit utiliser le bucket S3 privé et le fournisseur approuvés par Calas Conseil, avec maintenance et sauvegardes configurées.
+
 ## Construire et lancer l’application
 
 ```powershell
