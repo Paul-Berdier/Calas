@@ -1,0 +1,64 @@
+{
+  "project": "Calas",
+  "projectId": "e030d2f5-36b9-4fad-817d-7a146a3c3c31",
+  "environmentId": "cc59f611-8119-46f6-8f8d-d7c5d0d909a2",
+  "railwayEnvironmentName": "production",
+  "applicationEnvironment": "staging",
+  "url": "https://calas-web-test-production.up.railway.app",
+  "contentMode": "database",
+  "source": {
+    "repository": "Paul-Berdier/Calas",
+    "branch": "codex/custom-cms-migration",
+    "commit": "0c4e0b97cae6e6418f0b0b078eb6ae344ee023aa"
+  },
+  "deployment": {
+    "id": "757213ce-9369-4bcb-abf4-8ef80d20cb3e",
+    "status": "SUCCESS",
+    "updatedAt": "2026-10-25T14:24:30.577Z",
+    "image": "sha256:989e3106d4fd842cd55b0f05bfcb91b42bc0a774c69d2008f7a1ade08d3b5838"
+  },
+  "services": {
+    "web": {
+      "id": "4811b664-6212-4cdf-a1b5-3f998d317367",
+      "region": "europe-west4-drams3a",
+      "vCPU": 1,
+      "memoryGB": 1,
+      "replicas": 1,
+      "healthcheck": "/api/ready/"
+    },
+    "database": {
+      "id": "bfe26d62-f97f-45ab-ba63-afa9e8fbbad8",
+      "version": "17.11",
+      "region": "europe-west4-drams3a",
+      "publicTcpProxy": false,
+      "applicationRole": "calas_app",
+      "applicationPool": 5,
+      "ownerReservedForMigrations": true
+    },
+    "bucket": {
+      "id": "58425b8a-d78a-4023-b802-345c3842e808",
+      "name": "calas-review-media",
+      "region": "ams",
+      "private": true,
+      "forcePathStyle": false
+    }
+  },
+  "initialContent": {
+    "documents": 17,
+    "published": 17,
+    "localAuthCopied": false
+  },
+  "email": {
+    "contact": "simulation",
+    "externalSending": false,
+    "accountDelivery": "Private local activation file; TOTP enrollment by owner",
+    "hostedAuthenticationMail": "disabled"
+  },
+  "limitations": [
+    "No production business approval",
+    "No external SMTP/invitation/reset delivery",
+    "No scheduled offsite backup or Railway restore test",
+    "railway.json migration to IaC required before 2026-12-01"
+  ],
+  "generatedAt": "2026-10-25T14:26:36.834Z"
+}

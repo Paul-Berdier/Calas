@@ -2,7 +2,7 @@
 
 Site éditorial Astro SSR avec administration propriétaire sous `/admin`, PostgreSQL/Drizzle, Better Auth, Tiptap, médias S3 privés et OCR local. Le frontend et ses textes existants sont conservés. Sanity a été remplacé ; aucun compte Sanity n’est nécessaire.
 
-La version livrée est destinée à la recette. La production reste soumise à la validation de Sara et Agnès, aux informations juridiques et au raccordement de l’hébergement et du courriel. Aucun service payant n’a été créé et aucun email de test n’est envoyé à Sara.
+La version livrée est destinée à la recette. Sur autorisation de Paul, un site de test avec PostgreSQL et stockage privé est hébergé dans le projet Railway **Calas** : [ouvrir la préproduction](https://calas-web-test-production.up.railway.app/). La production reste soumise à la validation de Sara et Agnès, aux informations juridiques et au raccordement du courriel. Aucun email de test n’est envoyé à Sara. Voir [le déploiement de recette](docs/DEPLOYMENT.md#préproduction-railway-du-25-octobre-2026).
 
 ## Démarrage local
 

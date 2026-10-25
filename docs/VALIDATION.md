@@ -1,6 +1,6 @@
 # Revue éditoriale et autorisation de publication
 
-État de départ : développement local. Aucun domaine réservé, service payant souscrit ou site de production publié. Le brief exige la validation de l'accueil et de Diagnostic par Sara et Agnès, puis une relecture générale avant publication. Ce document est une liste de décision ; les résultats réellement exécutés sont consignés séparément dans le compte rendu de tests.
+État de départ : développement local. Le 25 octobre 2026, Paul a ensuite autorisé une préproduction publique dans le projet Railway Calas, avec PostgreSQL, stockage privé et compte de recette sans email externe. [Cette adresse](https://calas-web-test-production.up.railway.app/) permet la relecture ; ce n’est pas une validation de production. Le brief exige la validation de l'accueil et de Diagnostic par Sara et Agnès, puis une relecture générale avant lancement définitif. Ce document est une liste de décision ; les résultats réellement exécutés sont consignés séparément dans le compte rendu de tests.
 
 ## Revue 1 — Accueil et Diagnostic
 
@@ -34,7 +34,7 @@ Décision à consigner : date, noms des personnes ayant relu, version du code, f
 | Identité juridique | Nom légal, forme, SIREN/SIRET si applicable, adresse, directeur de publication | Pas de données factices |
 | Données personnelles | Responsable, destinataires, base légale, conservation, contact droits, sous-traitants | Revue nécessaire avant collecte réelle |
 | Domaine/hébergement | Propriété Calas Conseil, budget et administrateur | Aucune disponibilité ni propriété présumée |
-| CMS propriétaire | Adresse du premier responsable, accès Sara, PostgreSQL et S3 de production | Recette locale vérifiée ; accès du cabinet et hébergement à configurer |
+| CMS propriétaire | Adresse du premier responsable, accès Sara, PostgreSQL et S3 de production | Préproduction Railway vérifiée avec compte de recette ; comptes nominatifs et exploitation définitive à configurer |
 | Courriel | Expéditeur autorisé, transport authentifié, destinataire et test autorisé | Simulation ou boîte locale ; aucun email envoyé à Sara pendant la recette |
 
 ## Revue 2 — Avant production

@@ -157,4 +157,44 @@ La révision applicative finale `48ade34a`, incluant le correctif de fraîcheur 
 
 Ce test utilise uniquement le port loopback 14321 et aucun secret, serveur de données ou transport de courrier. Il ne remplace pas la recette d’une image raccordée à ses services privés.
 
-La préparation Docker/Railway ne constitue ni un déploiement Railway testé, ni une validation de domaine, ni un test SMTP externe. Les raccordements et leur recette restent à réaliser avec les accès et autorisations correspondants.
+Ces contrôles historiques ne constituaient pas un déploiement Railway ni un test SMTP externe. Le raccordement de recette réalisé ensuite est décrit ci-dessous ; le SMTP externe reste exclu.
+
+## Préproduction Railway du 25 octobre 2026
+
+Paul a autorisé le déploiement public de test, avec administration, PostgreSQL et stockage privé, puis choisi un compte de recette remis par fichier privé sans email externe.
+
+- Site : https://calas-web-test-production.up.railway.app/ ; administration : `/admin/`.
+- Projet Railway **Calas** : `e030d2f5-36b9-4fad-817d-7a146a3c3c31`.
+- L’environnement Railway conserve son nom par défaut `production` (`cc59f611-8119-46f6-8f8d-d7c5d0d909a2`), mais l’application tourne explicitement en **`SITE_ENV=staging`**, `CONTENT_MODE=database`. Ce nom dans le tableau Railway ne signifie pas que la mise en production métier est approuvée.
+- Service `Calas-Web-Test` : `4811b664-6212-4cdf-a1b5-3f998d317367`, une instance à Amsterdam (`europe-west4-drams3a`), limites de 1 vCPU / 1 Gio. Dockerfile de la racine, port 4321, contrôle `/api/ready/` réussi.
+- Source épinglée à `codex/custom-cms-migration`, pas à l’ancienne branche `main`. Le premier déploiement `bc1098b0-5644-48a6-bcfd-a3a0eb7fed71` utilisait `3de2cd5`. La recette a ensuite révélé une erreur de reconstruction d’origine HTTPS, corrigée dans **`0c4e0b97cae6e6418f0b0b078eb6ae344ee023aa`**. Le déploiement final **`757213ce-9369-4bcb-abf4-8ef80d20cb3e`** a réussi à 14:24:30 UTC, image `sha256:989e3106d4fd842cd55b0f05bfcb91b42bc0a774c69d2008f7a1ade08d3b5838`. Les commits ultérieurs de documentation ne sont pas automatiquement déployés.
+- PostgreSQL `bfe26d62-f97f-45ab-ba63-afa9e8fbbad8`, version réellement vérifiée **17.11**, même région, une instance limitée à 1 vCPU / 1 Gio, volume persistant `postgres-volume`. Aucun domaine ni proxy TCP public sur la base.
+- Bucket privé `calas-review-media`, `58425b8a-d78a-4023-b802-345c3842e808`, région `ams`. Endpoint HTTPS, URL virtual-host, `S3_FORCE_PATH_STYLE=false`. Les variables du site référencent le bucket Railway ; aucune clé n’entre dans Git, le JavaScript du navigateur ou l’image Docker.
+
+Les deux créations automatiques de services de l’ancienne version Sanity, jamais déployées, ont été annulées avant de démarrer le CMS actuel. Les migrations ont été appliquées volontairement via un tunnel SSH local vers la base privée, sans ouverture TCP publique. La base neuve `calas_staging` a reçu les 17 documents initiaux, explicitement publiés pour cette relecture. Aucun compte ou contenu de recette local n’a été copié.
+
+Le contrôle de connexion initial a détecté un refus `403 ORIGIN` malgré une origine légitime. WHATWG URL normalise `https:443` vers un port vide, alors que la configuration Astro exigeait littéralement `443`. Le correctif emploie le port normalisé et conserve `assertSameOrigin` sans assouplissement : le nom d’hôte et le protocole sont contrôlés, et la garde des mutations refuse toujours une origine ou un port différents. Trois tests utilisent la configuration réelle, les validateurs Astro et cette garde, avec HTTPS standard, HTTPS sur port explicite et développement local. Typecheck et lint passent. L’échec initial reste documenté dans `artifacts/railway-review/admin-smoke-initial-origin-failure.json` ; il ne doit pas être confondu avec la recette finale.
+
+Sur le déploiement final, **45 contrôles publics et 8 groupes de recette administrative passent**. Accueil/Diagnostic/navigation, bureau/mobile, absence d’erreurs de ressources, disponibilité PostgreSQL/S3, désindexation et refus des APIs anonymes ont été vérifiés. Un compte technique éditeur distinct a ensuite suivi la vraie vérification de lien, l’activation TOTP et une nouvelle connexion MFA ; droits, CSRF, interface, création/modification/historique/archivage d’une catégorie privée et cycle image/PDF S3 ont été contrôlés. Les fichiers privés répondaient 404 anonymement et 200 sous session MFA. Tous les médias créés pour le test ont été supprimés, la catégorie archivée et le compte technique suspendu avec sessions révoquées. Le compte destiné à Paul n’a pas été utilisé par ces tests. Rapports et captures : `artifacts/railway-review/`, sans secrets.
+
+La [CI complète 40201737133](https://github.com/Paul-Berdier/Calas/actions/runs/40201737133) est également **réussie sur `0c4e0b97`**, jobs `validate` et `container`, avec les deux nouvelles suites opérateur/proxy. Le tunnel SSH d’initialisation a été fermé après la recette. Le scan de livraison n’a trouvé aucun secret connu ou fichier privé parmi les fichiers livrés.
+
+### Rôle PostgreSQL et commandes opérateur
+
+Le service web utilise `calas_app`, sans superutilisateur, création de rôle/base, réplication, contournement RLS ou DDL. Le propriétaire PostgreSQL reste réservé aux migrations. Le pool web est limité à cinq connexions.
+
+Après migration, `node scripts/database-app-role.mjs --apply` crée ce rôle dans une transaction à partir des variables privées `DATABASE_URL`, `SITE_ENV=staging`, `APP_DATABASE_EXPECTED`, `APP_DATABASE_ROLE`, `APP_DATABASE_PASSWORD`. Il refuse une destination différente, une base non migrée, un rôle déjà existant ou des permissions publiques héritées autorisant le DDL. Le secret comporte au moins 32 caractères. Cette commande ne modifie ni ne renouvelle un rôle existant. `node --test tests/database-role.test.mjs` vérifie ses droits dans une base locale isolée ; les deux tests passent.
+
+La migration, le seed et le bootstrap ne font toujours pas partie du démarrage ou du build. Les fichiers opérateur et secrets locaux sont dans un dossier ignoré par Git, à ACL Windows restreintes. Ne jamais publier ce dossier ni l’inclure dans une archive de support.
+
+### Accès de recette et limites
+
+Un compte administrateur **neuf de recette** a été créé. Son message d’activation a été capturé par Mailpit sur le poste, sans envoi externe, et remis avec le mot de passe dans un fichier privé. Le lien Better Auth expire après une heure. Paul configure lui-même le TOTP et conserve ses codes de secours ; aucune dispense MFA n’est ajoutée. L’adresse réservée `example.test` ne représente pas une boîte personnelle dont la possession aurait été vérifiée.
+
+Le serveur hébergé utilise `AUTH_MAIL_TRANSPORT=disabled`, `MAIL_TRANSPORT=simulation`, `ALLOW_REAL_EMAIL=false`. Les textes, images et PDF peuvent être gérés après activation ; les invitations, renvois de liens et récupérations par email ne sont pas disponibles sans raccordement SMTP ultérieur. Une récupération de recette passe pour l’instant par l’opérateur. Aucun email n’a été adressé à Sara ou Agnès.
+
+La préproduction est publique mais désindexée (meta robots, `X-Robots-Tag`, `robots.txt` bloquant et sitemap désactivé). Cette désindexation n’est pas une restriction d’accès : les contenus publiés peuvent être vus par toute personne ayant l’adresse. Les brouillons et fichiers privés gardent leurs protections serveur.
+
+Les sauvegardes PostgreSQL/S3 et restaurations complètes ont été testées localement, mais aucune sauvegarde externe planifiée ni restauration Railway n’est revendiquée à ce stade. Avant utilisation définitive : comptes nominatifs, SMTP, sauvegardes externes/rétention, domaine final, relecture juridique et validations métier restent à traiter.
+
+La configuration historique `railway.json` reste acceptée au moment de ce déploiement. Railway annonce sa fin de prise en charge le **1er décembre 2026** : migrer et vérifier le plan vers `.railway/railway.ts` avant cette échéance. Ne pas appliquer une migration IaC qui modifierait ou supprimerait des ressources non prévues. [Procédure officielle](https://docs.railway.com/infrastructure-as-code#migrating-from-config-as-code).

@@ -1,0 +1,22 @@
+{
+  "issue": "The first Railway deployment served public pages but rejected authentication mutations with HTTP 403 ORIGIN.",
+  "observed": "A newly created technical editor verified its email through the real HTTPS link, then sign-in was refused. A separate nonexistent-account probe confirmed the generic ORIGIN response.",
+  "cause": "astro.config.mjs set allowedDomains.port to the string 443 for the standard HTTPS origin. WHATWG URL normalizes this port to an empty string, so Astro's remote pattern matcher rejected the legitimate host and reconstructed a different request origin.",
+  "change": "Use siteUrl.port directly, preserving URL normalization and the exact configured hostname/protocol. assertSameOrigin remains unchanged.",
+  "portBoundary": "Astro treats an empty port pattern as unconstrained; the unchanged application guard compares the complete request origin and still rejects a non-default public port, as well as a foreign Origin header. Explicitly configured non-default ports remain exact in Astro.",
+  "regressionCommand": "pnpm --filter @calas/web exec tsx --test ../../tests/proxy-origin.test.ts",
+  "regressionTests": {
+    "passed": 3,
+    "failed": 0,
+    "coverage": [
+      "standard HTTPS behind forwarded headers",
+      "foreign host and Origin rejected",
+      "non-default public port refused by the actual mutation guard",
+      "explicit non-default HTTPS port",
+      "localhost and loopback custom HTTP ports"
+    ]
+  },
+  "initialFailureReport": "admin-smoke-initial-origin-failure.json",
+  "initialCleanup": "The first technical account was suspended and its sessions revoked; no media or content fixture was created. Paul's account was not modified.",
+  "remoteVerification": "After deployment 757213ce-9369-4bcb-abf4-8ef80d20cb3e (commit 0c4e0b97), all eight remote admin acceptance groups passed, including real HTTPS login, email verification, MFA, editor permissions, content changes and private S3 media operations. See admin-smoke-report.json."
+}

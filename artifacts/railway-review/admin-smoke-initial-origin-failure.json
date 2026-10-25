@@ -1,0 +1,35 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "executedAt": "2026-10-25T14:14:41.258Z",
+  "transport": "HTTPS Railway + private PostgreSQL through SSH + private S3; email captured by local Mailpit only",
+  "mockedResponses": false,
+  "checks": [
+    {
+      "name": "Compte technique éditeur neuf ; connexion avant vérification et API anonyme refusées",
+      "passed": true
+    },
+    {
+      "name": "Lien réel de vérification HTTPS consommé ; email uniquement capturé localement",
+      "passed": true
+    },
+    {
+      "name": "Seul le compte technique suspendu ; toutes ses sessions révoquées et accès refusé",
+      "passed": true
+    }
+  ],
+  "cleanup": {
+    "mediaDeleted": true,
+    "technicalAccountDisabled": true,
+    "technicalSessionsRevoked": true
+  },
+  "limits": [
+    "Bounded editor/API/media acceptance; no external SMTP or cabinet user validation."
+  ],
+  "failure": {
+    "stage": "MFA enrollment",
+    "name": "AssertionError",
+    "message": "HTTP 403 at /api/auth/sign-in/email/"
+  },
+  "passed": false,
+  "completedAt": "2026-10-25T14:14:43.649Z"
+}
