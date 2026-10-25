@@ -20,6 +20,7 @@ await new Promise((done,reject)=>{
 });
 const report=JSON.parse(await readFile(`${output}.report.json`,'utf8'));
 const summary={date:report.fetchTime,origin,platform:process.platform,lighthouse:report.lighthouseVersion,userAgent:report.userAgent,
+ ci:process.env.CI==='true'?{runId:process.env.GITHUB_RUN_ID,commit:process.env.GITHUB_SHA}:undefined,
  formFactor:report.configSettings.formFactor,throttlingMethod:report.configSettings.throttlingMethod,throttling:report.configSettings.throttling,
  performance:Math.round(report.categories.performance.score*100),accessibility:Math.round(report.categories.accessibility.score*100),
  bestPractices:Math.round(report.categories['best-practices'].score*100),

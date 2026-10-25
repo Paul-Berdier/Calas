@@ -58,6 +58,7 @@ jobs:
             artifacts/lighthouse-custom-cms-ci.report.html
             artifacts/custom-cms/*report.json
             artifacts/custom-cms/dashboard-authenticated.png
+            artifacts/custom-cms/security-stale-*.png
             artifacts/custom-cms/admin/report.json
             artifacts/custom-cms/admin/login-report.json
             artifacts/custom-cms/admin/*.png

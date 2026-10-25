@@ -11,6 +11,6 @@ try{
  for(let i=0;i<80;i++){if(server.exitCode!==null)throw new Error('Le serveur de recette a quitté.');ready=await fetch(`${base}/api/ready/`,{signal:AbortSignal.timeout(1000)}).then(r=>r.ok,()=>false);if(ready)break;await new Promise(r=>setTimeout(r,500));}
  if(!ready)throw new Error('Le serveur de recette reste indisponible.');
  if(process.env.CI==='true')await run('performance-check.mjs');
- await run('auth-browser-check.mjs');await run('auth-security-check.mjs');await run('pdf-editorial-e2e.mjs');await run('auth-session-check.mjs');await run('image-crop-check.mjs');if(process.env.CI==='true')await run('admin-ui-check.mjs',['--authenticated']);await run('logo-coil-check.mjs');
+ await run('auth-browser-check.mjs');await run('auth-security-check.mjs');await run('pdf-editorial-e2e.mjs');await run('auth-session-check.mjs');await run('auth-freshness-check.mjs');await run('image-crop-check.mjs');if(process.env.CI==='true')await run('admin-ui-check.mjs',['--authenticated']);await run('logo-coil-check.mjs');
  await run('motion-loading-check.mjs');await run('brand-browser.mjs');
 }finally{server.kill();}

@@ -26,6 +26,8 @@ Le mot de passe oublié envoie un lien Better Auth valable une heure ; le messag
 
 L’utilisateur peut consulter et révoquer ses sessions. Un administrateur peut suspendre un autre compte, changer ses droits et révoquer ses sessions. Le dernier administrateur actif est protégé. Prévoir au moins deux responsables autorisés et des codes de secours conservés séparément. En cas de perte simultanée du mot de passe, du TOTP et des secours, faire vérifier l’identité et organiser une récupération par l’exploitant selon la procédure Better Auth ; aucun bouton de contournement public ni « mot de passe maître » n’est ajouté.
 
+Better Auth exige une connexion de moins de quinze minutes pour consulter la liste des sessions. L’écran explique cette limite et propose une déconnexion vérifiée suivie du mot de passe et du TOTP, puis revient à la rubrique Sécurité. L’activité ne renouvelle pas cette fenêtre ; l’accès éditorial ordinaire conserve sa durée de session de huit heures.
+
 ## Édition et publication
 
 Pages, accueil, personnes, statistiques et paramètres utilisent des champs structurés. Articles : Tiptap, auteur, catégorie, date, couverture, PDF facultatif et droits de téléchargement. L’enregistrement crée un brouillon ; Publier valide puis change atomiquement la version publique. Une autosauvegarde ultérieure ne modifie pas cette version. Les conflits 409 invitent à comparer ou recharger, sans écrasement silencieux.

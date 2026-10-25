@@ -8,6 +8,7 @@ import {
 import QRCode from "qrcode";
 import { ShieldCheck, ArrowLeft, LogOut, KeyRound, Mail } from "lucide-react";
 import { authClient } from "./client";
+import { SESSION_FRESH_AGE_SECONDS, sessionFreshUntil } from "./policy";
 import "./auth.css";
 type User = {
   id: string;
@@ -56,11 +57,16 @@ const genericError = (result: AuthResult) =>
 export default function AuthScreens({
   mode,
   user,
+  securityFreshUntil = 0,
+  serverTime = Date.now(),
 }: {
   mode: "login" | "security" | "reset" | "invitation" | "users";
   user?: User;
+  securityFreshUntil?: number;
+  serverTime?: number;
 }) {
-  if (mode === "security" && user) return <Security user={user} />;
+  if (mode === "security" && user)
+    return <Security user={user} initialFreshUntil={securityFreshUntil} serverTime={serverTime} />;
   if (mode === "users" && user) return <Users />;
   return (
     <Login mode={mode === "reset" || mode === "invitation" ? mode : "login"} />
@@ -75,6 +81,11 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
     );
   const [token] = useState(
     () => new URLSearchParams(window.location.search).get("token") || "",
+  );
+  const [destination] = useState(() =>
+    new URLSearchParams(window.location.search).get("returnTo") === "security"
+      ? "/admin/security/"
+      : "/admin/",
   );
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
@@ -153,7 +164,7 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
           throw new Error(
             "Ce code n’a pas pu être vérifié. Réessayez avec un code valide.",
           );
-        window.location.assign("/admin/");
+        window.location.assign(destination);
         return;
       }
       const result = await authClient.signIn.email({
@@ -339,7 +350,11 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
     </Shell>
   );
 }
-function Security({ user }: { user: User }) {
+function Security({ user, initialFreshUntil, serverTime }: {
+  user: User;
+  initialFreshUntil: number;
+  serverTime: number;
+}) {
   const [password, setPassword] = useState(""),
     [newPassword, setNewPassword] = useState(""),
     [code, setCode] = useState(""),
@@ -357,6 +372,20 @@ function Security({ user }: { user: User }) {
       userAgent?: string | null;
     }>
   >([]);
+  // Use the server's clock and a monotonic elapsed time, not the device's wall
+  // clock. The API remains authoritative if the window ends during a request.
+  const clock = useRef({ serverTime, started: performance.now() });
+  const serverNow = () => clock.current.serverTime + performance.now() - clock.current.started;
+  const [freshUntil, setFreshUntil] = useState(initialFreshUntil);
+  const [sessionsState, setSessionsState] = useState<"idle" | "loading" | "loaded" | "error" | "stale">(
+    initialFreshUntil > serverTime ? "idle" : "stale",
+  );
+  const [sessionsError, setSessionsError] = useState("");
+  function expireSessions() {
+    setSessions([]);
+    setSessionsError("");
+    setSessionsState("stale");
+  }
   async function execute(work: () => Promise<void>) {
     if (busy) return;
     setBusy(true);
@@ -376,12 +405,61 @@ function Security({ user }: { user: User }) {
     }
   }
   async function refreshSessions() {
-    const result = await authClient.listSessions();
-    if (result.data) setSessions(result.data);
+    if (!enabled || sessionsState === "stale" || serverNow() >= freshUntil) {
+      expireSessions();
+      return;
+    }
+    setSessionsState("loading");
+    setSessionsError("");
+    try {
+      const result = await authClient.listSessions();
+      if (result.error?.code === "SESSION_NOT_FRESH") {
+        expireSessions();
+        return;
+      }
+      if (result.error || !result.data)
+        throw new Error("La liste des sessions n’a pas pu être chargée. Réessayez dans un instant.");
+      if (serverNow() >= freshUntil) {
+        expireSessions();
+        return;
+      }
+      setSessions(result.data);
+      setSessionsState("loaded");
+    } catch (reason) {
+      if (serverNow() >= freshUntil) {
+        expireSessions();
+        return;
+      }
+      setSessions([]);
+      setSessionsState("error");
+      setSessionsError(reason instanceof Error ? reason.message : "La liste des sessions est momentanément indisponible.");
+    }
   }
   useEffect(() => {
     if (enabled) void refreshSessions();
-  }, [enabled]);
+  }, [enabled, freshUntil]);
+  useEffect(() => {
+    if (!enabled) return;
+    const remaining = freshUntil - serverNow();
+    if (remaining <= 0) { expireSessions(); return; }
+    const timer = window.setTimeout(expireSessions, remaining);
+    const check = () => { if (serverNow() >= freshUntil) expireSessions(); };
+    window.addEventListener("focus", check);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("focus", check);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [enabled, freshUntil]);
+  async function disconnect(reconnect = false) {
+    await execute(async () => {
+      const result = await authClient.signOut();
+      if (result.error)
+        throw new Error("La déconnexion n’a pas pu être confirmée. Réessayez.");
+      window.location.assign(reconnect ? "/admin/login/?returnTo=security" : "/admin/login/");
+    });
+  }
   async function setup(event: FormEvent) {
     event.preventDefault();
     await execute(async () => {
@@ -411,6 +489,13 @@ function Security({ user }: { user: User }) {
         throw new Error(
           "Code invalide. Vérifiez l’heure de votre appareil et réessayez.",
         );
+      // Enrollment rotates the session. Keep the codes on screen while using
+      // its actual creation time for the newly available session list.
+      const current = await authClient.getSession();
+      if (current.data?.session) {
+        setFreshUntil(sessionFreshUntil(current.data.session.createdAt));
+        setSessionsState("idle");
+      }
       setEnabled(true);
       setQr("");
       setCode("");
@@ -614,7 +699,25 @@ function Security({ user }: { user: User }) {
           <section className="auth-card" style={{ marginTop: 24 }}>
             <h2>Sessions ouvertes</h2>
             <p>Fermez une session sur un appareil que vous n’utilisez plus.</p>
-            {sessions.map((item) => (
+            {sessionsState === "stale" && (
+              <>
+                <Notice message={`Pour consulter vos sessions ouvertes, reconnectez-vous avec votre mot de passe et votre code de sécurité. Cette vérification est valable ${SESSION_FRESH_AGE_SECONDS / 60} minutes.`} />
+                <button className="auth-button" disabled={busy} onClick={() => void disconnect(true)}>
+                  Se reconnecter
+                </button>
+              </>
+            )}
+            {sessionsState === "loading" && <p role="status">Chargement des sessions…</p>}
+            {sessionsState === "error" && (
+              <>
+                <Notice message={sessionsError} error />
+                <button className="auth-button secondary" disabled={busy} onClick={() => void refreshSessions()}>
+                  Réessayer le chargement
+                </button>
+              </>
+            )}
+            {sessionsState === "loaded" && sessions.length === 0 && <p>Aucune session ouverte n’a été retournée.</p>}
+            {sessionsState === "loaded" && sessions.map((item) => (
               <div className="auth-session" key={item.id}>
                 <span>
                   {item.userAgent?.slice(0, 150) || "Navigateur"}
@@ -648,12 +751,8 @@ function Security({ user }: { user: User }) {
         <div className="auth-actions">
           <button
             className="auth-button secondary"
-            onClick={() =>
-              void execute(async () => {
-                await authClient.signOut();
-                window.location.assign("/admin/login/");
-              })
-            }
+            disabled={busy}
+            onClick={() => void disconnect()}
           >
             <LogOut size={17} aria-hidden /> Se déconnecter
           </button>

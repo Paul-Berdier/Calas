@@ -106,6 +106,8 @@ Les versions facilitent les retours éditoriaux. Les sauvegardes de l’ensemble
 
 Dans **Compte et sécurité**, vous pouvez changer votre mot de passe, renouveler les codes de secours et fermer des sessions ouvertes. Les anciens codes deviennent inutilisables après leur renouvellement. Terminez avec **Se déconnecter**, surtout sur un ordinateur partagé.
 
+La liste des sessions nécessite une connexion datant de moins de quinze minutes. Si le bouton **Se reconnecter** apparaît, cliquez dessus puis saisissez votre mot de passe et votre code de sécurité : vous reviendrez directement à **Compte et sécurité**. Vous pouvez continuer à travailler sur vos contenus.
+
 ## Première prise en main accompagnée
 
 À réaliser en préproduction : modifier un paragraphe de l’accueil, vérifier son aperçu mobile ; remplacer une image ; importer un PDF de test clairement identifié ; relire et publier l’article de test ; vérifier dans une fenêtre non connectée que seul le contenu publié est accessible ; restaurer une version en brouillon puis retirer le test.

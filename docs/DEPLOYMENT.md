@@ -9,7 +9,7 @@ Utiliser Node **24.19.0**, pnpm **11.25.0** et Docker Desktop. Depuis la racine 
 ```powershell
 pnpm install --frozen-lockfile
 pnpm cms:prepare
-docker compose up -d
+docker compose up -d --wait
 pnpm db:migrate --apply
 node scripts/media-storage-setup.mjs --local
 pnpm content:seed --dry-run
@@ -144,7 +144,9 @@ Le suivi d’exploitation doit couvrir mises à jour Node/dépendances, migratio
 
 Les parcours CMS, PDF, Tiptap, médias privés, SMTP local et sécurité Better Auth ont été exécutés avec PostgreSQL 17 et MinIO/Mailpit locaux. La sauvegarde/restauration sur ressources isolées est décrite dans `BACKUP.md`. Les rapports se trouvent dans `artifacts/custom-cms/`.
 
-Une image Linux a été construite puis exécutée avec un système de fichiers en lecture seule et l’utilisateur `node` (UID 1000). Le smoke a confirmé Node 24.19.0, la génération WebP par Sharp natif, l’accueil en mode démo explicite, la vivacité 200 et la disponibilité 503 sans configuration privée. Aucun fichier `.env` ni source applicative n’était présent dans l’image finale. Le conteneur de recette a été arrêté automatiquement. Le rapport est `artifacts/custom-cms/docker-smoke-report.json` ; refaire ce contrôle sur l’image finale avant déploiement :
+Une image Linux de recette, incluant le chargement différé de l’authentification pour la preview, a été construite puis exécutée avec un système de fichiers en lecture seule et l’utilisateur `node` (UID 1000). Le smoke a confirmé Node 24.19.0, la génération WebP par Sharp natif, l’accueil en mode démo explicite, la vivacité 200 et la disponibilité 503 sans configuration privée. Le message de démarrage a également confirmé le chargement du logger Astro JSON filtré. Aucun fichier `.env` ni source applicative n’était présent dans cette image. Le conteneur de recette a été arrêté automatiquement. Le rapport `artifacts/custom-cms/docker-smoke-report.json` contient l’identifiant exact de l’image et les empreintes vérifiées des sources clés.
+
+Ce contrôle local précède le dernier ajustement de l’écran de sécurité concernant une session trop ancienne (`SessionNotFresh`) ; il ne valide pas cette modification ultérieure. Le job CI `container` reconstruit l’image et exécute le même smoke pour la révision du run. Consulter le résultat de la CI de la révision livrée, puis refaire ce contrôle après tout nouveau build destiné à l’hébergement :
 
 ```powershell
 docker build --tag calas-cms:local-check --build-arg SITE_URL=http://localhost:4321 .

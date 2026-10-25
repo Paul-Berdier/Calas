@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-25T10:34:28.539Z",
+  "origin": "http://127.0.0.1:4336",
+  "platform": "linux",
+  "lighthouse": "13.5.0",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "formFactor": "mobile",
+  "throttlingMethod": "simulate",
+  "throttling": {
+    "rttMs": 150,
+    "throughputKbps": 1638.4,
+    "requestLatencyMs": 562.5,
+    "downloadThroughputKbps": 1474.5600000000002,
+    "uploadThroughputKbps": 675,
+    "cpuSlowdownMultiplier": 4
+  },
+  "performance": 96,
+  "accessibility": 100,
+  "bestPractices": 100,
+  "lcpMs": 2570.510772262153,
+  "cls": 0.00008236906841116219,
+  "tbtMs": 0,
+  "speedIndexMs": 1892.0923102184606
+}

@@ -23,6 +23,7 @@ Une API simulée est employée uniquement dans les tests unitaires de frontière
 | Reprise d’import, API simulée explicitement | 5 contrôles d’interface : confirmation préalable, clics multiples, réponse perdue/reprise, brouillon et responsive |
 | Authentification réelle | 9 groupes de sécurité réussis, plus connexion TOTP réelle et refus d’accès anonyme |
 | Durée des sessions | 2 contrôles réels supplémentaires : session expirée refusée, déconnexion effective côté serveur |
+| Fraîcheur des sessions | 5 scénarios supplémentaires : ancien accès toujours éditorial, liste protégée après quinze minutes, reconnexion mot de passe/TOTP, timer d’onglet et expiration pendant un appel ; axe à 390/1440 px |
 | Parcours éditorial réel | 20 étapes PDF→Tiptap→aperçu→publication→nouveau brouillon→republication→restauration ; ajout/remplacement d’image, refus de suppression utilisée et suppression d’image inutilisée |
 | Administration | 53 états contrôlés aux largeurs 360/390/768/1280/1440 ; zéro violation axe A/AA, erreur console ou débordement horizontal |
 | Aperçu public dans l’administration | 15 combinaisons : viewport interne ordinateur/tablette/mobile exact, mise à l’échelle sans rognage, zéro violation axe |
@@ -44,6 +45,7 @@ Les groupes de sécurité couvrent invitations à usage unique, email vérifié,
 - Exécution Windows : une relance des tests locaux a été bloquée par les droits de lecture du bac à sable dans esbuild ; la même commande hors de cette restriction réussit ses 44 contrôles, sans modification du code.
 - Première CI : image communautaire MinIO indisponible. Remplacement par une construction depuis source officielle verrouillée ; compilation, santé et intégration PostgreSQL/S3 réussies sur Ubuntu dans l’exécution `40183929033`.
 - Deuxième CI : axe a mesuré les statistiques pendant une transition translucide de l’iframe. La capture montre l’animation en cours ; le contraste final est 6,43:1. La recette attend maintenant la fin des révélations avant capture et audit, sans désactiver le mouvement ni exclure de règle axe.
+- Compte et sécurité : une session de plus de quinze minutes ne peut pas consulter la liste des sessions selon Better Auth. L’interface ignorait ce refus et affichait une liste vide ; elle explique désormais la reconnexion, sans modifier cette protection. Cinq scénarios vérifient les vraies réponses serveur ; seul le passage du timer d’onglet utilise une horloge de navigateur contrôlée.
 
 Ces échecs initiaux sont conservés comme constats de recette ; les scénarios concernés ont été corrigés et relancés. Les résultats du build final et la mesure Lighthouse sont consignés ci-dessous après leur exécution.
 
@@ -61,6 +63,10 @@ Les mesures locales emploient Lighthouse 13.5.0, Chromium 156, viewport mobile e
 Ces résultats ne satisfont pas la cible locale de 90 et leur variabilité est conservée, pas remplacée par le meilleur score. Certaines réponses observées par Lighthouse duraient 10–20 s, alors que les lectures PostgreSQL isolées étaient inférieures à une seconde. L’instrumentation temporaire a observé des rendus ultérieurs autour de 20–40 ms ; le poste disposait d’environ 1,2 Go de mémoire libre pendant la recette. Cela ne démontre pas à lui seul la cause de la variation. L’import privé différé et la suppression du reflow sont des corrections vérifiées, sans garantie tirée d’une mesure isolée.
 
 `scripts/performance-check.mjs` reproduit le même profil de laboratoire dans la CI Ubuntu et impose performance ≥90, accessibilité100 et CLS≤0,1. Le système d’exploitation est différent : son score doit être présenté séparément de la comparaison Windows historique. Le résumé `performance-ci-report.json` et le rapport HTML sont conservés avec les artefacts de chaque exécution. Les mesures détaillées intermédiaires sont dans `artifacts/custom-cms/performance.json`. Aucune donnée Web Vitals de terrain n’est revendiquée.
+
+Première CI intégralement verte : [exécution 40185045623, révision 45cec4ed](https://github.com/Paul-Berdier/Calas/actions/runs/40185045623). Performance mobile **96/100**, accessibilité **100/100**, bonnes pratiques **100/100**, LCP **2,57 s**, TBT **0 ms**, CLS **0,00008**. Le LCP reste légèrement au-dessus de la cible idéale de 2,5 s ; les seuils obligatoires de performance et de stabilité passent. [Rapport Lighthouse Linux](../artifacts/lighthouse-custom-cms-ci.report.html) et [données du protocole](../artifacts/custom-cms/performance-ci-report.json).
+
+Cette exécution vérifie également les deux jobs Linux complets : 44 tests CMS locaux, 15 de domaine, 38 d’intégration, 38 parcours publics, les recettes PDF/OCR et authentifiées, 53 états d’administration, 48 contrôles du logo et 26 des animations éditoriales. Aucun défaut axe ni erreur console après attente correcte des transitions. Le conteneur passe ses cinq groupes de contrôle.
 
 ## Captures et rapports
 

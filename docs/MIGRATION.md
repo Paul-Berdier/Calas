@@ -16,8 +16,8 @@ Base vérifiée : `ece27bda5bcb53219d03c1e44a15e8bc7bc39d9c`, dépôt propre, br
 | D | Better Auth, rôles, MFA, invitations et sessions | Vérifié en services réels : 9 groupes sécurité, connexion TOTP, expiration et déconnexion |
 | E | Administration, édition structurée, aperçu et historique | Vérifié : 53 états responsive et 15 aperçus, zéro défaut axe/console/débordement |
 | F | Tiptap, médias S3 privés, PDF/OCR | Vérifié : 20 étapes réelles, 6 cas OCR, médiathèque privée, remplacement et suppression protégée |
-| G | Étude des trois enroulements, comparaison et mouvement final | 48 contrôles navigateur et 1 515 états géométriques réussis ; optimisation du coût initial après mesure Lighthouse en cours |
-| H | Nettoyage, CI, sauvegarde/restauration, recette et PR | Sauvegarde chiffrée PG+S3 et restauration isolée vérifiées : 6 contrôles réussis ; Sanity retiré, conteneur Linux vérifié, CI préparée ; mesure finale et PR en cours |
+| G | Étude des trois enroulements, comparaison et mouvement final | 48 contrôles logo, 26 contrôles éditoriaux et 1 515 états géométriques réussis ; initialisation différée et coût géométrique réduit, contours finaux exacts |
+| H | Nettoyage, CI, sauvegarde/restauration, recette et PR | Sauvegarde chiffrée PG+S3 et restauration isolée vérifiées ; Sanity retiré, conteneur Linux vérifié ; PR1 ouverte, dernières validations de performance et de session en cours |
 
 ## Conservation et correspondance
 
@@ -41,6 +41,8 @@ Concurrence des sauvegardes : version attendue et transaction. Fuite de brouillo
 - Phase H, sauvegarde : six contrôles réussis, dont dump PostgreSQL et restauration sur deux bases et deux buckets S3 locaux isolés, avec historique, comptes, brouillon plus récent et octets PDF conservés. Archive AES-256-GCM, inventaire SHA-256 et contrôles avant écriture. Aucune restauration distante revendiquée. Procédure et limites dans `docs/BACKUP.md`.
 
 - Phases C–F : tests de données, de services et de navigateurs réellement exécutés. Correction du routage Better Auth, de l’état Tiptap après publication, du cadrage d’image et de l’aperçu mobile. Les anciennes suites CMS ont été remplacées, pas supprimées sans équivalent.
-- Phase G : trois variantes comparées ; B retenue, enroulement extérieur vers noyau en 2,2 s, tracé final exact. Firefox a révélé un flash initial, corrigé puis contrôlé dans les deux moteurs. Première mesure mobile 78/100, accessibilité 100, CLS0 ; le coût d’initialisation des animations est en cours de réduction, cette mesure n’est pas masquée.
+- Phase G : trois variantes comparées ; B retenue, enroulement extérieur vers noyau en 2,2 s, tracé final exact. Firefox a révélé un flash initial, corrigé puis contrôlé dans les deux moteurs. Initialisation différée, ScrollTrigger absent du premier écran d’accueil, reflow supprimé et calcul géométrique réduit d’environ80% dans le microbenchmark. Les mesures Windows78/80/85/46 sont toutes conservées ; un contrôle Lighthouse mobile ≥90 est désormais exécuté sur Ubuntu en CI, séparément de cette série locale variable.
 - Exploitation : journalisation filtrée pour retirer secrets et URLs de récupération ; tests dédiés réussis. Contact SQL vérifié sur plusieurs processus et avec un pool limité à une connexion.
 - Commits logiques : données et sauvegardes `8223de3`, administration et sécurité `31625cd`, médias/PDF `24b8c8c`, raccordement Astro/retrait Sanity `71dcb69`, logo `183f3ce`.
+- CI : l’image MinIO historique n’était plus récupérable ; une construction depuis source officielle vérifiée remplace cette dépendance de recette. Sur Ubuntu, migrations, S3, sauvegarde/restauration,44 tests CMS locaux,15 de domaine,38 d’intégration,38 publics, OCR, authentification et parcours PDF réussissent. Le dernier défaut de contraste concernait un instant de transition dans l’iframe ; l’audit attend maintenant la stabilité sans désactiver l’animation.
+- Pull request de migration : https://github.com/Paul-Berdier/Calas/pull/1, branche `codex/custom-cms-migration`, sans fusion ni déploiement.

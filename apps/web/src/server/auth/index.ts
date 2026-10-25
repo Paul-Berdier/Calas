@@ -5,6 +5,7 @@ import {getDb,type DatabaseExecutor} from '../db';
 import * as schema from '../db/auth-schema';
 import {sendAuthMail} from './mail';
 import {eq} from 'drizzle-orm';
+import {SESSION_FRESH_AGE_SECONDS} from '../../auth/policy';
 
 export function createAuth(database:DatabaseExecutor=getDb(),allowRegistration=false){
   const secret=process.env.BETTER_AUTH_SECRET||'';
@@ -18,7 +19,7 @@ export function createAuth(database:DatabaseExecutor=getDb(),allowRegistration=f
     emailVerification:{sendOnSignUp:true,sendOnSignIn:false,autoSignInAfterVerification:false,expiresIn:3600,
       sendVerificationEmail:async({user,url})=>sendAuthMail(user.email,'Vérifier votre adresse — Calas Conseil',`Confirmez votre adresse en ouvrant ce lien personnel valable une heure :\n${url}`)},
     user:{additionalFields:{role:{type:'string',defaultValue:'editor',input:false},disabled:{type:'boolean',defaultValue:false,input:false}}},
-    session:{expiresIn:8*60*60,updateAge:15*60,freshAge:15*60,cookieCache:{enabled:false},additionalFields:{mfaVerified:{type:'boolean',defaultValue:false,input:false}}},
+    session:{expiresIn:8*60*60,updateAge:15*60,freshAge:SESSION_FRESH_AGE_SECONDS,cookieCache:{enabled:false},additionalFields:{mfaVerified:{type:'boolean',defaultValue:false,input:false}}},
     databaseHooks:{session:{create:{before:async session=>{
       const [person]=await database.select().from(schema.user).where(eq(schema.user.id,session.userId));
       if(!person||person.disabled)return false;

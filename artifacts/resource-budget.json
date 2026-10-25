@@ -1,16 +1,11 @@
 {
-  "javascriptGzipBytes": 49059,
-  "totalDecodedBytes": 283257,
+  "javascriptGzipBytes": 47995,
+  "totalDecodedBytes": 281075,
   "resources": [
     {
       "url": "http://127.0.0.1:4322/",
-      "bytes": 34303,
+      "bytes": 34847,
       "type": "document"
-    },
-    {
-      "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-400-normal.B-1hWBU7.woff2",
-      "bytes": 22876,
-      "type": "font"
     },
     {
       "url": "http://127.0.0.1:4322/_astro/Layout.Do4Swzpv.css",
@@ -23,8 +18,13 @@
       "type": "stylesheet"
     },
     {
-      "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-400-italic.Dc_OZ8oc.woff2",
-      "bytes": 23660,
+      "url": "http://127.0.0.1:4322/_astro/Layout.astro_astro_type_script_index_0_lang.Xt_yDzK7.js",
+      "bytes": 123117,
+      "type": "script"
+    },
+    {
+      "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-400-normal.B-1hWBU7.woff2",
+      "bytes": 22876,
       "type": "font"
     },
     {
@@ -33,9 +33,9 @@
       "type": "font"
     },
     {
-      "url": "http://127.0.0.1:4322/_astro/Layout.astro_astro_type_script_index_0_lang.B7-JhxTn.js",
-      "bytes": 125843,
-      "type": "script"
+      "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-400-italic.Dc_OZ8oc.woff2",
+      "bytes": 23660,
+      "type": "font"
     },
     {
       "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-500-normal.BsRWmXhO.woff2",
