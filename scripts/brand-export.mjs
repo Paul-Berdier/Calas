@@ -3,7 +3,7 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 import {shellMarkup,viewBox} from '../assets/brand/geometry.mjs';
-import {unfurlSvg} from '../assets/brand/unfurl.mjs';
+import {coilSvg,coilDuration} from '../assets/brand/coil.mjs';
 import sharp from 'sharp';
 import opentype from 'opentype.js';
 
@@ -56,8 +56,8 @@ for(const[name,content]of Object.entries(assets)){
 // Editable typography source; production exports above carry vector outlines.
 const editable=svg(660,180,symbol(0,0,170,180,'editable')+'<text x="184" y="99" font-family="Cormorant Garamond" font-weight="500" font-size="72" fill="#14213A">Calas <tspan fill="#94672F">Conseil</tspan></text><text x="188" y="136" font-family="EB Garamond" font-size="24" fill="#14213A">La voie de la qualité relationnelle.</text>');
 await writeFile(resolve(source,'logo-editable.svg'),editable);
-for(const[stage,time]of [['start',.2],['middle',1.15],['end',2.34]]){
- const content=unfurlSvg(time,{background:'none'});
+for(const[stage,time]of [['start',.12],['middle',1.1],['end',coilDuration]]){
+ const content=coilSvg(time,{background:'none'});
  await writeFile(resolve(source,`motion-${stage}.svg`),content);
  await sharp(Buffer.from(content)).png().toFile(resolve(source,`motion-${stage}.png`));
 }

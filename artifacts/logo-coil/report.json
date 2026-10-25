@@ -1,0 +1,59 @@
+{
+  "at": "2026-10-25T09:36:07.369Z",
+  "runs": [
+    {
+      "base": "http://127.0.0.1:4336",
+      "at": "2026-10-25T09:34:07.161Z",
+      "reports": [
+        {
+          "browser": "chromium",
+          "width": 1440,
+          "base": "http://127.0.0.1:4336",
+          "duration": 2.2,
+          "checks": 12,
+          "frames": 66,
+          "result": "passed",
+          "errors": []
+        },
+        {
+          "browser": "chromium",
+          "width": 390,
+          "base": "http://127.0.0.1:4336",
+          "duration": 2.2,
+          "checks": 12,
+          "frames": 123,
+          "result": "passed",
+          "errors": []
+        }
+      ],
+      "browser": "chromium"
+    },
+    {
+      "base": "http://127.0.0.1:4336",
+      "at": "2026-10-25T09:36:06.360Z",
+      "reports": [
+        {
+          "browser": "firefox",
+          "width": 1440,
+          "base": "http://127.0.0.1:4336",
+          "duration": 2.2,
+          "checks": 12,
+          "frames": 18,
+          "result": "passed",
+          "errors": []
+        },
+        {
+          "browser": "firefox",
+          "width": 390,
+          "base": "http://127.0.0.1:4336",
+          "duration": 2.2,
+          "checks": 12,
+          "frames": 56,
+          "result": "passed",
+          "errors": []
+        }
+      ],
+      "browser": "firefox"
+    }
+  ]
+}

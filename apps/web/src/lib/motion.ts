@@ -1,6 +1,6 @@
 import {gsap} from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
-import {ribbonGuides,ribbonFrame} from '../../../../assets/brand/unfurl.mjs';
+import {coilState,coilDuration} from '../../../../assets/brand/coil.mjs';
 
 gsap.registerPlugin(ScrollTrigger);
 const activeRoots=new WeakSet<ParentNode>();
@@ -23,11 +23,11 @@ export function initMotion(root:ParentNode=document):()=>void {
  };
 }
 
-/** Each ribbon grows along its own curved spine. The wrapper never moves. */
+/** Outside-in coiling deforms each ribbon around a stationary nucleus.
+ * All transforms belong to the contours; the wrapper and lettering stay fixed. */
 function initSignatureMotion(root:ParentNode):()=>void {
  const shells=Array.from(root.querySelectorAll<SVGSVGElement>('[data-shell-animate]'));
  const cleanups:Array<()=>void>=[];
- const svgNS='http://www.w3.org/2000/svg';
  for(const shell of shells){
   if(shell.dataset.motionReady==='true')continue;
   shell.dataset.motionReady='true';
@@ -35,14 +35,13 @@ function initSignatureMotion(root:ParentNode):()=>void {
   const final=paths.map(path=>path.getAttribute('d')??'');
   let played=false;
   let timeline:gsap.core.Timeline|undefined;
-  let masks:SVGDefsElement|undefined;
   const restore=()=>{
    paths.forEach((path,index)=>{
     path.setAttribute('d',final[index]??'');
     path.removeAttribute('mask');
     path.style.removeProperty('visibility');
+    path.style.removeProperty('opacity');
    });
-   masks?.remove();masks=undefined;
    shell.style.removeProperty('visibility');
    shell.removeAttribute('data-shell-pending');
    shell.dataset.motionProgress='1';
@@ -54,44 +53,12 @@ function initSignatureMotion(root:ParentNode):()=>void {
    }
    let observer:IntersectionObserver|undefined;
    try {
-    masks=document.createElementNS(svgNS,'defs');
-    masks.setAttribute('data-unfurl-masks','');
-    shell.prepend(masks);
-    const idPrefix=`unfurl-${crypto.randomUUID()}`;
-    const renderers=ribbonGuides.map(guide=>{
-     const path=paths[guide.index];
-     if(!path)throw new Error('Missing shell ribbon');
-     const mask=document.createElementNS(svgNS,'mask');
-     const maskPath=document.createElementNS(svgNS,'path');
-     mask.id=`${idPrefix}-${guide.index}`;
-     mask.setAttribute('maskUnits','userSpaceOnUse');
-     mask.setAttribute('x','-80');mask.setAttribute('y','-80');
-     mask.setAttribute('width','760');mask.setAttribute('height','760');
-     maskPath.setAttribute('fill','none');maskPath.setAttribute('stroke','white');
-     maskPath.setAttribute('stroke-linecap','butt');
-     maskPath.setAttribute('stroke-linejoin','round');
-     maskPath.setAttribute('pathLength','1');
-     maskPath.setAttribute('stroke-dasharray','1 1');
-     maskPath.setAttribute('data-ribbon-front',String(guide.index));
-     mask.append(maskPath);masks!.append(mask);
-     const draw=(progress:number)=>{
-      if(progress>=1){
-       path.setAttribute('d',final[guide.index]??'');
-       path.removeAttribute('mask');
-       path.style.removeProperty('visibility');
-       return;
-      }
-      const frame=ribbonFrame(guide.index,progress);
-      path.setAttribute('d',frame.contour);
-      path.setAttribute('mask',`url(#${mask.id})`);
-      path.style.visibility=progress>0?'visible':'hidden';
-      maskPath.setAttribute('d',frame.guide);
-      maskPath.setAttribute('stroke-width',String(frame.width));
-      maskPath.setAttribute('stroke-dashoffset',String(1-progress));
-     };
-     draw(0);
-     return {guide,draw};
+    const draw=(time:number)=>paths.forEach((path,index)=>{
+     const frame=coilState(index,time);
+     path.setAttribute('d',frame.contour);
+     path.style.opacity=String(frame.opacity);
     });
+    draw(0);
     shell.dataset.motionProgress='0';
     shell.removeAttribute('data-shell-pending');
     shell.style.removeProperty('visibility');
@@ -101,12 +68,10 @@ function initSignatureMotion(root:ParentNode):()=>void {
      timeline=gsap.timeline({onUpdate:()=>{
       shell.dataset.motionProgress=String(timeline?.progress()??0);
      },onComplete:()=>{restore();shell.dataset.motionComplete='true';}});
-     renderers.forEach(({guide,draw})=>{
-      const state={progress:0};
-      timeline!.to(state,{progress:1,duration:guide.duration,ease:'none',onUpdate:()=>{
-       try{draw(state.progress);}catch{timeline?.kill();restore();}
-      }},guide.start);
-     });
+     const state={time:0};
+     timeline.to(state,{time:coilDuration,duration:coilDuration,ease:'none',onUpdate:()=>{
+      try{draw(state.time);}catch{timeline?.kill();restore();}
+     }},0);
     },{threshold:.15});
     observer.observe(shell);
    } catch {played=true;restore();}
