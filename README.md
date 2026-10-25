@@ -37,6 +37,8 @@ Le mode `CONTENT_MODE=demo` reste disponible pour une revue du frontend sans ser
 
 Suivre [la procédure CMS](docs/CMS.md). La commande `pnpm auth:bootstrap` lit `INIT_ADMIN_EMAIL`, `INIT_ADMIN_NAME` et `INIT_ADMIN_PASSWORD` dans l’environnement privé du processus, refuse si un compte existe déjà, puis exige vérification de l’adresse et activation TOTP. Aucun mot de passe par défaut et aucune inscription publique.
 
+Pour son compte de **recette Railway uniquement**, Paul a ensuite demandé une connexion avec identifiant et mot de passe, sans TOTP. Cette exception ciblée est activée seulement en `staging`, pour un compte réservé explicitement désigné par l’opérateur. Les autres comptes et la production gardent la MFA. Voir [les limites de cet accès](docs/DEPLOYMENT.md#accès-de-recette-et-limites).
+
 Les courriels de développement arrivent dans [Mailpit local](http://localhost:18025/). Les autres collaborateurs sont invités depuis l’administration. Le [guide de Sara illustré](docs/GUIDE-SARA.md) présente la connexion, les pages, les images, l’import PDF, les brouillons, la publication et l’historique.
 
 ## Commandes principales
