@@ -1,0 +1,24 @@
+{
+  "label": "Recette locale, accès Sanity simulés",
+  "browser": "Chromium",
+  "externalRequests": 0,
+  "browserErrors": [],
+  "reports": [
+    {
+      "check": "Real text PDF analysis, no upload or document before Create",
+      "result": "passed"
+    },
+    {
+      "check": "Double click guarded; new draft with source PDF, reviewed=false, no invented author/date",
+      "result": "passed"
+    },
+    {
+      "check": "Lost creation response retried with same payload/UUID; one upload, one document",
+      "result": "passed"
+    },
+    {
+      "check": "Open draft invokes the article editing intent",
+      "result": "passed"
+    }
+  ]
+}

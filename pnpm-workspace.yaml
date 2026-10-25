@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+allowBuilds:
+  esbuild: true
+  sharp: true
+  '@swc/core': true
+  tesseract.js: false
+overrides:
+  '@opentelemetry/api': 1.9.0

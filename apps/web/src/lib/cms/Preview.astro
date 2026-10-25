@@ -1,0 +1,14 @@
+---
+import { getPreviewPerspective } from './preview';
+interface Props { enabled: boolean }
+const { enabled } = Astro.props;
+const published = getPreviewPerspective(Astro.cookies) === 'published';
+---
+{enabled && <>
+  <link rel="stylesheet" href="/_preview/editor.css" />
+  <aside class="private-preview" data-calas-preview aria-label="Prévisualisation privée">
+    <span data-preview-status>{published ? 'Contenu publié — prévisualisation privée' : 'Brouillon — prévisualisation privée'}</span>
+    <a href="/api/preview/disable/">Quitter la prévisualisation</a>
+  </aside>
+  <script is:inline type="module" src="/_preview/editor.js"></script>
+</>}

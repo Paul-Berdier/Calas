@@ -1,0 +1,24 @@
+---
+import {imageUrl} from '../lib/cms/images';
+import type {ContentImage} from '../lib/cms/types';
+interface Props {
+  image:ContentImage;
+  width:number;
+  height?:number;
+  class?:string;
+  sizes?:string;
+  loading?:'lazy'|'eager';
+}
+const {image,width,height,class:className,sizes='(max-width: 760px) 100vw, 80vw',loading='lazy'}=Astro.props;
+const src=imageUrl(image,width,height);
+const dimensions=image.asset?.metadata?.dimensions;
+const croppedWidth=dimensions?dimensions.width*(1-(image.crop?.left??0)-(image.crop?.right??0)):undefined;
+const croppedHeight=dimensions?dimensions.height*(1-(image.crop?.top??0)-(image.crop?.bottom??0)):undefined;
+const displayHeight=height??(croppedWidth&&croppedHeight?Math.round(width*croppedHeight/croppedWidth):undefined);
+const widths=[...new Set([Math.min(480,width),Math.min(800,width),width])];
+const srcset=widths.map(candidate=>{
+  const url=imageUrl(image,candidate,height?Math.round(candidate*height/width):undefined);
+  return url?`${url} ${candidate}w`:undefined;
+}).filter(Boolean).join(', ');
+---
+{src&&<img class={className} src={src} srcset={srcset||undefined} sizes={sizes} alt={image.alt} width={width} height={displayHeight} loading={loading} decoding="async"/>}

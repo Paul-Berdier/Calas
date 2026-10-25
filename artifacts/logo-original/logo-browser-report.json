@@ -1,0 +1,35 @@
+{
+  "base": "http://127.0.0.1:4321",
+  "date": "2026-10-25T05:08:16.775Z",
+  "viewport": "1440 × 1000",
+  "reports": [
+    {
+      "browser": "chromium",
+      "tests": [
+        "deformation effective",
+        "progression",
+        "pose finale exacte",
+        "mouvement réduit au chargement",
+        "changement de préférence pendant la timeline",
+        "absence de rejeu",
+        "fallback sans JavaScript"
+      ],
+      "pageErrors": [],
+      "result": "passed"
+    },
+    {
+      "browser": "firefox",
+      "tests": [
+        "deformation effective",
+        "progression",
+        "pose finale exacte",
+        "mouvement réduit au chargement",
+        "changement de préférence pendant la timeline",
+        "absence de rejeu",
+        "fallback sans JavaScript"
+      ],
+      "pageErrors": [],
+      "result": "passed"
+    }
+  ]
+}

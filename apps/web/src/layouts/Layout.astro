@@ -1,0 +1,88 @@
+---
+import '../styles/global.css';
+import '../styles/motion.css';
+import bodyFont from '@fontsource/eb-garamond/files/eb-garamond-latin-400-normal.woff2?url';
+import titleFont from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-400-normal.woff2?url';
+import italicFont from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-400-italic.woff2?url';
+import Brand from '../components/Brand.astro';
+import {isPreview} from '../lib/cms/preview';
+import {env,isProductionSite} from '../lib/environment';
+import {safeHref} from '../lib/links';
+import type {SiteSettings} from '../lib/cms/types';
+interface Props { title: string; description?: string; settings: SiteSettings; noindex?: boolean }
+const {title,description='Calas Conseil : prévention des risques psychosociaux, qualité du lien, accompagnement des équipes et des managers.',settings,noindex=false}=Astro.props;
+const preview=isPreview(Astro.cookies);
+const Preview=preview?(await import('../lib/cms/Preview.astro')).default:undefined;
+const production=isProductionSite();
+const hidden=noindex || !production || preview;
+const origin=env('SITE_URL','http://localhost:4321');
+const canonical=new URL(Astro.url.pathname,origin).href;
+const nav=[['Diagnostic RPS','/diagnostic-rps/'],['Équipes','/equipes/'],['Managers','/managers/'],['Notre approche','/notre-approche/'],['Qui sommes-nous','/qui-sommes-nous/'],['Réflexions','/reflexions/'],['Contact','/contact/']];
+const phoneHref=`tel:${settings.phone.replace(/\s/g,'').replace(/^0/,'+33')}`;
+const organization={
+  '@context':'https://schema.org','@type':'Organization',name:settings.brand,
+  slogan:settings.tagline,email:settings.email,telephone:settings.phone,
+  ...(production?{url:origin}:{}),
+  ...(settings.linkedin&&safeHref(settings.linkedin)?{sameAs:[settings.linkedin]}:{})
+};
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="preload" href={titleFont} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={bodyFont} as="font" type="font/woff2" crossorigin />
+    {Astro.url.pathname==='/'&&<link rel="preload" href={italicFont} as="font" type="font/woff2" crossorigin />}
+    <meta name="theme-color" content="#F7F2EA" /><title>{title}</title>
+    <meta name="description" content={description} /><meta name="robots" content={hidden?'noindex, nofollow':'index, follow'} />
+    {production && <link rel="canonical" href={canonical} />}
+    <meta property="og:title" content={title} /><meta property="og:description" content={description} /><meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" /><meta property="og:site_name" content={settings.brand} />
+    <meta property="og:image" content={new URL('/brand/open-graph.png',origin).href} />
+    {production && <meta property="og:url" content={canonical} />}
+    <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg" />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organization).replace(/</g,'\\u003c')}/>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    {!production && <div class="environment-note">Version de travail · Relecture avant publication{env('MAIL_TRANSPORT','simulation')==='simulation'?' · Formulaire de test, aucun courriel envoyé':''}</div>}
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand-link" href="/" aria-label="Calas Conseil — Accueil"><Brand /></a>
+        <nav class="desktop-nav" aria-label="Navigation principale">
+          {nav.map(([label,href],i)=><a href={href} class:list={{priority:i===0,'nav-contact':i===6}} aria-current={Astro.url.pathname===href?'page':undefined}>{label}</a>)}
+        </nav>
+        <details class="mobile-nav" id="mobile-menu">
+          <summary aria-controls="mobile-panel">Menu</summary>
+          <nav class="mobile-panel" id="mobile-panel" aria-label="Navigation mobile">{nav.map(([label,href])=><a href={href} aria-current={Astro.url.pathname===href?'page':undefined}>{label}<span aria-hidden="true" style="float:right">↗</span></a>)}</nav>
+        </details>
+      </div>
+      <span class="reading-progress" aria-hidden="true"></span>
+    </header>
+    <main id="contenu" tabindex="-1"><slot /></main>
+    <footer class="site-footer dark">
+      <div class="wrap">
+        <div class="footer-kicker"><p>{settings.tagline}</p><a href="/contact/" aria-label="Échanger avec Calas Conseil">↗</a></div>
+        <div class="footer-top">
+          <div><div class="footer-brand"><Brand dark withTagline /></div><p class="footer-description">{settings.footerText}</p></div>
+          <div><p class="footer-label">Faire le premier pas</p><div class="footer-links"><a href={phoneHref}>{settings.phone}</a><a href={`mailto:${settings.email}`} style="overflow-wrap:anywhere">{settings.email}</a><a href="/contact/">Échanger sur votre situation ↗</a>{settings.linkedin&&<a href={safeHref(settings.linkedin)} rel="noopener noreferrer">LinkedIn ↗</a>}</div></div>
+          <div><p class="footer-label">Nos accompagnements</p><nav class="footer-links" aria-label="Pied de page">{nav.slice(0,3).map(([label,href])=><a href={href}>{label}</a>)}<a href="/notre-approche/">Notre approche</a></nav></div>
+        </div>
+        <div class="footer-bottom"><span>© {new Date().getFullYear()} Calas Conseil</span><nav aria-label="Informations légales"><a href="/mentions-legales/">Mentions légales</a><a href="/confidentialite/">Confidentialité</a></nav><span>La voie de la qualité relationnelle.</span></div>
+      </div>
+    </footer>
+    {Preview&&<Preview enabled={true} />}
+    <script>
+      import {initMotion} from '../lib/motion';
+      const disposeMotion=initMotion();
+      const menu=document.querySelector<HTMLDetailsElement>('#mobile-menu');
+      const summary=menu?.querySelector('summary');
+      if(menu&&summary){
+        const update=()=>summary.setAttribute('aria-expanded',String(menu.open));update();menu.addEventListener('toggle',update);
+        document.addEventListener('keydown',(event)=>{if(event.key==='Escape'&&menu.open){menu.open=false;summary.focus();}});
+        document.addEventListener('click',(event)=>{if(menu.open&&!menu.contains(event.target as Node))menu.open=false;});
+      }
+      window.addEventListener('pagehide',disposeMotion,{once:true});
+    </script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+---
+import Layout from '../layouts/Layout.astro';
+import {getSiteContent} from '../lib/cms/client';
+const {settings}=await getSiteContent(Astro);Astro.response.status=404;
+---
+<Layout settings={settings} title="Page introuvable | Calas Conseil" noindex><section class="error-page wrap"><p class="error-code" aria-hidden="true">404</p><p class="eyebrow">Retrouver le fil</p><h1>Cette page n’est plus ici.</h1><p>Revenons à l’essentiel : comprendre votre situation et trouver le bon point de départ.</p><div class="actions"><a href="/" class="button">Retour à l’accueil <span aria-hidden="true">↗</span></a><a href="/contact/" class="text-link">Nous contacter</a></div></section></Layout>

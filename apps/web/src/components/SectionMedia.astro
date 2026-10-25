@@ -1,0 +1,8 @@
+---
+import CmsImage from './CmsImage.astro';
+import type {ContentImage} from '../lib/cms/types';
+interface Props {image?:ContentImage}
+const {image}=Astro.props;
+---
+{image&&<figure class="wrap section-media"><CmsImage image={image} width={1280} sizes="(max-width: 760px) 100vw, 90vw"/></figure>}
+<style>.section-media{margin-top:40px}.section-media :global(img){display:block;width:100%;height:auto}</style>

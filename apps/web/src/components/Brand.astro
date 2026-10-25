@@ -1,0 +1,31 @@
+---
+import Shell from './Shell.astro';
+interface Props {
+ variant?: 'horizontal'|'stacked';
+ dark?: boolean;
+ class?: string;
+ withTagline?: boolean;
+}
+const {variant='horizontal',dark=false,class:className='',withTagline=false}=Astro.props;
+---
+<span class:list={['calas-brand',`calas-brand--${variant}`,{'calas-brand--dark':dark},className]} role="img" aria-label={withTagline?'Calas Conseil — La voie de la qualité relationnelle.':'Calas Conseil'}>
+ <span class="calas-brand__symbol"><Shell/></span>
+ <span class="calas-brand__lettering" aria-hidden="true">
+  <span class="calas-brand__name">Calas <span>Conseil</span></span>
+  {withTagline && <span class="calas-brand__tagline">La voie de la qualité relationnelle.</span>}
+ </span>
+</span>
+<style>
+ .calas-brand{display:inline-flex;align-items:center;gap:.55rem;color:var(--ink,#14213A);vertical-align:middle}
+ .calas-brand__symbol{display:block;flex:0 0 auto;width:3.2rem}
+ .calas-brand__lettering{display:flex;flex-direction:column;gap:.22rem}
+ .calas-brand__name{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.95rem;line-height:1;font-weight:500;letter-spacing:-.035em;white-space:nowrap}
+ .calas-brand__name>span{color:var(--bronze-text,#805724)}
+ .calas-brand__tagline{font-family:'EB Garamond',Georgia,serif;font-size:.8rem;line-height:1.3;white-space:nowrap;letter-spacing:.012em}
+ .calas-brand--stacked{flex-direction:column;gap:.8rem;text-align:center}
+ .calas-brand--stacked .calas-brand__symbol{width:7.5rem}
+ .calas-brand--stacked .calas-brand__name{font-size:2.8rem}
+ .calas-brand--dark{color:#F7F2EA}
+ .calas-brand--dark .calas-brand__name>span{color:#D5B37E}
+ @media(max-width:390px){.calas-brand__symbol{width:2.5rem}.calas-brand__name{font-size:1.75rem}}
+</style>

@@ -1,0 +1,42 @@
+{
+  "name": "calas-conseil",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=24.16.0 <25"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @calas/web dev",
+    "dev:studio": "pnpm --filter @calas/studio dev",
+    "build": "pnpm --filter @calas/web build",
+    "build:studio": "pnpm --filter @calas/studio build",
+    "preview": "pnpm --filter @calas/web preview",
+    "start": "pnpm --filter @calas/web start",
+    "typecheck": "pnpm --filter @calas/web typecheck && pnpm --filter @calas/studio typecheck",
+    "lint": "eslint apps/web/src apps/studio --no-warn-ignored",
+    "test": "playwright test",
+    "test:unit": "playwright test tests/cms.spec.ts tests/contact-unit.spec.ts --project=chromium",
+    "test:cms-local": "node --test scripts/cms-config.test.mjs tests/*.test.mjs tests/*.unit.mjs",
+    "test:visual": "playwright test tests/visual.spec.ts",
+    "cms:prepare": "node scripts/cms-setup.mjs prepare",
+    "cms:check": "node scripts/cms-setup.mjs check",
+    "content:seed": "node scripts/content-seed.mjs",
+    "content:export": "node scripts/content-export.mjs",
+    "content:import": "node scripts/content-import.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@axe-core/playwright": "4.14.0",
+    "@types/node": "26.6.5",
+    "typescript": "6.0.3",
+    "sharp": "0.35.5",
+    "opentype.js": "2.0.0",
+    "eslint": "10.13.0",
+    "@eslint/js": "10.0.1",
+    "typescript-eslint": "8.72.0",
+    "eslint-plugin-astro": "3.2.1",
+    "lighthouse": "13.5.0",
+    "esbuild": "0.28.2"
+  }
+}

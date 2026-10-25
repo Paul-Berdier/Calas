@@ -1,0 +1,158 @@
+[
+  {
+    "browser": "chromium",
+    "width": 1440,
+    "checks": [
+      "small initial strand",
+      "progressive visible surface",
+      "stable wrapper",
+      "exact final logo",
+      "no first-paint flash",
+      "reduced-motion final state",
+      "clean runtime"
+    ],
+    "frames": [
+      {
+        "progress": 0.16282051282051282,
+        "area": 6854
+      },
+      {
+        "progress": 0.3128205128205128,
+        "area": 19176
+      },
+      {
+        "progress": 0.5256410256410257,
+        "area": 41389
+      },
+      {
+        "progress": 0.7115384615384616,
+        "area": 64332
+      },
+      {
+        "progress": 0.9243589743589743,
+        "area": 88933
+      },
+      {
+        "progress": 1,
+        "area": 94268
+      }
+    ]
+  },
+  {
+    "browser": "chromium",
+    "width": 390,
+    "checks": [
+      "small initial strand",
+      "progressive visible surface",
+      "stable wrapper",
+      "exact final logo",
+      "no first-paint flash",
+      "reduced-motion final state",
+      "clean runtime"
+    ],
+    "frames": [
+      {
+        "progress": 0.08803418803418804,
+        "area": 1053
+      },
+      {
+        "progress": 0.2594017094017094,
+        "area": 3872
+      },
+      {
+        "progress": 0.458974358974359,
+        "area": 9254
+      },
+      {
+        "progress": 0.6576923076923077,
+        "area": 14876
+      },
+      {
+        "progress": 0.8645299145299147,
+        "area": 21187
+      },
+      {
+        "progress": 1,
+        "area": 23200
+      }
+    ]
+  },
+  {
+    "browser": "firefox",
+    "width": 1440,
+    "checks": [
+      "small initial strand",
+      "progressive visible surface",
+      "stable wrapper",
+      "exact final logo",
+      "no first-paint flash",
+      "reduced-motion final state",
+      "clean runtime"
+    ],
+    "frames": [
+      {
+        "progress": 0.21495726495726497,
+        "area": 8984
+      },
+      {
+        "progress": 0.3700854700854701,
+        "area": 27635
+      },
+      {
+        "progress": 0.6192307692307693,
+        "area": 53367
+      },
+      {
+        "progress": 0.6833333333333333,
+        "area": 63753
+      },
+      {
+        "progress": 0.8615384615384616,
+        "area": 85603
+      },
+      {
+        "progress": 1,
+        "area": 94202
+      }
+    ]
+  },
+  {
+    "browser": "firefox",
+    "width": 390,
+    "checks": [
+      "small initial strand",
+      "progressive visible surface",
+      "stable wrapper",
+      "exact final logo",
+      "no first-paint flash",
+      "reduced-motion final state",
+      "clean runtime"
+    ],
+    "frames": [
+      {
+        "progress": 0.07905982905982907,
+        "area": 955
+      },
+      {
+        "progress": 0.2423076923076923,
+        "area": 3203
+      },
+      {
+        "progress": 0.43504273504273505,
+        "area": 8720
+      },
+      {
+        "progress": 0.6555555555555556,
+        "area": 14780
+      },
+      {
+        "progress": 0.8547008547008548,
+        "area": 21088
+      },
+      {
+        "progress": 1,
+        "area": 23178
+      }
+    ]
+  }
+]

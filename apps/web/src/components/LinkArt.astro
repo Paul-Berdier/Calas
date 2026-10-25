@@ -1,0 +1,74 @@
+---
+/** Editorial artwork: distinct working realities meet in a shared direction.
+ * Decorative only. It carries no claim, data, required label, or brand mark. */
+interface Props {
+ variant?: 'converge' | 'orbit';
+ tone?: 'light' | 'dark';
+ class?: string;
+ label?: string;
+}
+const {variant='converge',tone='light',class:className='',label}=Astro.props;
+const trajectories=variant==='converge' ? [
+ 'M 38 76 C 148 30 156 182 284 182',
+ 'M 28 182 C 112 182 180 182 284 182',
+ 'M 38 288 C 148 334 156 182 284 182',
+ 'M 284 182 C 334 182 366 182 414 182',
+] : [
+ 'M 42 232 C 30 128 114 52 212 84 C 300 112 282 252 370 274',
+ 'M 66 286 C 124 336 224 302 234 212 C 244 126 296 58 390 94',
+ 'M 32 182 C 110 182 148 182 234 182 C 294 182 350 182 420 182',
+];
+const focus=variant==='converge' ? {x:284,y:182} : {x:234,y:182};
+---
+<figure class:list={['link-art',`link-art--${tone}`,`link-art--${variant}`,className]} data-link-art>
+ <svg class="link-art__canvas" viewBox="0 0 448 364" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-parallax="12">
+  <g class="link-art__field">
+   <circle cx={focus.x} cy={focus.y} r="126" />
+   <path d={`M ${focus.x-126} ${focus.y} H ${focus.x+126}`} />
+   <path d={`M ${focus.x} ${focus.y-126} V ${focus.y+126}`} />
+  </g>
+  <circle class="link-art__halo" cx={focus.x} cy={focus.y} r="66" data-art-halo />
+  <g class="link-art__tracks">
+   {trajectories.map(d=><path d={d} />)}
+  </g>
+  <g class="link-art__threads">
+   {trajectories.map((d,i)=><path d={d} data-line data-line-delay={i===3?'.4':String(i*.1)} />)}
+  </g>
+  {variant==='converge' ? <g class="link-art__origins">
+   <circle cx="38" cy="76" r="4.5" data-art-node />
+   <circle cx="28" cy="182" r="4.5" data-art-node />
+   <circle cx="38" cy="288" r="4.5" data-art-node />
+  </g> : <g class="link-art__origins">
+   <circle cx="42" cy="232" r="4.5" data-art-node />
+   <circle cx="66" cy="286" r="4.5" data-art-node />
+   <circle cx="32" cy="182" r="4.5" data-art-node />
+  </g>}
+  <g class="link-art__focus" data-art-focus>
+   <circle class="link-art__focus-ring" cx={focus.x} cy={focus.y} r="15" />
+   <circle class="link-art__focus-core" cx={focus.x} cy={focus.y} r="5" data-art-node />
+  </g>
+  <path class="link-art__terminus" d="M 407 177 L 414 182 L 407 187" />
+  <g class="link-art__ticks"><path d="M 208 32 H 228 M 218 22 V 42" /><path d="M 342 326 H 352" /></g>
+ </svg>
+ {label&&<figcaption>{label}</figcaption>}
+</figure>
+<style>
+ .link-art{--art-stroke:#95652e;--art-field:#14213a;--art-ground:#f7f2ea;position:relative;margin:0;width:100%;isolation:isolate}
+ .link-art--dark{--art-stroke:#d6b17a;--art-field:#f7f2ea;--art-ground:#14213a}
+ .link-art__canvas{display:block;width:100%;height:auto;overflow:visible}
+ .link-art__field{stroke:var(--art-stroke);stroke-width:.75;opacity:.22}
+ .link-art__field path{stroke-dasharray:2 7;opacity:.6}
+ .link-art__halo{fill:var(--art-stroke);fill-opacity:.055;stroke:var(--art-stroke);stroke-width:.75;stroke-opacity:.24;transform-box:fill-box;transform-origin:center}
+ .link-art__tracks{stroke:var(--art-stroke);stroke-width:2;stroke-opacity:.13}
+ .link-art__threads{stroke:var(--art-stroke);stroke-width:1.7;stroke-linecap:round}
+ .link-art__threads path:nth-child(2){stroke-width:2.2}
+ .link-art__origins{fill:var(--art-ground);stroke:var(--art-stroke);stroke-width:1.4}
+ .link-art__origins circle,.link-art__focus-core{transform-box:fill-box;transform-origin:center}
+ .link-art__focus-ring{fill:var(--art-ground);stroke:var(--art-stroke);stroke-width:1.4}
+ .link-art__focus-core{fill:var(--art-stroke)}
+ .link-art__terminus{stroke:var(--art-stroke);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+ .link-art__ticks{stroke:var(--art-stroke);stroke-width:.8;opacity:.5}
+ .link-art figcaption{margin-top:10px;font-size:14px;line-height:1.5;letter-spacing:.02em;color:inherit;opacity:.8;text-align:center;max-width:28em;margin-inline:auto}
+ @media(hover:hover) and (prefers-reduced-motion:no-preference){.link-art__halo{transition:fill-opacity .35s,stroke-opacity .35s}.link-art:hover .link-art__halo{fill-opacity:.09;stroke-opacity:.45}}
+ @media(max-width:599px){.link-art figcaption{font-size:13px}}
+</style>

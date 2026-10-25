@@ -1,0 +1,30 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import {PortableText} from '@portabletext/astro';
+import PortableLink from '../../components/PortableLink.astro';
+import CmsImage from '../../components/CmsImage.astro';
+import ArticlePdf from '../../components/ArticlePdf.astro';
+import {getSiteContent} from '../../lib/cms/client';
+import '../../styles/contact-editorial.css';
+const {settings,articles}=await getSiteContent(Astro);
+const article=articles.find(a=>a.slug===Astro.params.slug);
+if(!article)return Astro.rewrite('/404/');
+---
+<Layout settings={settings} title={article.seo?.title||`${article.title} | Calas Conseil`} description={article.seo?.description||article.excerpt}>
+  <article class="reading-page wrap">
+    <header class="reading-header">
+      <nav class="journal-breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span><a href="/reflexions/">Réflexions</a><span aria-hidden="true">/</span><span>{article.category?.title||'Article'}</span></nav>
+      <p class="journal-kicker"><span aria-hidden="true"></span>{article.category?.title||'Le carnet de Calas Conseil'}</p>
+      <h1>{article.title}</h1>
+      <p class="reading-deck">{article.excerpt}</p>
+      <div class="reading-byline"><span>Par {article.author.name}</span><time datetime={article.date}>{new Intl.DateTimeFormat('fr-FR',{dateStyle:'long'}).format(new Date(article.date))}</time></div>
+      <ArticlePdf file={article.sourcePdf}/>
+      {article.image&&<figure class="reading-cover"><CmsImage image={article.image} width={1440} height={900} sizes="(max-width: 760px) 90vw, 80vw" loading="eager"/></figure>}
+    </header>
+    <div class="reading-layout">
+      <aside class="reading-sidebar" aria-label="À propos de l’auteure"><p class="journal-caption">Un regard de</p><p class="reading-author">{article.author.name}</p><p class="reading-author-role">{article.author.role}</p><a href="/qui-sommes-nous/" class="journal-text-link">Faire connaissance <span aria-hidden="true">↗</span></a></aside>
+      <div class="reading-copy"><PortableText value={article.body} components={{mark:{link:PortableLink}}}/></div>
+    </div>
+    <footer class="reading-footer"><a class="journal-text-link" href="/reflexions/"><span aria-hidden="true">←</span> Toutes les réflexions</a><a class="journal-text-link" href="/contact/">Échanger sur votre situation <span aria-hidden="true">↗</span></a></footer>
+  </article>
+</Layout>

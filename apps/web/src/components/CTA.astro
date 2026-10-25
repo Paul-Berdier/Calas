@@ -1,0 +1,7 @@
+---
+import type {Cta} from '../lib/cms/types';
+import {safeHref} from '../lib/links';
+interface Props {cta:Cta; variant?:'primary'|'outline'|'light'|'link'}
+const {cta,variant='primary'}=Astro.props;
+---
+<a href={safeHref(cta.href)||'/contact/'} class:list={[variant==='link'?'text-link':'button',variant]}>{cta.label}<span class="arrow" aria-hidden="true">↗</span></a>

@@ -1,0 +1,5 @@
+---
+import {safeHref} from '../lib/links';
+const href=safeHref(Astro.props.node?.markDef?.href);
+---
+{href?<a href={href} rel="noopener noreferrer"><slot /></a>:<span><slot /></span>}

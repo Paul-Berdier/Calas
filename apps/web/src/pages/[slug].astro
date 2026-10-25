@@ -1,0 +1,45 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LinkArt from '../components/LinkArt.astro';
+import CTA from '../components/CTA.astro';
+import ContentSections from '../components/ContentSections.astro';
+import CmsImage from '../components/CmsImage.astro';
+import EditorialLines from '../components/EditorialLines.astro';
+import {getSiteContent} from '../lib/cms/client';
+import '../styles/editorial.css';
+const {settings,pages,people}=await getSiteContent(Astro);
+const page=pages.find(p=>p.slug===Astro.params.slug);
+if(!page) return Astro.rewrite('/404/');
+const isPeople=page.slug==='qui-sommes-nous';
+const legal=['mentions-legales','confidentialite'].includes(page.slug);
+const isDiagnostic=page.slug==='diagnostic-rps';
+const isOffer=['diagnostic-rps','equipes','managers'].includes(page.slug);
+const sectionId=(key:string)=>`section-${key.replace(/[^a-zA-Z0-9_-]/g,'-')}`;
+const anchors=page.sections.filter(s=>s.title&&s.kind!=='notice').slice(0,6);
+const offerNumber=['diagnostic-rps','equipes','managers'].indexOf(page.slug)+1;
+const anchorLabels:Record<string,string>={signaux:'Les signaux',etapes:'La démarche',regards:'Nos regards',livrables:'Les livrables',questions:'Vos questions',conference:'La conférence',ateliers:'Les ateliers',cycles:'Les trois cycles',experience:'Dans la durée',besoins:'Nos repères',surface:'Sous la surface',cadre:'Le cadre de travail'};
+const method=page.sections.find(section=>section.presentation==='method')??page.sections.find(section=>section.kind==='steps');
+const editorial=page.editorial??{};
+---
+<Layout settings={settings} title={page.seo?.title || `${page.title.replace(/\n/g,' ')} | Calas Conseil`} description={page.seo?.description || page.intro}>
+  <div class:list={['editorial-page',{'is-legal':legal,'is-diagnostic':isDiagnostic,'is-people':isPeople}]}>
+    <section class="editorial-hero"><div class="wrap">
+      <nav class="editorial-breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span><span aria-current="page">{page.eyebrow||page.title}</span></nav>
+      <div class="editorial-hero-grid">
+        <div class="editorial-hero-copy"><p class="eyebrow">{isOffer&&<span class="offer-number" aria-hidden="true">0{offerNumber} /</span>}{page.eyebrow}</p><h1 class="line-break">{page.title}</h1><p class="editorial-intro">{page.intro}</p>{page.cta&&<div class="actions"><CTA cta={page.cta}/>{isDiagnostic&&method&&<a class="hero-method-link" href={`#${sectionId(method._key)}`}>{editorial.methodLinkLabel??'Explorer la démarche'} <span aria-hidden="true">↓</span></a>}</div>}</div>
+        {!legal&&<div class="editorial-hero-art" aria-hidden="true"><span class="art-annotation top">{editorial.artTop??(isOffer?'LIRE LE TRAVAIL AUTREMENT':'LA QUALITÉ DU LIEN')}</span><LinkArt variant={isOffer?'converge':'orbit'} tone="light"/><span class="art-annotation bottom">{editorial.artBottom??'ORGANISATION · MANAGEMENT · RELATIONS'}</span></div>}
+      </div>
+    </div></section>
+    {!legal&&anchors.length>2&&<nav class="editorial-anchor-nav" aria-label="Dans cette page"><div class="wrap"><span class="anchor-nav-label">Dans cette page</span><ul>{anchors.map(s=><li><a href={`#${sectionId(s._key)}`}>{s.navigationLabel??anchorLabels[s._key]??s.eyebrow??s.title?.replace(/\n/g,' ')}</a></li>)}</ul></div></nav>}
+    {isPeople&&<section class="editorial-profiles" aria-label="Les deux regards de Calas Conseil"><div class="wrap profile-grid">{people.map((person,i)=><article class="editorial-profile">
+      <div class="profile-topline"><span aria-hidden="true">0{i+1}</span><span>{person.name}</span></div>
+      {person.portrait?<CmsImage class="editorial-portrait" image={person.portrait} width={800} height={1000} sizes="(max-width: 599px) 90vw, 40vw"/>:<div class="profile-letter" aria-hidden="true">{person.name.slice(0,1)}<span>.</span></div>}
+      <h2>{person.name}</h2><p class="editorial-profile-role">{person.role}</p>{person.bio&&<p class="editorial-profile-bio">{person.bio}</p>}
+      {person._id===settings.qualification.personId&&settings.qualification.status==='verified'&&<p class="editorial-profile-qualification">{settings.qualification.label}</p>}
+    </article>)}</div></section>}
+    {page.image&&<figure class="wrap editorial-page-image"><CmsImage image={page.image} width={1280} height={720} sizes="90vw"/></figure>}
+    <ContentSections sections={page.sections} context={page.slug}/>
+    {page.format&&(page.format.duration||page.format.rhythm||page.format.delivery)&&<section class="editorial-format wrap"><p class="eyebrow">Le format</p><dl>{page.format.duration&&<div><dt>Durée</dt><dd>{page.format.duration}</dd></div>}{page.format.rhythm&&<div><dt>Rythme</dt><dd>{page.format.rhythm}</dd></div>}{page.format.delivery&&<div><dt>Modalités</dt><dd>{page.format.delivery}</dd></div>}</dl></section>}
+    {page.cta&&<section class="editorial-invitation dark"><div class="wrap"><div><p class="eyebrow">{editorial.invitationEyebrow??'Et maintenant ?'}</p><h2><EditorialLines text={editorial.invitationTitle??'Commençons par\nvotre situation.'}/></h2></div><div class="invitation-action"><CTA cta={page.cta} variant="light"/><a class="invitation-phone" href={`tel:${settings.phone.replace(/\s/g,'').replace(/^0/,'+33')}`}>{settings.phone}</a></div></div></section>}
+  </div>
+</Layout>

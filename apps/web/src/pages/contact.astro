@@ -1,0 +1,103 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ContentSections from '../components/ContentSections.astro';
+import SectionMedia from '../components/SectionMedia.astro';
+import CTA from '../components/CTA.astro';
+import EditorialLines from '../components/EditorialLines.astro';
+import {safeHref} from '../lib/links';
+import {getSiteContent} from '../lib/cms/client';
+import {subjects,createFormToken,readFields,readBoundedForm,emptyFields,submitContact,type ContactResult} from '../lib/contact';
+import {env,isProductionSite} from '../lib/environment';
+import '../styles/contact-editorial.css';
+const {settings,pages}=await getSiteContent(Astro);
+const content=pages.find(page=>page.slug==='contact');
+const contact=content?.contact??{};
+Astro.response.headers.set('Cache-Control','private, no-store');
+let fields={...emptyFields,subject:Object.hasOwn(subjects,Astro.url.searchParams.get('objet')||'')?Astro.url.searchParams.get('objet')!:'autre'};
+let result:ContactResult|undefined;
+let token=createFormToken();
+if(Astro.request.method==='POST'){
+  const length=Number(Astro.request.headers.get('content-length')||0);
+  if(length>65536)result={ok:false,status:413,message:'Votre message dépasse la taille autorisée.'};
+  else {
+    try{const form=await readBoundedForm(Astro.request);fields=readFields(form);token=String(form.get('token')||token);result=await submitContact(Astro.request,form,Astro.clientAddress);}catch(error){result=error instanceof RangeError?{ok:false,status:413,message:'Votre message dépasse la taille autorisée.'}:{ok:false,status:400,message:'La demande n’a pas pu être lue. Votre courriel et notre téléphone restent disponibles.'};}
+  }
+  if(Astro.request.headers.get('accept')?.includes('application/json'))return new Response(JSON.stringify(result),{status:result?.status||400,headers:{'Content-Type':'application/json','Cache-Control':'private, no-store',...(result?.status===429?{'Retry-After':'900'}:{})}});
+  Astro.response.status=result?.status||400;
+}
+const errors=result?.errors||{};
+const simulated=!isProductionSite()&&env('MAIL_TRANSPORT','simulation')==='simulation';
+---
+<Layout settings={settings} title={content?.seo?.title||'Échangeons sur votre situation | Calas Conseil'} description={content?.seo?.description||content?.intro}>
+  <section class="contact-page wrap" aria-labelledby="contact-title">
+    <nav class="journal-breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span><span aria-current="page">Contact</span></nav>
+    <div class="contact-composition">
+      <div class="contact-introduction">
+        <p class="journal-kicker"><span aria-hidden="true"></span>{content?.eyebrow||'Le premier pas'}</p>
+        <h1 class="line-break" id="contact-title">{(content?.title||'Et si nous prenions le temps d’en parler ?').replace(/ ([?!;:])/g,'\u00a0$1')}</h1>
+        <p class="contact-opening">{content?.intro||settings.contactText}</p>
+
+        <div class="contact-channels">
+          <p class="journal-caption">{contact.directHeading??'Vous préférez un contact direct ?'}</p>
+          <a class="contact-channel" href={`tel:${settings.phone.replace(/\s/g,'').replace(/^0/,'+33')}`}>
+            <span class="contact-channel-label">Par téléphone</span>
+            <span class="contact-channel-value">{settings.phone}<span aria-hidden="true">↗</span></span>
+          </a>
+          <a class="contact-channel" href={`mailto:${settings.email}`}>
+            <span class="contact-channel-label">Par courriel</span>
+            <span class="contact-channel-value contact-channel-email">{settings.email}<span aria-hidden="true">↗</span></span>
+          </a>
+          {settings.linkedin&&<a class="contact-channel contact-linkedin" href={safeHref(settings.linkedin)} rel="noopener noreferrer"><span>{contact.linkedinLabel??'Retrouvons-nous sur LinkedIn'}</span><span aria-hidden="true">↗</span></a>}
+        </div>
+
+        <div class="contact-context">
+          <span class="contact-context-mark" aria-hidden="true">↳</span>
+          <p>{contact.context??'Diagnostic RPS, équipe ou management : choisissez l’objet qui se rapproche le plus de votre situation.'}</p>
+        </div>
+      </div>
+
+      <form class="contact-sheet" method="post" action="/contact/" id="contact-form" aria-labelledby="contact-form-title" novalidate>
+        <div class="contact-sheet-heading"><span class="journal-caption">{contact.formEyebrow??'Nous écrire'}</span><span class="contact-sheet-number" aria-hidden="true">01 — 03</span></div>
+        <h2 id="contact-form-title"><EditorialLines text={contact.formTitle??'Votre situation,\nen quelques mots.'} accentLast/></h2>
+        <p class="form-required">Les champs marqués d’un astérisque sont nécessaires pour vous répondre.</p>
+        <div class:list={['form-status',{success:result?.ok}]} id="form-status" role="status" tabindex="-1" aria-live="polite">{result?.message}</div>
+        {simulated&&<p class="contact-test-note"><strong>Envoi de test.</strong> Aucun courriel n’est envoyé, aucune copie du message n’est conservée.</p>}
+        <input type="hidden" name="token" value={token} />
+        <div class="form-trap" aria-hidden="true"><label for="website">Votre site web</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
+
+        <fieldset class="contact-fieldset">
+          <legend><span aria-hidden="true">01</span> Votre demande</legend>
+          <div class="field contact-subject"><label for="subject">Votre demande concerne *</label><select id="subject" name="subject" required aria-invalid={errors.subject?'true':undefined} aria-describedby="error-subject">{Object.entries(subjects).map(([value,label])=><option value={value} selected={fields.subject===value}>{label}</option>)}</select><p class="field-error" id="error-subject">{errors.subject}</p></div>
+        </fieldset>
+
+        <fieldset class="contact-fieldset">
+          <legend><span aria-hidden="true">02</span> Pour vous répondre</legend>
+          <div class="form-row">
+            <div class="field"><label for="name">Votre nom *</label><input id="name" name="name" required minlength="2" maxlength="100" autocomplete="name" value={fields.name} aria-invalid={errors.name?'true':undefined} aria-describedby="error-name" /><p class="field-error" id="error-name">{errors.name}</p></div>
+            <div class="field"><label for="company">Votre entreprise <small>(facultatif)</small></label><input id="company" name="company" maxlength="160" autocomplete="organization" value={fields.company} aria-invalid={errors.company?'true':undefined} aria-describedby="error-company" /><p class="field-error" id="error-company">{errors.company}</p></div>
+          </div>
+          <div class="field"><label for="email">Votre courriel *</label><input id="email" name="email" type="email" required maxlength="254" autocomplete="email" value={fields.email} aria-invalid={errors.email?'true':undefined} aria-describedby="error-email" /><p class="field-error" id="error-email">{errors.email}</p></div>
+        </fieldset>
+
+        <fieldset class="contact-fieldset contact-message-group">
+          <legend><span aria-hidden="true">03</span> Ce qui vous amène</legend>
+          <div class="field"><label for="message">Votre message *</label><textarea id="message" name="message" required minlength="10" maxlength="5000" rows="5" aria-invalid={errors.message?'true':undefined} aria-describedby="message-hint error-message">{fields.message}</textarea><p class="field-hint" id="message-hint">Merci de ne pas transmettre d'informations médicales ni de données concernant un tiers.</p><p class="field-error" id="error-message">{errors.message}</p></div>
+        </fieldset>
+
+        <button class="button form-submit" type="submit" disabled={result?.ok}>Envoyer ma demande <span aria-hidden="true">↗</span></button>
+        <p class="form-privacy">Ces informations servent à traiter votre demande. Consultez notre <a href="/confidentialite/">page de confidentialité</a> pour connaître leur traitement et vos droits.</p>
+      </form>
+    </div>
+  </section>
+  <SectionMedia image={content?.image}/>
+  {content&&content.sections.length>0&&<ContentSections sections={content.sections}/>}
+  {content?.cta&&<div class="wrap" style="padding-bottom:60px"><CTA cta={content.cta}/></div>}
+</Layout>
+<script>
+const form=document.querySelector<HTMLFormElement>('#contact-form');
+if(form){const submit=form.querySelector<HTMLButtonElement>('button[type=submit]')!;const status=document.querySelector<HTMLElement>('#form-status')!;let busy=false;form.addEventListener('submit',async event=>{event.preventDefault();if(busy)return;busy=true;submit.disabled=true;submit.setAttribute('aria-busy','true');submit.textContent='Envoi en cours…';status.textContent='';status.classList.remove('success');form.querySelectorAll('[aria-invalid]').forEach(el=>el.removeAttribute('aria-invalid'));form.querySelectorAll('.field-error').forEach(el=>el.textContent='');const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);let success=false;
+  try{const body=new URLSearchParams();new FormData(form).forEach((value,key)=>{if(typeof value==='string')body.set(key,value);});const response=await fetch(form.action,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/x-www-form-urlencoded'},body,signal:controller.signal});const data=await response.json();success=response.ok&&data.ok===true;status.textContent=data.message||'L’envoi n’a pas pu être confirmé. Réessayez ou contactez-nous directement.';status.classList.toggle('success',success);if(data.errors){for(const [key,message]of Object.entries(data.errors)){const input=form.elements.namedItem(key);if(input instanceof HTMLElement){input.setAttribute('aria-invalid','true');const error=document.getElementById(`error-${key}`);if(error)error.textContent=String(message);}}(form.querySelector('[aria-invalid=true]')as HTMLElement)?.focus();}else status.focus();}
+  catch(error){status.textContent=error instanceof DOMException&&error.name==='AbortError'?'Le délai de réponse est dépassé. Votre saisie est conservée. Réessayez ; le même formulaire évite un double envoi.':'La connexion a été interrompue. Votre saisie est conservée. Réessayez ou contactez-nous directement.';status.focus();}
+  finally{clearTimeout(timer);busy=false;submit.disabled=success;submit.removeAttribute('aria-busy');submit.textContent=success?'Demande traitée':'Réessayer l’envoi';}
+});}
+</script>

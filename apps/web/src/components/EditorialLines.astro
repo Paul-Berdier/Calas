@@ -1,0 +1,6 @@
+---
+interface Props {text: string; accentLast?: boolean}
+const {text,accentLast=false}=Astro.props;
+const lines=text.split('\n');
+---
+{lines.map((line,index)=><Fragment>{index>0&&<br/>}{accentLast&&lines.length>1&&index===lines.length-1?<em>{line}</em>:line}</Fragment>)}

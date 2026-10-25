@@ -1,0 +1,15 @@
+/* Everything remains fully visible without JavaScript. Only decorative rails
+   and highlights use these values; the method text never depends on motion. */
+[data-method]{--method-progress:1}
+.method-progress-fill{transform:scaleX(var(--method-progress,1));transform-origin:left center}
+[data-method-axis="vertical"] .method-progress-fill{transform:scaleY(var(--method-progress,1));transform-origin:center top}
+@media(prefers-reduced-motion:no-preference){
+ [data-step] .step-index{transition:color .25s,opacity .25s}
+ [data-step-active="true"] .step-index{color:var(--gold,#c9a46e)}
+ [data-step-complete="true"] .step-index{opacity:.72}
+ [data-step] [data-step-marker]{transition:background-color .25s,box-shadow .25s}
+ [data-step-active="true"] [data-step-marker]{background:var(--gold,#c9a46e);box-shadow:0 0 0 5px rgb(201 164 110 / 13%)}
+}
+@media(prefers-reduced-motion:reduce){
+ .method-progress-fill{transform:none}
+}

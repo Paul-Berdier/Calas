@@ -1,0 +1,14 @@
+{
+  "browser": "chromium",
+  "tests": [
+    "deformation effective",
+    "progression",
+    "pose finale exacte",
+    "mouvement réduit au chargement",
+    "changement de préférence pendant la timeline",
+    "absence de rejeu",
+    "fallback sans JavaScript"
+  ],
+  "pageErrors": [],
+  "result": "passed"
+}

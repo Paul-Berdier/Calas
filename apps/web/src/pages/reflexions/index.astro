@@ -1,0 +1,44 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ContentSections from '../../components/ContentSections.astro';
+import CTA from '../../components/CTA.astro';
+import CmsImage from '../../components/CmsImage.astro';
+import SectionMedia from '../../components/SectionMedia.astro';
+import EditorialLines from '../../components/EditorialLines.astro';
+import {getSiteContent} from '../../lib/cms/client';
+import {safeHref} from '../../lib/links';
+import '../../styles/contact-editorial.css';
+const {settings,articles,pages}=await getSiteContent(Astro);
+const content=pages.find(page=>page.slug==='reflexions');
+const relatedPages=['notre-approche','managers','diagnostic-rps'].flatMap(slug=>pages.filter(page=>page.slug===slug));
+const journal=content?.journal??{};
+const seriesCta=journal.seriesCta??{label:'Découvrir notre conviction',href:'/notre-approche/'};
+---
+<Layout settings={settings} title={content?.seo?.title||'Réflexions sur le travail et la qualité du lien | Calas Conseil'} description={content?.seo?.description||content?.intro}>
+  <section class="journal-opening wrap" aria-labelledby="journal-title">
+    <nav class="journal-breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span><span aria-current="page">Réflexions</span></nav>
+    <p class="journal-kicker"><span aria-hidden="true"></span>{content?.eyebrow||'Prendre du recul'}</p>
+    <div class="journal-masthead"><h1 id="journal-title">{content?.title||'Réflexions'}</h1><p>{content?.intro}</p></div>
+    <div class="journal-baseline"><span>{journal.baseline??'Le carnet de Calas Conseil'}</span><span>{journal.topics??'Travail · Relations · Management'}</span></div>
+  </section>
+
+  {articles.length ? <section class="journal-publications wrap" aria-label="Les réflexions publiées">
+    {articles.map((article,index)=><article class:list={['journal-entry',{'journal-entry-featured':index===0}]}>
+      <a class="journal-entry-link" href={`/reflexions/${article.slug}/`}>
+        {article.image&&<div class="journal-entry-image"><CmsImage image={article.image} width={index===0?1000:700} height={index===0?650:455} sizes="(max-width: 430px) 90vw, 45vw"/></div>}
+        <div class="journal-entry-content"><p class="journal-meta"><time datetime={article.date}>{new Intl.DateTimeFormat('fr-FR',{dateStyle:'long'}).format(new Date(article.date))}</time>{article.category&&<span>{article.category.title}</span>}</p><h2>{article.title}</h2><p class="journal-entry-excerpt">{article.excerpt}</p><div class="journal-entry-footer"><span>Par {article.author.name}</span><span>Lire la réflexion <span aria-hidden="true">↗</span></span></div></div>
+      </a>
+    </article>)}
+  </section> : <section class="journal-coming wrap" aria-labelledby="first-series-title">
+    <div class="journal-coming-label"><p class="journal-caption">{journal.seriesEyebrow??'Notre première série'}</p><span class="journal-status">{journal.seriesStatus??'À paraître'}</span><span class="journal-line" aria-hidden="true"></span></div>
+    <div class="journal-coming-body"><h2 id="first-series-title"><EditorialLines text={journal.seriesTitle??'Le manager comme\nprofessionnel du lien.'} accentLast/></h2><p>{journal.seriesText??'Cette première série ouvrira notre espace de publications. Un prolongement de la conviction qui guide Calas Conseil : le lien est une compétence qui s’apprend et se développe.'}</p><a class="journal-text-link" href={safeHref(seriesCta.href)}>{seriesCta.label} <span aria-hidden="true">↗</span></a></div>
+  </section>}
+
+  <section class="journal-explore wrap" aria-labelledby="journal-explore-title">
+    <div class="journal-explore-heading"><p class="journal-kicker"><span aria-hidden="true"></span>{journal.exploreEyebrow??'Pour poursuivre'}</p><h2 id="journal-explore-title"><EditorialLines text={journal.exploreTitle??'De la réflexion\nà votre réalité.'} accentLast/></h2></div>
+    <div class="journal-related">{relatedPages.map((page,index)=><a href={`/${page.slug}/`}><span class="journal-related-index" aria-hidden="true">0{index+1}</span><div><span class="journal-caption">{page.eyebrow}</span><h3>{page.title.replace(/\n/g,' ')}</h3></div><span class="journal-related-arrow" aria-hidden="true">↗</span></a>)}</div>
+  </section>
+  <SectionMedia image={content?.image}/>
+  {content&&content.sections.length>0&&<ContentSections sections={content.sections}/>}
+  {content?.cta&&<div class="wrap" style="padding-bottom:60px"><CTA cta={content.cta}/></div>}
+</Layout>

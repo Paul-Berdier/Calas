@@ -1,0 +1,47 @@
+{
+  "base": "http://127.0.0.1:4330",
+  "date": "2026-10-25T06:37:43.564Z",
+  "viewport": "1440 × 1000",
+  "reports": [
+    {
+      "browser": "chromium",
+      "tests": [
+        "deformation effective",
+        "progression",
+        "pose finale exacte",
+        "mouvement réduit au chargement",
+        "changement de préférence pendant la timeline",
+        "absence de rejeu",
+        "fallback sans JavaScript",
+        "dessin des trajectoires au scroll",
+        "révélation des contenus au scroll",
+        "progression de lecture",
+        "progression méthode après ouverture",
+        "nettoyage méthode mouvement réduit",
+        "accordéon natif sans JavaScript"
+      ],
+      "pageErrors": [],
+      "result": "passed"
+    },
+    {
+      "browser": "firefox",
+      "tests": [
+        "deformation effective",
+        "progression",
+        "pose finale exacte",
+        "mouvement réduit au chargement",
+        "changement de préférence pendant la timeline",
+        "absence de rejeu",
+        "fallback sans JavaScript",
+        "dessin des trajectoires au scroll",
+        "révélation des contenus au scroll",
+        "progression de lecture",
+        "progression méthode après ouverture",
+        "nettoyage méthode mouvement réduit",
+        "accordéon natif sans JavaScript"
+      ],
+      "pageErrors": [],
+      "result": "passed"
+    }
+  ]
+}
