@@ -41,6 +41,8 @@ jobs:
       - run: pnpm test:cms-local
       - run: pnpm test:domain
       - run: pnpm test:integration
+      - run: node --test tests/database-role.test.mjs
+      - run: pnpm --filter @calas/web exec tsx --test ../../tests/proxy-origin.test.ts
       - run: pnpm build
       - run: pnpm exec playwright install --with-deps chromium firefox
       - run: pnpm test

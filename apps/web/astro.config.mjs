@@ -12,7 +12,9 @@ export default defineConfig({
   site:process.env.SITE_URL || 'http://localhost:4321',
   // Public links retain their existing slash; Better Auth must also accept its slashless API URLs.
   trailingSlash:'ignore', devToolbar:{enabled:false},
-  security:{allowedDomains:local?[{hostname:'localhost',protocol:'http'},{hostname:'127.0.0.1',protocol:'http'}]:[{hostname:siteUrl.hostname,protocol:siteUrl.protocol.replace(':',''),port:siteUrl.port||'443'}]},
+  // WHATWG URL normalizes the default HTTPS port to ''. Astro compares that
+  // normalized value, so an explicit '443' pattern rejects the legitimate host.
+  security:{allowedDomains:local?[{hostname:'localhost',protocol:'http'},{hostname:'127.0.0.1',protocol:'http'}]:[{hostname:siteUrl.hostname,protocol:siteUrl.protocol.replace(':',''),port:siteUrl.port}]},
   integrations:[react()],
   vite:{plugins:[tailwind()],worker:{format:'es'},server:{allowedHosts:['localhost','127.0.0.1']}}
 });
