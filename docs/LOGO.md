@@ -28,13 +28,15 @@ L’étude interactive autonome est [study.html](../artifacts/logo-coil/study.ht
 
 `assets/brand/coil.mjs` contient la déformation, les trois variantes et le rendu des poses. Chaque portion de ruban tourne d’un angle **différent selon sa distance au noyau**, tandis que son rayon se rapproche progressivement de la position finale. Les portions extérieures se courbent davantage que les parties proches du centre. Le noyau reste fixe. Il s’agit d’une modification des contours, sans transformation rigide du bloc ni simple inversion de l’ancien masque.
 
-La variante B fait entrer les rubans dans l’ordre `[4,2,1,0,3]`, avec 100 ms de décalage. Chaque courbure évolue pendant 1,8 seconde. Un bref fondu de 180 ms accompagne l’arrivée ; les contours continuent de se déformer bien après ce fondu. La progression utilise une interpolation cosinus, lente à ses extrémités. Les courbes sont subdivisées pour conserver la douceur des contours pendant la transformation.
+La variante B fait entrer les rubans dans l’ordre `[4,2,1,0,3]`, avec 100 ms de décalage. Chaque courbure évolue pendant 1,8 seconde. Un bref fondu de 180 ms accompagne l’arrivée ; les contours continuent de se déformer bien après ce fondu. La progression utilise une interpolation cosinus, lente à ses extrémités. Les courbes sont subdivisées une fois pour conserver la douceur des contours pendant la transformation. Leurs constantes polaires sont mémorisées ; les rubans encore invisibles ne calculent pas de posture intermédiaire.
 
 `apps/web/src/lib/motion.ts` pilote cette fonction avec une timeline GSAP Core. À la fin, les cinq attributs `d` sont rétablis **octet pour octet** depuis la source. Aucun masque ou style temporaire ne subsiste. Les poses de `assets/brand/motion-start.svg`, `motion-middle.svg` et `motion-end.svg`, ainsi que leurs PNG, correspondent à 0,12 s, 1,10 s et 2,20 s.
 
 Le HTML de `Shell.astro` contient toujours le symbole final complet. Un script placé **avant le SVG** active une garde CSS uniquement lorsque JavaScript et le mouvement sont disponibles ; cela couvre aussi une première peinture pendant le chargement progressif du HTML. Le script suivant le SVG arme son initialisation et son délai de secours. Si le module ne prend pas la main sous 1 400 ms, le garde-fou affiche le logo final et empêche un démarrage tardif. Sans JavaScript ou avec mouvement réduit, la géométrie finale est immédiatement affichée. Aucun texte ni bouton ne passe par cet état d’attente.
 
 `gsap.matchMedia()` prend aussi en compte un changement de préférence pendant l’animation : la timeline et l’observer sont arrêtés, les contours et leur opacité sont rétablis. Un retour au mouvement normal ne rejoue pas la séquence. `initMotion()` expose un nettoyage complet. Une erreur d’initialisation ou de rendu restaure le logo final.
+
+La séquence commence lorsque le symbole entre dans le champ. Sur mobile, où il se trouve sous le premier écran, aucun contour intermédiaire n’est calculé pendant la lecture de l’introduction. La comparaison locale de sept poses après optimisation conserve une différence moyenne maximale de 0,133 sur 255 par canal et une pose finale strictement identique ; le calcul de 360 images de cinq rubans passe de 769 à 154 ms dans le microbenchmark Node. Ce résultat mesure le calcul géométrique, pas la vitesse de chargement du site. Les données sont conservées dans [performance-comparison.json](../artifacts/logo-coil/performance-comparison.json).
 
 ## Vérification de la géométrie
 
@@ -58,9 +60,11 @@ Recette exécutée le 25 octobre 2026 sur le build standalone local : **48 contr
 
 `node scripts/brand-browser.mjs` reste la recette plus large du mouvement éditorial : dessins des trajectoires, révélations au défilement, progression de lecture et étapes Diagnostic. Les résultats doivent être associés au serveur et à la date du rapport, et non assimilés à une validation d’un hébergement non testé.
 
+`node scripts/motion-loading-check.mjs` vérifie à 390 et 1440 px que l’accueil ne télécharge pas ScrollTrigger au premier écran, que le logo mobile attend son entrée dans le champ et que la méthode Diagnostic charge puis active son animation. Le rapport est [loading-report.json](../artifacts/logo-coil/loading-report.json). L’illustration de premier écran de Diagnostic utilise déjà la parallaxe sur ordinateur : ce cas charge donc le plugin dès son approche.
+
 ## Mouvement éditorial conservé
 
-`LinkArt.astro` est distinct du logo. Ses trajectoires et ses arcs ouverts sont décoratifs et masqués aux technologies d’assistance. GSAP ScrollTrigger conserve les révélations de 600 ms, le dessin des trajectoires, la progression de lecture et les accents des étapes Diagnostic.
+`LinkArt.astro` est distinct du logo. Ses trajectoires et ses arcs ouverts sont décoratifs et masqués aux technologies d’assistance. Les révélations GSAP de 600 ms et le dessin des trajectoires commencent à l’entrée dans le champ, grâce à IntersectionObserver. Les longueurs SVG sont lues ensemble avant l’écriture des styles. ScrollTrigger est importé uniquement à l’approche d’une animation continue : étapes Diagnostic ou parallaxe sur ordinateur. La progression de lecture suit le défilement natif avec une mise à jour groupée par image ; elle ne force aucune mesure de mise en page au chargement.
 
 Le défilement reste natif, sans blocage ni épinglage. La parallaxe des autres décors est limitée à 18 px sur grand écran et ne concerne jamais le logo. Le focus clavier termine une révélation en cours si nécessaire. Les accords natifs `details/summary` restent utilisables sans JavaScript ; le mouvement réduit supprime les effets sans fermer le contenu choisi.
 

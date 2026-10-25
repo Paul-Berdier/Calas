@@ -12,13 +12,13 @@ export const coilOrder=[4,2,1,0,3];
 export const coilDuration=2.2;
 export const coilSelected='B';
 const clamp=value=>Math.min(1,Math.max(0,value));
-const numeric=value=>Number(value.toFixed(3));
+const numeric=value=>Math.round(value*1000)/1000;
 const mix=(a,b,t=.5)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
 function split(curve){
  const a=mix(curve[0],curve[1]),b=mix(curve[1],curve[2]),c=mix(curve[2],curve[3]),d=mix(a,b),e=mix(b,c),f=mix(d,e);
  return [[curve[0],a,d,f],[f,e,c,curve[3]]];
 }
-function subdivide(curve,depth=2){return depth?split(curve).flatMap(part=>subdivide(part,depth-1)):[curve];}
+function subdivide(curve,depth=1){return depth?split(curve).flatMap(part=>subdivide(part,depth-1)):[curve];}
 const prepared=new Map();
 function contours(index){
  if(prepared.has(index))return prepared.get(index);
@@ -51,16 +51,28 @@ export function coilPoint(x,y,progress,variant='B'){
 }
 export function coilFrame(index,progress,variant='B'){
  if(progress>=1)return ribbonPaths[index];
- const curves=contours(index),warp=p=>coilPoint(p[0],p[1],progress,variant).map(numeric).join(' ');
+ const config=coilVariants[variant];if(!config)throw new RangeError('Unknown coil study');
+ const curves=contours(index),amount=(1+Math.cos(Math.PI*clamp(progress)))/2;
+ const warp=p=>{
+  let polar=polarPoints.get(p);
+  if(!polar){
+   const dx=p[0]-nucleus[0],dy=p[1]-nucleus[1],radius=Math.hypot(dx,dy),angle=Math.atan2(dy,dx),radial=Math.min(1.3,radius/430);
+   polar={radius,angle,bend:radial**1.25,wave:Math.sin(angle*2+.4)*radial,expansion:radial**.8};polarPoints.set(p,polar);
+  }
+  const angle=polar.angle+amount*(config.twist*polar.bend+config.wave*polar.wave);
+  const radius=polar.radius*(1+config.opening*amount*polar.expansion);
+  return `${numeric(nucleus[0]+Math.cos(angle)*radius)} ${numeric(nucleus[1]+Math.sin(angle)*radius)}`;
+ };
  return `M ${warp(curves[0][0])} `+curves.map(curve=>'C '+curve.slice(1).map(warp).join(' ')).join(' ')+' Z';
 }
+const polarPoints=new WeakMap();
 export function coilState(index,time,variant='B'){
  const config=coilVariants[variant];if(!config)throw new RangeError('Unknown coil study');
  const start=coilOrder.indexOf(index)*config.stagger;
  const progress=clamp((time-start)/config.duration);
  // A short entry accompanies the actual deformation; it never substitutes it.
  const opacity=clamp((time-start)/.18);
- return {progress,opacity,contour:coilFrame(index,progress,variant)};
+ return {progress,opacity,contour:opacity===0?ribbonPaths[index]:coilFrame(index,progress,variant)};
 }
 export function coilSvg(time,{variant='B',background='none',id='coil-gold'}={}){
  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="610" height="590"><rect x="-25" y="-30" width="610" height="590" fill="${background}"/><defs><linearGradient id="${id}" x1="0" y1="0.65" x2="1" y2="0.25" gradientUnits="objectBoundingBox">${gradientStops.map(([offset,color])=>`<stop offset="${offset}" stop-color="${color}"/>`).join('')}</linearGradient></defs>${ribbonPaths.map((_,index)=>{const frame=coilState(index,time,variant);return `<path d="${frame.contour}" fill="url(#${id})" opacity="${frame.opacity}"/>`;}).join('')}</svg>`;

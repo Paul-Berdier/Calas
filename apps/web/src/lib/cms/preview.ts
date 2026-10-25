@@ -1,9 +1,11 @@
 import type {APIContext} from 'astro';
-import {getActor} from '../../server/auth/permissions';
 export const PRIVATE_HEADERS={'Cache-Control':'private, no-store, max-age=0','X-Robots-Tag':'noindex, nofollow, noarchive','Referrer-Policy':'no-referrer',Vary:'Cookie'};
 export async function isPreview(context:Pick<APIContext,'request'|'url'|'locals'>):Promise<boolean>{
   if(context.locals.cmsPreview!==undefined)return context.locals.cmsPreview;
   if(context.url.searchParams.get('preview')!=='1')return false;
+  // Public requests do not need to load the private authentication runtime.
+  // The same server-side permission check remains mandatory for every preview.
+  const {getActor}=await import('../../server/auth/permissions');
   return Boolean(await getActor(context.request));
 }
 export function safePreviewRedirect(value:string,origin:string):string{
