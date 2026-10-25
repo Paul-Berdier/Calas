@@ -1,0 +1,39 @@
+{
+  "protocol": {
+    "lighthouse": "13.5.0",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "formFactor": "mobile",
+    "throttlingMethod": "simulate",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "site": "PostgreSQL local, build standalone, cache neuf"
+  },
+  "runs": [
+    {
+      "stage": "Première mesure avant optimisation de l’initialisation des animations",
+      "date": "2026-10-25T09:40:03.004Z",
+      "performance": 78,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "lcpMs": 3333.89615,
+      "cls": 0.0001876897793871579,
+      "tbtMs": 358.6320499999997
+    },
+    {
+      "stage": "Après chargement différé de ScrollTrigger et réduction du coût géométrique, avant correction des recalculs forcés",
+      "date": "2026-10-25T09:52:32.067Z",
+      "performance": 80,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "lcpMs": 2665.812425,
+      "cls": 0.0316384445346052,
+      "tbtMs": 258
+    }
+  ]
+}

@@ -1,115 +1,77 @@
 # Calas Conseil
 
-Site vitrine éditorial en français : Astro SSR, TypeScript strict, Sanity Studio séparé, CSS sur mesure et animation SVG/GSAP. Le diagnostic RPS constitue le parcours prioritaire. La marque utilise **Calas Conseil**, avec un seul s.
+Site éditorial Astro SSR avec administration propriétaire sous `/admin`, PostgreSQL/Drizzle, Better Auth, Tiptap, médias S3 privés et OCR local. Le frontend et ses textes existants sont conservés. Sanity a été remplacé ; aucun compte Sanity n’est nécessaire.
 
-La livraison est prévue pour une revue locale ou de préproduction. La publication dépend de la validation de Sara et Agnès. Le mode de démonstration est explicite ; aucun article inventé n'est publié sous leur nom et aucun email de test n'est envoyé à Sara.
+La version livrée est destinée à la recette. La production reste soumise à la validation de Sara et Agnès, aux informations juridiques et au raccordement de l’hébergement et du courriel. Aucun service payant n’a été créé et aucun email de test n’est envoyé à Sara.
 
 ## Démarrage local
 
-Prérequis : Node **24.19.0** (contrainte compatible dans `package.json`) et pnpm **11.25.0**. Les dépendances sont épinglées et le lockfile doit être conservé. Depuis la racine du dépôt, sous PowerShell :
+Prérequis : Node **24.19.0**, pnpm **11.25.0**, Docker Desktop démarré. Depuis la racine :
 
 ```powershell
 pnpm install --frozen-lockfile
-Copy-Item -LiteralPath apps/web/.env.example -Destination apps/web/.env
+pnpm cms:prepare
+docker compose up -d --wait
+pnpm db:migrate --apply
+node scripts/media-storage-setup.mjs --local
+pnpm content:seed --dry-run
+pnpm content:seed --apply --publish-initial
+```
+
+`cms:prepare` complète les fichiers `.env` ignorés sans remplacer les valeurs existantes et génère des secrets aléatoires. Aucun compte n’est créé. Le seed ci-dessus publie explicitement les contenus initiaux **dans la recette locale seulement** ; il ne modifie jamais les documents déjà présents. Sans `--publish-initial`, il crée des brouillons.
+
+Dans `apps/web/.env`, choisir `CONTENT_MODE=database`, `SITE_ENV=development`, et garder `SITE_URL` et `BETTER_AUTH_URL` identiques, normalement `http://localhost:4321`. Puis :
+
+```powershell
+pnpm cms:check --services
 pnpm dev
 ```
 
-Ouvrir l'URL locale indiquée par Astro, normalement [http://localhost:4321](http://localhost:4321). Garder `CONTENT_MODE=demo`, `SITE_ENV=development` et `MAIL_TRANSPORT=simulation` pour la première visite. Le mode simulation traite la demande côté serveur puis la détruit, sans envoi ni stockage du message. Pour reproduire une indisponibilité du transport, utiliser le mode de test `unavailable` puis redémarrer.
+Ouvrir [le site](http://localhost:4321/) et [l’administration](http://localhost:4321/admin/). Ne pas alterner `localhost` et `127.0.0.1` pour la connexion : une session est liée à son origine.
 
-Les copies de `.env.example` ci-dessus sont destinées à un premier démarrage. Si un `.env` existe déjà, le conserver et ne compléter que les clés manquantes. Aucun secret ne doit être committé.
+Le mode `CONTENT_MODE=demo` reste disponible pour une revue du frontend sans services. Il est explicite, interdit en production et ne sert jamais de repli silencieux en cas de panne PostgreSQL.
 
-## Studio et contenu connecté
+## Premier administrateur
 
-Les sources de l'interface d'édition sont présentes dans `apps/studio`. Le Studio nécessite un vrai projet Sanity détenu par Calas Conseil pour modifier et publier des données. La simple compilation ne démontre pas une connexion CMS fonctionnelle.
+Suivre [la procédure CMS](docs/CMS.md). La commande `pnpm auth:bootstrap` lit `INIT_ADMIN_EMAIL`, `INIT_ADMIN_NAME` et `INIT_ADMIN_PASSWORD` dans l’environnement privé du processus, refuse si un compte existe déjà, puis exige vérification de l’adresse et activation TOTP. Aucun mot de passe par défaut et aucune inscription publique.
 
-Après configuration du projet et du dataset de test dans les exemples d'environnement :
+Les courriels de développement arrivent dans [Mailpit local](http://localhost:18025/). Les autres collaborateurs sont invités depuis l’administration. Le [guide de Sara illustré](docs/GUIDE-SARA.md) présente la connexion, les pages, les images, l’import PDF, les brouillons, la publication et l’historique.
 
-```powershell
-Copy-Item -LiteralPath apps/studio/.env.example -Destination apps/studio/.env
-pnpm dev:studio
-```
+## Commandes principales
 
-Ouvrir l'URL donnée par Sanity, normalement [http://localhost:3333](http://localhost:3333). La procédure technique se trouve dans [docs/CMS.md](docs/CMS.md), et le parcours sans terminal destiné à Sara dans [docs/GUIDE-SARA.md](docs/GUIDE-SARA.md).
-
-Les pages publiques utilisent la perspective `published`. La preview vérifie un secret Sanity avant d'émettre une session signée ; ses réponses sont privées et non indexables. Un paramètre `preview=true` ou un cookie arbitraire n'ouvre pas les brouillons. Les jetons privés restent côté serveur. Le mode connecté ne retourne jamais de faux contenu de démonstration lorsqu'un CMS est indisponible.
-
-Le cache partagé public est prévu à 30 secondes, sans CDN Sanity supplémentaire. La publication réelle et le délai de visibilité doivent être mesurés après connexion et sur l'hébergement retenu. Aucun redéploiement manuel du frontend n'est nécessaire pour les pages éditables SSR.
-
-## Commandes
-
-| Commande | Usage |
+| Commande | Effet |
 | --- | --- |
-| `pnpm dev` | Serveur Astro local |
-| `pnpm dev:studio` | Interface Sanity locale |
-| `pnpm cms:prepare` | Préparer les configurations locales sans connexion ni publication |
-| `pnpm cms:check` | Signaler les réglages manquants sans afficher les secrets ; `--remote` pour vérifier ensuite la lecture API |
-| `pnpm build` | Compilation du frontend Node standalone |
-| `pnpm build:studio` | Compilation du Studio séparé |
-| `pnpm preview` | Inspection locale du build Astro |
-| `pnpm start` | Démarrage du serveur Node compilé |
-| `pnpm typecheck` | Contrôles TypeScript et Astro |
-| `pnpm lint` | Analyse statique des sources |
-| `pnpm test:unit` | Tests unitaires pertinents |
-| `pnpm test:cms-local` | Configuration, preview, images, PDF et contenus initiaux sans compte réel |
-| `pnpm test` | Parcours Playwright |
-| `pnpm test:visual` | Captures et contrôles visuels Playwright |
-| `pnpm content:seed` | Initialisation explicite du dataset de test autorisé |
-| `pnpm content:export` | Export de contenu selon la procédure CMS |
-| `pnpm content:import` | Import volontaire dans l'environnement autorisé |
+| `pnpm dev` | Astro local et préparation des fichiers OCR locaux |
+| `pnpm build` / `pnpm start` | Compilation / serveur Node standalone |
+| `pnpm typecheck` / `pnpm lint` | Contrôles Astro, TypeScript et ESLint |
+| `pnpm test:cms-local` | Configuration, contenu initial, preview, rendu riche, médias/PDF |
+| `pnpm test:domain` | Modèles métier et validation des médias |
+| `pnpm test:integration` | PostgreSQL, médias S3, contact partagé et sauvegarde selon les variables de recette |
+| `pnpm test` | Parcours publics Chromium/Firefox, accessibilité et budgets |
+| `pnpm db:generate` / `pnpm db:migrate --apply` | Générer / appliquer explicitement les migrations |
+| `pnpm cms:prepare` / `pnpm cms:check --services` | Configuration locale / vérification sans afficher les secrets |
+| `pnpm content:seed --dry-run` | Inventaire des contenus initiaux, aucune écriture |
+| `pnpm content:export` / `pnpm content:import … --confirm-empty` | Sauvegarde chiffrée complète / restauration isolée |
 
-Les paramètres et garde-fous des trois commandes de contenu sont décrits dans `docs/CMS.md`. `pnpm content:seed --dry-run` prépare l'inventaire sans appel réseau. Une initialisation réelle crée seulement des brouillons absents, dans un dataset de test explicitement autorisé, sans écraser les modifications existantes. Ne jamais ajouter l'initialisation ou un import à la commande de build/déploiement.
+La compilation, le démarrage et le déploiement ne lancent ni migration, ni seed, ni publication. Les ports 4322/4324/4325 servent aux tests publics ; 4336 à la recette authentifiée. Ne pas reconstruire `dist` pendant qu’un test utilise ses chunks.
 
-## Organisation
+## Architecture et exploitation
 
-```text
-apps/web/            Application Astro, routes SSR, formulaire et preview
-apps/studio/         Interface Sanity, structure éditoriale et schémas
-assets/brand/        Sources vectorielles et géométrie du coquillage
-apps/web/public/    Assets publics et variantes du logo
-scripts/            Outils reproductibles d'assets et de contenu
-tests/              Recette automatisée
-docs/               Architecture, sources, édition, validation et exploitation
-```
+Le public utilise uniquement les versions publiées. Les brouillons nécessitent une session vérifiée avec MFA et ne sont pas mis en cache. Publier est une opération distincte d’enregistrer ; restaurer ajoute une version sans réécrire l’historique. L’administration et le moteur PDF/OCR ne sont pas chargés sur les pages publiques.
 
-Le rendu initial contient les textes, chiffres et actions. Si le mouvement est autorisé, le logo se révèle progressivement depuis son noyau, ruban après ruban, de l’intérieur vers l’extérieur. Son bloc reste fixe, sans parallaxe. Sans JavaScript ou en mouvement réduit, le logo complet reste visible. Les portraits et les articles finaux restent absents jusqu'à fourniture et validation ; la présentation utilise les informations disponibles, sans faux visuel.
+Les images et PDF restent dans un bucket privé, servis par une route qui contrôle les droits. Un PDF devient téléchargeable seulement après publication et autorisation explicite. L’OCR français/anglais s’exécute dans le navigateur ; aucun fichier n’est téléversé avant confirmation de création.
 
-## Contact et exploitation
+Le contact conserve validation, contrôle d’origine, honeypot, simulation et SMTP. En mode base de données, limitation et idempotence sont partagées via PostgreSQL ; les messages ne sont pas journalisés. Un SMTP externe exige configuration et autorisation. Les services locaux sont liés à `127.0.0.1`.
 
-Le formulaire a besoin d'un transport SMTP authentifié pour une livraison réelle. Régler `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` et `SMTP_TO`. Le visiteur devient `Reply-To`, jamais l'expéditeur usurpé. Hors production, la destination reste un domaine de test, sauf autorisation explicite matérialisée par `ALLOW_REAL_EMAIL=true`.
+- [Architecture et sécurité](docs/ARCHITECTURE.md)
+- [CMS et accès](docs/CMS.md)
+- [Médias et PDF](docs/MEDIA.md)
+- [Sauvegarde/restauration](docs/BACKUP.md)
+- [Déploiement Railway préparé](docs/DEPLOYMENT.md)
+- [Guide de Sara](docs/GUIDE-SARA.md)
+- [Migration et référence conservée](docs/MIGRATION.md)
+- [Recette et limites](docs/RECETTE.md)
+- [Validation éditoriale](docs/VALIDATION.md)
+- [Sources métier](docs/SOURCES.md), [logo](docs/LOGO.md), [prestation et maintenance](docs/PROPOSITION.md)
 
-Le contrôle de débit et l'idempotence utilisent une mémoire bornée par instance ; avant une exploitation sur plusieurs instances, prévoir une protection de débit commune en amont. Aucun corps de message n'est conservé dans les journaux applicatifs. La conservation réelle chez le prestataire email et dans la boîte destinataire doit être validée avec Calas Conseil.
-
-La route `/api/health/` indique la santé du serveur. Déployer avec `HOST=0.0.0.0` et le `PORT` de la plateforme. Les instructions de mise en ligne, cache, sauvegarde et restauration figurent dans [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-
-## Documents de livraison
-
-- [Architecture](docs/ARCHITECTURE.md) : choix techniques et limites.
-- [Sources et corrections](docs/SOURCES.md) : ODT, statistiques, terminologie et références.
-- [Validation](docs/VALIDATION.md) : revue des pages prioritaires, contenus manquants et conditions de publication.
-- [Guide de Sara](docs/GUIDE-SARA.md) : édition graphique, brouillons et publication.
-- [CMS](docs/CMS.md) : raccordement, sécurité et opérations sur le contenu.
-- [Logo](docs/LOGO.md) : source, variantes et mouvement.
-- [Déploiement](docs/DEPLOYMENT.md) : Node, transport email, sauvegarde et restauration.
-- [Proposition](docs/PROPOSITION.md) : réalisation, hébergement et maintenance séparés, sans tarif accepté.
-
-Les vérifications effectivement réalisées sont à lire dans le compte rendu de recette livré avec les captures. Les parcours Sanity réels, la délivrabilité SMTP, les mentions juridiques finales et l'autorisation de publication restent distincts de la validation technique locale. Aucune disponibilité ou propriété du domaine `calasconseil.fr` n'est présumée.
-
-Le Studio comprend **Importer un PDF** : extraction locale ou OCR français/anglais des scans, aperçu et création d’un nouvel article en brouillon avec PDF téléchargeable. La relecture, l’auteure et la date restent nécessaires avant publication. Les fichiers joints Sanity sont accessibles par leur lien dès leur téléversement. Les modèles OCR sont reconstruits depuis les dépendances avant le démarrage et le build du Studio ; ils ne sont pas chargés sur le site public. Voir le [guide de prise en main](docs/GUIDE-SARA.md).
-
-## Résultat de la recette locale
-
-Après refonte : 37 scénarios Playwright couverts, corrections et relances ciblées réussies dans Chromium et Firefox ; build web, TypeScript et lint réussis. Lighthouse mobile : performance 94/100, LCP 2,7 s, CLS 0. Le déroulement du logo dispose de contrôles visuels dédiés dans Chromium et Firefox, sur ordinateur et mobile. Ces mesures de laboratoire ne remplacent pas la recette connectée ou les mesures de terrain.
-
-Après préparation Sanity/PDF : 38 scénarios publics et 29 tests locaux réussis, builds web/Studio réussis. Six cas d’extraction/OCR et quatre contrôles d’interface avec API Sanity simulée passent. Les mesures Lighthouse ci-dessus précèdent cette préparation ; seuls les budgets de ressources ont été remesurés. Le compte Sanity réel reste à connecter.
-
-Le [compte rendu de recette](docs/RECETTE.md) contient les captures ordinateur/mobile, la vidéo du logo, le protocole Lighthouse et les limites exactes. L’édition privée est compilée séparément au démarrage et au build ; aucun asset d’édition n’est chargé par le visiteur public.
-
-Avant les tests, compiler puis installer les navigateurs si nécessaire :
-
-```powershell
-pnpm build
-pnpm exec playwright install chromium firefox
-pnpm test
-```
-
-Les ports 4322, 4324 et 4325 sont réservés à la recette et doivent être libres. Ne pas reconstruire pendant un test. Dans un environnement Windows restreint, Firefox peut exiger une exécution autorisée hors du bac à sable. Si la télémétrie Astro tente d’écrire hors du dossier autorisé, définir `$env:ASTRO_TELEMETRY_DISABLED='1'` dans le terminal de travail.
+Les résultats historiques et les résultats de cette migration sont distingués dans la recette. Un succès local ne vaut ni validation éditoriale ni test de l’infrastructure de production.

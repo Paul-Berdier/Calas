@@ -11,13 +11,13 @@ Base vérifiée : `ece27bda5bcb53219d03c1e44a15e8bc7bc39d9c`, dépôt propre, br
 | Phase | Travail | État / preuves |
 | --- | --- | --- |
 | A | Audit, routes, contrats, référence des tests | Vérifié : typecheck web/Studio, lint, build, 29 tests locaux et 38 scénarios Playwright réussis ; rapports `artifacts/migration-baseline-*.log` |
-| B | PostgreSQL, migrations, révisions, reprise idempotente | Conception validée, implémentation en cours |
-| C | Lecture Astro et rendu riche indépendants du CMS précédent | À faire |
-| D | Better Auth, rôles, MFA, invitations et sessions | À faire |
-| E | Administration, édition structurée, aperçu et historique | Implémentation isolée en cours |
-| F | Tiptap, médias S3 privés, PDF/OCR | Implémentation isolée en cours |
-| G | Étude des trois enroulements, comparaison et mouvement final | À faire |
-| H | Nettoyage, CI, sauvegarde/restauration, recette et PR | À faire |
+| B | PostgreSQL, migrations, révisions, reprise idempotente | Migrations Drizzle appliquées sur PostgreSQL 17 local ; 17 ressources reprises, 25 contrôles modèles/persistance réussis |
+| C | Lecture Astro et rendu riche indépendants du CMS précédent | Vérifié : contrat public conservé, preview privée, rendu filtré, 38 parcours publics réussis |
+| D | Better Auth, rôles, MFA, invitations et sessions | Vérifié en services réels : 9 groupes sécurité, connexion TOTP, expiration et déconnexion |
+| E | Administration, édition structurée, aperçu et historique | Vérifié : 53 états responsive et 15 aperçus, zéro défaut axe/console/débordement |
+| F | Tiptap, médias S3 privés, PDF/OCR | Vérifié : 20 étapes réelles, 6 cas OCR, médiathèque privée, remplacement et suppression protégée |
+| G | Étude des trois enroulements, comparaison et mouvement final | 48 contrôles navigateur et 1 515 états géométriques réussis ; optimisation du coût initial après mesure Lighthouse en cours |
+| H | Nettoyage, CI, sauvegarde/restauration, recette et PR | Sauvegarde chiffrée PG+S3 et restauration isolée vérifiées : 6 contrôles réussis ; Sanity retiré, conteneur Linux vérifié, CI préparée ; mesure finale et PR en cours |
 
 ## Conservation et correspondance
 
@@ -26,7 +26,7 @@ Base vérifiée : `ece27bda5bcb53219d03c1e44a15e8bc7bc39d9c`, dépôt propre, br
 - Un moteur de documents et de révisions immuables partage le cycle éditorial, avec des tables relationnelles par domaine. Les références publiées et de travail sont distinctes. Une restauration ajoute une révision.
 - Les médias demeurent dans un bucket privé. Le serveur décide de leur exposition à partir des références publiées ; un PDF requiert une autorisation de téléchargement explicite.
 - La prévisualisation réutilise les pages Astro sous session Better Auth autorisée, avec cache privé désactivé.
-- L'ancien Studio ne sera retiré qu'après vérification de ses remplacements. Les captures et résultats historiques restent identifiés comme historiques.
+- L’ancien Studio a été retiré après vérification de ses remplacements. Les captures et résultats historiques restent identifiés comme historiques.
 
 ## Risques et contrôles
 
@@ -36,3 +36,11 @@ Concurrence des sauvegardes : version attendue et transaction. Fuite de brouillo
 
 - Audit initial : architecture et brief relus ; versions inchangées, aucune modification locale préalable à protéger. Vérification Astro initiale : 40 fichiers, zéro erreur/avertissement. Suite de référence terminée : 29 tests locaux et 38 scénarios Chromium/Firefox réussis.
 - Services de recette locaux : PostgreSQL 17, MinIO privé et Mailpit démarrés dans Docker, ports liés à 127.0.0.1. Images verrouillées par digest ; secrets générés dans les fichiers ignorés, aucun envoi externe.
+- Phase B : moteur `content_documents`/`content_revisions` partagé, tables métier et sous-tables de révisions des pages/articles. JSONB strictement validé, clés étrangères, garde SQL d’immutabilité et propriété des pointeurs, concurrence optimiste et transactions. Le seed a repris neuf pages, l’accueil, deux personnes, quatre statistiques et les paramètres ; aucun article inventé. Nouvelle lecture publique depuis PostgreSQL, sans cache applicatif partagé.
+- Tests B : 25 contrôles réussis sur modèles et base isolée, dont seed idempotent, brouillon distinct du publié, publication, restauration, refus d’écrasement concurrent, refus de révision étrangère, rôles, références, médias PDF privés, autorisation de téléchargement et dépublication. Une erreur de comparaison liée à l’ordre des clés JSONB a été détectée puis corrigée avec une sérialisation canonique.
+- Phase H, sauvegarde : six contrôles réussis, dont dump PostgreSQL et restauration sur deux bases et deux buckets S3 locaux isolés, avec historique, comptes, brouillon plus récent et octets PDF conservés. Archive AES-256-GCM, inventaire SHA-256 et contrôles avant écriture. Aucune restauration distante revendiquée. Procédure et limites dans `docs/BACKUP.md`.
+
+- Phases C–F : tests de données, de services et de navigateurs réellement exécutés. Correction du routage Better Auth, de l’état Tiptap après publication, du cadrage d’image et de l’aperçu mobile. Les anciennes suites CMS ont été remplacées, pas supprimées sans équivalent.
+- Phase G : trois variantes comparées ; B retenue, enroulement extérieur vers noyau en 2,2 s, tracé final exact. Firefox a révélé un flash initial, corrigé puis contrôlé dans les deux moteurs. Première mesure mobile 78/100, accessibilité 100, CLS0 ; le coût d’initialisation des animations est en cours de réduction, cette mesure n’est pas masquée.
+- Exploitation : journalisation filtrée pour retirer secrets et URLs de récupération ; tests dédiés réussis. Contact SQL vérifié sur plusieurs processus et avec un pool limité à une connexion.
+- Commits logiques : données et sauvegardes `8223de3`, administration et sécurité `31625cd`, médias/PDF `24b8c8c`, raccordement Astro/retrait Sanity `71dcb69`, logo `183f3ce`.

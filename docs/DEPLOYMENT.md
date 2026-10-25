@@ -1,118 +1,142 @@
-# Déploiement, sauvegarde et restauration
+# Déployer et exploiter le CMS Calas Conseil
 
-La livraison vise d'abord le développement et la préproduction. Aucun compte d'hébergement, domaine ou abonnement n'a été créé par cette procédure. La publication dépend de la revue de `VALIDATION.md`. Les identifiants et la propriété administrative doivent appartenir à Calas Conseil.
+Le dépôt prépare une préproduction avec une application Astro SSR, PostgreSQL et un bucket S3 privé. Aucun projet Railway, abonnement, domaine, transport SMTP externe ou déploiement public n’a été créé par cette livraison. Les comptes d’exploitation doivent appartenir à Calas Conseil. La validation de Sara et Agnès et la relecture finale restent indispensables avant ouverture au public.
 
-## Application Node autonome
+## Démarrage local
 
-Le dépôt contient `apps/web` (Astro SSR) et `apps/studio` (Sanity Studio séparé). La configuration Astro utilise `@astrojs/node` en mode `standalone`. Le serveur produit les pages éditables à la demande et sert aussi les assets. Le Studio n'est pas intégré au parcours du visiteur.
+Utiliser Node **24.19.0**, pnpm **11.25.0** et Docker Desktop. Depuis la racine du dépôt :
 
-Utiliser la version de Node déclarée dans `package.json`, ainsi que la version de pnpm du champ `packageManager`. Installer à partir du lockfile :
-
-```sh
+```powershell
 pnpm install --frozen-lockfile
-pnpm typecheck
-pnpm lint
-pnpm build
-pnpm test:unit
-pnpm build:studio
+pnpm cms:prepare
+docker compose up -d
+pnpm db:migrate --apply
+node scripts/media-storage-setup.mjs --local
+pnpm content:seed --dry-run
+pnpm content:seed --apply
+pnpm auth:bootstrap
+pnpm dev
 ```
 
-La recette navigateur se lance avec `pnpm test`. Les tests doivent utiliser un transport simulé ou une boîte locale, jamais l'adresse réelle de Sara sans autorisation. Ne pas interpréter un build réussi comme une preuve du fonctionnement CMS, de la preview ou de la réception d'un email.
+La préparation crée les secrets locaux dans les fichiers `.env` ignorés par Git. Elle ne crée aucun compte, n’envoie aucun email et ne modifie aucun contenu. Avant le bootstrap, renseigner `INIT_ADMIN_EMAIL`, `INIT_ADMIN_NAME` et `INIT_ADMIN_PASSWORD` (12 caractères minimum) dans l’environnement privé du processus, sans les placer dans l’historique du terminal. Retirer ces variables ensuite. Le bootstrap refuse une base contenant déjà un compte ; les accès suivants passent par les invitations. Vérifier l’email puis activer TOTP, comme décrit dans [CMS.md](CMS.md). Mailpit est accessible sur `http://127.0.0.1:18025` ; aucun message de cette boîte ne part sur Internet.
 
-Pour lancer le serveur compilé depuis la racine, avec les variables injectées par l'hébergeur :
+Le seed crée seulement les contenus absents et conserve les modifications existantes. Pour une recette locale des pages issues du cahier des charges, `pnpm content:seed --apply --publish-initial` est une option explicite ; ne pas la placer dans une installation, une compilation ou un démarrage. Passer `CONTENT_MODE=database` dans `apps/web/.env` pour lire les versions publiées de PostgreSQL. `demo` reste un mode de recette choisi, jamais un repli après panne.
 
-```sh
+Arrêter les services locaux avec `docker compose stop`. Ne pas supprimer les volumes PostgreSQL/MinIO pour une simple relance. Ne pas reconstruire `dist` tant qu’un serveur de recette utilise ses fichiers.
+
+## Construire et lancer l’application
+
+```powershell
+pnpm typecheck
+pnpm lint
+pnpm test:cms-local
+pnpm test:domain
+pnpm build
 pnpm start
 ```
 
-L'entrée Node correspond à `apps/web/dist/server/entry.mjs`. Le répertoire de travail du script `start` est `apps/web`. Pour un lancement direct depuis ce dossier :
+Le build génère les ressources PDF.js et OCR français/anglais dans les assets publics. Le site public ne charge pas ces moteurs. La compilation et le démarrage ne migrent pas la base, ne créent pas de bucket, n’importent et ne publient rien.
 
-```sh
-node ./dist/server/entry.mjs
+L’entrée SSR est `apps/web/dist/server/entry.mjs`. Le processus doit démarrer depuis `apps/web`, avec `HOST=0.0.0.0` sur l’hébergeur et son `PORT`. Le serveur Node sert les pages et les assets ; les uploads restent dans S3 et les données dans PostgreSQL. Aucun volume de médias sur le disque éphémère de l’application n’est nécessaire. [Adaptateur Node officiel Astro](https://docs.astro.build/en/guides/integrations-guide/node/).
+
+## Image Docker
+
+Le `Dockerfile` comporte des étapes séparées pour la construction et les dépendances de production. Le processus final utilise l’utilisateur non privilégié `node`. Les sources de test, `.env`, sauvegardes, captures et caches locaux sont exclus du contexte par `.dockerignore`. Aucun secret n’est un argument de compilation.
+
+```powershell
+docker build --tag calas-cms:recette --build-arg SITE_URL=https://preproduction.example.invalid .
 ```
 
-Le runtime lit `HOST` et `PORT`. Utiliser `HOST=0.0.0.0` sur l'hébergeur et son port imposé ; localement, `127.0.0.1` suffit. Placer HTTPS devant le serveur Node, au niveau du proxy ou de la plateforme. Conserver les dossiers `dist/server` et `dist/client` ainsi que les dépendances de runtime requises. [Documentation officielle de l'adaptateur Node](https://docs.astro.build/en/guides/integrations-guide/node/).
+Remplacer l’origine d’exemple par l’URL exacte approuvée de la préproduction. `SITE_URL` est le seul argument public nécessaire au build ; le fournir également au runtime. Astro compile les canonicals et l’hôte de confiance avec cette valeur. Un changement de domaine nécessite donc une nouvelle image.
 
-## Variables et séparation des environnements
+Le conteneur attend les secrets au runtime par le gestionnaire de variables de l’hébergeur. Un fichier temporaire `--env-file` peut servir sur un poste maîtrisé ; il doit rester privé, hors Git et hors image. L’image finale ne contient pas les outils de migration ou de sauvegarde : exécuter ces commandes explicitement depuis le dépôt verrouillé, sur le poste d’exploitation ou un job d’administration autorisé.
 
-Les fichiers `.env.example` sont les inventaires de référence ; les copier localement en `.env`, puis injecter les valeurs réelles dans le gestionnaire de secrets de l'hébergement. Ne jamais committer les `.env`, jetons, exports contenant des brouillons ou justificatifs privés.
+## Variables par environnement
 
-| Environnement | Contenu | Courriel | Indexation |
-| --- | --- | --- | --- |
-| Développement local | `CONTENT_MODE=demo` explicitement, ou dataset de test autorisé | Simulation / boîte locale | Désactivée |
-| Préproduction privée | Dataset de test distinct, comptes Sanity autorisés | Destination de test explicite | Désactivée et accès privé |
-| Production approuvée | `CONTENT_MODE=sanity`, contenus relus publiés | SMTP authentifié, expéditeur autorisé, destinataire validé | Activée seulement après revue |
+`apps/web/.env.example` est l’inventaire de référence. Ne jamais donner de préfixe `PUBLIC_` aux identifiants de base, clés S3, secrets Better Auth ou SMTP.
 
-Configurer `SITE_URL` avec l'origine exacte de chaque environnement et `SITE_ENV` avec `development`, `staging` ou `production`. Pour le frontend, `PUBLIC_SANITY_PROJECT_ID`, `PUBLIC_SANITY_DATASET` et `PUBLIC_SANITY_STUDIO_URL` identifient le projet, le dataset et le Studio ; ces identifiants ne sont pas secrets. `SANITY_API_READ_TOKEN` et `PREVIEW_SESSION_SECRET` restent strictement côté serveur. La clé de signature doit être aléatoire et contenir au moins 32 caractères. Le Studio utilise ses variables `SANITY_STUDIO_*`, dont l'URL de preview. Aucun secret de lecture privée ou d'écriture ne doit avoir un préfixe `PUBLIC_` ni être placé dans une variable destinée au bundle du Studio.
+| Variables | Utilisation |
+| --- | --- |
+| `SITE_URL`, `BETTER_AUTH_URL` | Même origine exacte, HTTPS sur l’hébergement ; `SITE_URL` est aussi fourni au build. |
+| `SITE_ENV` | `development`, `staging` ou `production`. La préproduction reste désindexée. |
+| `CONTENT_MODE` | `database` pour le CMS ; `demo` seulement pour une recette explicite. |
+| `HOST`, `PORT` | Adresse d’écoute et port fournis par l’hébergeur. |
+| `DATABASE_URL`, `DATABASE_POOL_MAX` | Connexion PostgreSQL et taille du pool. Commencer avec 10 connexions par instance et respecter le budget de la base. |
+| `BETTER_AUTH_SECRET` | Secret aléatoire d’au moins 32 caractères ; conserver séparément sa copie de récupération. |
+| `CONTACT_SIGNING_SECRET` | Secret aléatoire indépendant d’au moins 32 caractères pour le formulaire et ses protections. |
+| `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET` | Endpoint HTTPS du service de stockage, région et nom du bucket privé. |
+| `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Identifiants limités au bucket de cet environnement. |
+| `S3_FORCE_PATH_STYLE` | `true` pour MinIO local ; choisir selon les exigences du fournisseur et vérifier la connexion. |
+| `TRUST_RAILWAY_PROXY` | `false` par défaut ; `true` uniquement avec l’origine exclusivement accessible par le proxy Railway vérifié. |
+| `AUTH_MAIL_TRANSPORT` | `local` pour Mailpit en développement, `smtp` pour un transport externe autorisé. |
+| `AUTH_SMTP_HOST`, `AUTH_SMTP_PORT`, `AUTH_SMTP_FROM` | Mailpit local uniquement. Ne pas conserver ces réglages de développement en production. |
+| `MAIL_TRANSPORT` | `simulation` en recette locale, `smtp` pour le formulaire effectivement raccordé. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Transport SMTP commun aux emails de compte et au formulaire. |
+| `SMTP_TO` | Destinataire approuvé du formulaire, indépendant des emails de compte. |
+| `ALLOW_REAL_EMAIL` | `false` jusqu’à autorisation explicite d’envoi réel ; `true` requis pour le raccordement externe. |
+| `CONTACT_RATE_LIMIT` | Nombre de demandes autorisées par fenêtre de quinze minutes, 5 par défaut. |
+| `BACKUP_ENCRYPTION_KEY` | Clé base64 de 32 octets, nécessaire au poste de sauvegarde, conservée hors des archives. |
 
-Le déploiement du frontend ne lance **aucun import ou seed**. Une panne CMS doit retourner l'état maîtrisé prévu par l'application ; elle ne doit pas basculer vers les données de démonstration.
+Séparer totalement les bases, buckets, identifiants, secrets de session et destinations de courrier entre recette et production. La désindexation n’est pas un contrôle d’accès : restreindre aussi l’accès réseau à la préproduction lorsqu’elle contient des données privées.
 
-L'initialisation peut être inspectée sans appel réseau :
+## Raccordement Railway après autorisation
 
-```sh
-pnpm content:seed --dry-run
+1. Choisir explicitement le compte, l’environnement, la région et le budget. Créer les ressources uniquement après accord. Le dépôt ne suppose aucun projet préexistant.
+2. Configurer une application depuis la racine du dépôt. `railway.json` sélectionne le Dockerfile, une instance, le contrôle `/api/ready/`, un délai de démarrage de 120 secondes et trois tentatives de redémarrage après panne. Ne pas ajouter de seed à une commande de pré-déploiement. [Dockerfiles Railway](https://docs.railway.com/builds/dockerfiles) et [schéma de configuration officiel](https://railway.com/railway.schema.json).
+3. Raccorder PostgreSQL 17 sur le réseau privé, avec un compte applicatif limité. Employer TLS pour une connexion distante exposée et vérifier le certificat ; ne pas désactiver sa validation pour contourner une erreur.
+4. Raccorder un bucket S3 privé dédié et vérifier ses permissions. Ne pas activer de lecture publique, de CORS navigateur ou de domaine public de médias : l’application sert les fichiers par son proxy autorisé. Les clés restent exclusivement serveur. [Stockage S3 Railway](https://docs.railway.com/storage-buckets).
+5. Injecter la configuration et les secrets. Définir l’origine HTTPS exacte avant construction. Le Dockerfile déclare `ARG SITE_URL` afin que Railway puisse lui fournir cette variable publique.
+6. Sauvegarder, puis appliquer les migrations explicitement avec la même révision du dépôt. Le premier seed et le bootstrap administrateur restent des actions distinctes. Contrôler `pnpm cms:check --services` avant ouverture.
+7. Démarrer l’image, vérifier la disponibilité, puis refaire une recette sur l’URL HTTPS réelle : login, email, MFA, preview, publication locale à cet environnement, médias privés, PDF autorisé, dépublication et restauration. Les contrôles réalisés sur MinIO/Mailpit ne remplacent pas ce raccordement.
+8. Connecter le domaine final et activer `SITE_ENV=production` seulement après validations métier. Vérifier certificat, canonicals, sitemap, contact, désindexation de l’administration et en-têtes sur le domaine réel.
+
+Les accès S3 applicatifs doivent être bornés aux opérations nécessaires sur ce bucket : lecture, écriture, suppression d’objets et lecture de son inventaire. La création de buckets appartient à l’exploitation. `media-storage-setup.mjs --local` refuse un endpoint distant.
+
+## Origine, proxy et débit
+
+Railway documente `X-Real-IP` comme adresse distante, `X-Forwarded-Proto` comme protocole et `X-Forwarded-Host` comme hôte original. Notre confiance dans `X-Real-IP` est conditionnée à `TRUST_RAILWAY_PROXY=true`. L’accès direct au processus doit alors être fermé : un client joignant directement Node pourrait fabriquer cet en-tête. Avec l’option désactivée, les en-têtes fournis par le navigateur ne deviennent pas une identité de limitation. [Spécifications réseau Railway](https://docs.railway.com/networking/public-networking/specs-and-limits).
+
+Les origines autorisées restent exactes, sans wildcard. Les mutations de l’administration et de l’authentification contrôlent l’origine et utilisent les sessions HttpOnly. Les réponses privées, aperçus et médias privés ne sont pas mis en cache. Ne pas ajouter un cache de proxy qui contourne ces en-têtes.
+
+Les compteurs et l’idempotence du contact sont mutualisés dans PostgreSQL, comme la protection des opérations administratives. Le corps du contact est borné à 64 Kio ; les endpoints médias vérifient leur flux et leur format, sous la limite générale de 22 Mio du serveur. Le moteur PDF s’exécute dans le navigateur ; la validation serveur reste obligatoire. Voir [MEDIA.md](MEDIA.md).
+
+## Santé et surveillance
+
+- `/api/health/` : processus HTTP vivant, sans lecture des contenus.
+- `/api/ready/` : configuration, schéma PostgreSQL et bucket joignables ; réponse générique 503 en cas d’échec, sans identifiant sensible. Ce contrôle ne livre aucun brouillon et n’envoie pas d’email.
+- Le healthcheck Docker utilise la vivacité ; Railway attend la disponibilité avant d’activer une nouvelle instance.
+
+Le healthcheck de déploiement n’est pas une surveillance continue. Prévoir, après accord d’exploitation, des contrôles externes périodiques de la disponibilité, des erreurs et des sauvegardes, avec un destinataire d’alerte identifié. Contrôler l’arrêt propre et les connexions PostgreSQL lors des redémarrages. Ne pas enregistrer les corps des formulaires, les mots de passe, les cookies ou les liens de récupération dans les journaux.
+
+## SMTP et délivrabilité
+
+Le transport local vérifié est Mailpit. Il capture les invitations, vérifications et réinitialisations sans distribution externe. La simulation du formulaire valide son parcours mais ne démontre aucune délivrabilité.
+
+Pour raccorder un fournisseur approuvé, configurer le transport authentifié, l’expéditeur autorisé et les enregistrements SPF, DKIM et DMARC demandés. Le visiteur du formulaire est placé en `Reply-To`, jamais usurpé en expéditeur. Vérifier réception, réponse, classement en indésirables, liens HTTPS et expiration des jetons avec une boîte de recette autorisée ; aucun test à Sara sans instruction explicite.
+
+Documenter le fournisseur, ses traitements, la rétention des emails et leur suppression. L’idempotence applicative ne garantit pas une livraison SMTP exactement une fois lorsque le serveur accepte un message puis perd son accusé de réception. Reprendre manuellement une livraison incertaine plutôt que d’affirmer qu’aucun email n’a été envoyé.
+
+## Sauvegarde, mise à jour et retour arrière
+
+La procédure complète se trouve dans [BACKUP.md](BACKUP.md). `pnpm content:export` chiffre ensemble le dump PostgreSQL, les comptes, l’historique et les objets S3, y compris les versions de fichiers conservées. Une sauvegarde locale seule ne suffit pas : prévoir une copie chiffrée dans un autre domaine de panne, une rétention approuvée, la clé séparée et un contrôle périodique de restauration.
+
+Avant une migration : exporter, vérifier l’archive, tester la nouvelle version dans une base et un bucket isolés, puis appliquer les migrations explicitement. `pnpm content:import <archive> --confirm-empty` refuse une destination non vide et ne cible pas la production. Ne jamais exécuter de reset de base pour déployer.
+
+Pour revenir en arrière, redéployer le code précédent seulement si le schéma reste compatible. Sinon restaurer dans de nouvelles ressources, vérifier puis faire autoriser la bascule. Conserver `BETTER_AUTH_SECRET` lors d’un transfert normal : il protège les secrets MFA en base. Après compromission, préparer séparément rotation, révocation des sessions et récupération des accès. Renouveler les clés S3/SMTP sans les placer dans Git et tester les nouvelles avant révocation des anciennes.
+
+Le suivi d’exploitation doit couvrir mises à jour Node/dépendances, migrations, disponibilité des sauvegardes, espace PostgreSQL/S3 et nettoyage des objets de médias en attente. Les anciens médias référencés par l’historique ne sont pas supprimés arbitrairement.
+
+## État de vérification
+
+Les parcours CMS, PDF, Tiptap, médias privés, SMTP local et sécurité Better Auth ont été exécutés avec PostgreSQL 17 et MinIO/Mailpit locaux. La sauvegarde/restauration sur ressources isolées est décrite dans `BACKUP.md`. Les rapports se trouvent dans `artifacts/custom-cms/`.
+
+Une image Linux a été construite puis exécutée avec un système de fichiers en lecture seule et l’utilisateur `node` (UID 1000). Le smoke a confirmé Node 24.19.0, la génération WebP par Sharp natif, l’accueil en mode démo explicite, la vivacité 200 et la disponibilité 503 sans configuration privée. Aucun fichier `.env` ni source applicative n’était présent dans l’image finale. Le conteneur de recette a été arrêté automatiquement. Le rapport est `artifacts/custom-cms/docker-smoke-report.json` ; refaire ce contrôle sur l’image finale avant déploiement :
+
+```powershell
+docker build --tag calas-cms:local-check --build-arg SITE_URL=http://localhost:4321 .
+node scripts/docker-smoke-check.mjs
 ```
 
-Pour une écriture réellement autorisée, utiliser un dataset nommé `staging`, `development` ou `test` (ou l'un de ces préfixes suivi d'un suffixe avec tiret), fournir `SANITY_WRITE_TOKEN` côté serveur et activer `CALAS_ALLOW_CONTENT_WRITE=yes`. Le seed crée uniquement les documents absents comme **brouillons**, sans article inventé ; un document déjà publié ou déjà en brouillon n'est pas remplacé. Le lancement normal est `pnpm content:seed`. Faire relire puis publier manuellement les contenus nécessaires dans le dataset de test. Retirer l'opt-in et le jeton d'écriture de l'environnement du serveur web après l'opération.
+Ce test utilise uniquement le port loopback 14321 et aucun secret, serveur de données ou transport de courrier. Il ne remplace pas la recette d’une image raccordée à ses services privés.
 
-## Sanity et prévisualisation
-
-La procédure complète, les rôles réels, les commandes de contenu et la recette sont dans `CMS.md`. Héberger le Studio sur un sous-domaine Sanity appartenant au projet Calas Conseil, une fois le compte créé et les accès validés. Les brouillons doivent rester de vrais brouillons Sanity.
-
-Renseigner les seules origines requises dans CORS : Studio déployé, frontend de préproduction et origines locales nécessaires à la recette. N'autoriser les credentials que pour les origines exactes qui en ont besoin, jamais avec un wildcard. Configurer l'autorisation d'iframe de la preview pour le Studio exact ; vérifier les restrictions de cookies dans les navigateurs testés.
-
-Les routes `/api/preview/enable/` et `/api/preview/disable/` ouvrent ou ferment la preview. Vérifier la session signée d'une durée d'une heure, son expiration et le refus d'un cookie arbitraire. Les réponses de preview sont privées, sans cache et sans indexation ; les routes publiques utilisent `published`. Le token de lecture des brouillons reste côté serveur. Les messages du formulaire, les secrets et les attestations privées ne doivent jamais être stockés dans le dataset éditorial public.
-
-Le contenu public connecté est actuellement servi avec `public, max-age=0, s-maxage=30, must-revalidate`, sans cache CDN Sanity supplémentaire. Le budget de visibilité prévu est de 30 secondes de cache partagé, auquel s'ajoutent le traitement de publication et le transit. Un hébergement sans cache partagé refait la lecture à chaque requête. Ce n'est pas une invalidation automatique après publication. Mesurer après raccordement en publiant une modification dans le dataset de test, en interrogeant le frontend sans cookies et en notant l'heure de première apparition. Répéter depuis les chemins de cache réellement déployés. Un proxy qui modifie les en-têtes impose de refaire cette mesure. Aucune mesure CMS réelle n'est revendiquée en l'absence de projet connecté.
-
-## Courriel et données de contact
-
-Choisir le transport authentifié et valider son traitement des données. Le réglage `MAIL_TRANSPORT=simulation` accepte puis détruit la demande en développement, sans l'envoyer ni la conserver. `MAIL_TRANSPORT=smtp` utilise `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` et `SMTP_TO`. Le mode `unavailable` est réservé au test de panne. Configurer une adresse `SMTP_FROM` autorisée par ce transport ; placer l'adresse validée du visiteur en `Reply-To`. Ne jamais usurper l'adresse du visiteur comme expéditeur.
-
-Publier les enregistrements SPF, DKIM et DMARC demandés par le fournisseur pour le domaine d'envoi choisi, puis effectuer un test autorisé de réception, réponse et classement en indésirables. Documenter le destinataire réel, les éventuelles copies, la rétention chez le transport et dans la boîte destinataire, ainsi que leur suppression. Ne pas conserver ni journaliser le corps des messages dans les logs applicatifs.
-
-La simulation de développement valide le parcours applicatif mais ne démontre pas la délivrabilité. En préproduction, afficher clairement la destination de test aux personnes qui font la recette. Hors production, `SMTP_TO` doit cibler un domaine `example.test` ou `.invalid` ; `ALLOW_REAL_EMAIL=true` ne doit être utilisé qu'après autorisation explicite d'un test réel. Désactiver toute injection volontaire de panne avant la production. La limite `CONTACT_RATE_LIMIT=5` correspond à cinq demandes par fenêtre de quinze minutes. Vérifier la limitation de débit en tenant compte de l'IP fournie par le proxy de confiance ; une limitation en mémoire concerne une seule instance et se réinitialise au redémarrage. Avant plusieurs instances, utiliser une protection de débit mutualisée en amont.
-
-## Option Railway
-
-Cette option ne présume aucun projet existant. Après accord sur le service et son budget, utiliser la racine du dépôt comme répertoire de construction, la version Node déclarée, l'installation verrouillée, puis `pnpm build`. La commande de démarrage est `pnpm start`. Injecter `HOST=0.0.0.0` et écouter le `PORT` fourni par Railway. Configurer le healthcheck `/api/health/` et vérifier son HTTP 200 avant l'ouverture au public. Cette réponse de santé indique que le processus répond ; elle ne prouve pas à elle seule la disponibilité Sanity ou la réception des emails.
-
-Un healthcheck Railway valide un déploiement ; il ne constitue pas une surveillance continue après démarrage. Si une liste d'hôtes autorisés est ajoutée, tenir compte de `healthcheck.railway.app`. [Déploiement Astro sur Railway](https://docs.railway.com/guides/astro) et [healthchecks Railway](https://docs.railway.com/deployments/healthchecks).
-
-Ne connecter le domaine définitif et ne lever la désindexation qu'après la validation. Vérifier le certificat HTTPS, les redirections, les canonicals, le sitemap, les pages 404 et les en-têtes sur l'URL réellement déployée.
-
-## Sauvegardes
-
-1. Conserver le code, le lockfile, les schémas et les assets source dans un dépôt sauvegardé contrôlé par Calas Conseil. Marquer chaque version livrée ; ne jamais inclure de secrets.
-2. Exporter les documents Sanity **et les médias** avec la procédure de `CMS.md`, avant toute opération de restauration ou migration, puis selon la fréquence convenue.
-3. Conserver les exports chiffrés avec accès limité. Ils peuvent contenir des brouillons ; ne pas les placer dans `public/`, le dépôt ou une URL publique.
-4. Tenir un inventaire séparé des secrets à recréer : SMTP, jeton lecture preview, signature de session et jetons d'administration temporaires. Une sauvegarde du code ne restaure pas ces secrets.
-5. Noter la date, le dataset, la version de schéma, le nombre de documents/assets et le résultat de chaque sauvegarde. Définir la conservation et la suppression avec le cabinet.
-
-Les scripts chargent les variables de processus et les fichiers `.env` locaux. Pour l'export, fournir `SANITY_EXPORT_TOKEN` ou un `SANITY_API_READ_TOKEN` autorisé, ainsi que les identifiants de projet/dataset :
-
-```sh
-pnpm content:export backups/contenu-2026-10-25.tar.gz
-```
-
-Le script utilise le CLI officiel, avec les médias inclus par défaut, et refuse d'écraser une archive existante. Adapter le nom à la date réelle de l'opération. Pour la restauration, sélectionner un dataset de test **vide**, fournir `SANITY_WRITE_TOKEN` et l'opt-in d'écriture :
-
-```sh
-pnpm content:import backups/contenu-2026-10-25.tar.gz
-```
-
-Le script refuse un dataset contenant déjà des documents et n'utilise pas l'option `--replace`. Il refuse la production. Le jeton est transmis au CLI dans l'environnement de son processus, pas dans les arguments de commande. Les commandes ci-dessus sont livrées mais l'export/restauration réel doit être exécuté avec le projet autorisé avant d'être déclaré vérifié.
-
-## Restauration et retour arrière
-
-Restaurer d'abord dans un **dataset de test distinct**, jamais directement sur le dataset de production. Vérifier textes, références, images, brouillons et articles ; comparer l'inventaire à l'export. Brancher une préproduction sur ce dataset et reprendre la recette des pages et de la preview. Vérifier séparément l'historique et la restauration proposés par le forfait Sanity réel ; ne pas les confondre avec un export indépendant.
-
-Pour un incident de code, redéployer la dernière version validée avec ses dépendances verrouillées. Une restauration de code ne doit ni réinitialiser le contenu, ni republier les données de démonstration. Pour un incident de contenu, comparer d'abord les versions disponibles ou l'export dans l'environnement de test, obtenir l'autorisation pour l'opération de production, puis conserver une sauvegarde préalable de l'état courant.
-
-Après restauration : contrôler santé HTTP, pages prioritaires, contact, secrets, cache, droits d'accès et images ; noter ce qui a été restauré et la perte de données éventuelle. Un objectif de délai de reprise ou de perte maximale ne peut être annoncé qu'après accord et exercice mesuré.
-
-## Origine, proxy et protection du formulaire
-
-La configuration lit SITE_URL pendant la compilation pour construire security.allowedDomains avec un hôte exact et HTTPS en hébergement. Renseigner cette valeur avant pnpm build, puis garder la même origine au runtime. Aucun wildcard n’est autorisé. Le proxy de confiance doit écraser X-Forwarded-Host, X-Forwarded-Proto et X-Forwarded-For ; fermer l’accès direct au processus Node. Sans cette précaution, les adresses fournies par un appelant ne constituent pas une identité de limitation fiable. Vérifier un POST réel sur l’origine HTTPS après déploiement. Le corps du formulaire est lu par flux avec une borne de 64 Kio ; les champs gardent leurs propres limites. L’adaptateur ajoute une borne générale de 128 Kio.
-
-L’idempotence du formulaire évite les doubles soumissions applicatives pendant une heure sur une instance. Elle ne garantit pas une livraison SMTP exactement une fois si le serveur de courriel accepte un message puis perd son accusé de réception. Les corps ne sont ni journalisés ni conservés par la simulation ; le limiteur conserve temporairement un condensat signé d’adresse et le compteur, les réponses dédupliquées ne contiennent aucun message.
+La préparation Docker/Railway ne constitue ni un déploiement Railway testé, ni une validation de domaine, ni un test SMTP externe. Les raccordements et leur recette restent à réaliser avec les accès et autorisations correspondants.

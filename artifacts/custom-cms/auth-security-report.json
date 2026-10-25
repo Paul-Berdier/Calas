@@ -1,0 +1,50 @@
+{
+  "environment": "http://localhost:4336",
+  "services": "Real PostgreSQL, Better Auth and local Mailpit; no external email",
+  "mockedResponses": false,
+  "reports": [
+    {
+      "name": "Inscription publique, APIs anonymes et invitation cross-origin refusées",
+      "passed": true
+    },
+    {
+      "name": "Invitation reçue par Mailpit, usage unique, rôle serveur et vérification email obligatoires",
+      "passed": true
+    },
+    {
+      "name": "Mot de passe incorrect/inconnu refusé, TOTP activé, ancienne session pré-MFA non promue et appareil non approuvé",
+      "passed": true
+    },
+    {
+      "name": "Rôle éditeur contrôlé côté serveur ; élévation, désactivation MFA et changement cross-origin impossibles",
+      "passed": true
+    },
+    {
+      "name": "Connexion TOTP réelle, code incorrect refusé et challenge consommé une seule fois",
+      "passed": true
+    },
+    {
+      "name": "Code de secours utilisable une seule fois pour une vraie connexion",
+      "passed": true
+    },
+    {
+      "name": "Liste de sessions puis révocation ciblée immédiatement effective",
+      "passed": true
+    },
+    {
+      "name": "Lien réel de réinitialisation Mailpit, jeton unique, anciennes sessions révoquées, nouveau mot de passe et MFA conservée",
+      "passed": true
+    },
+    {
+      "name": "Révocation administrative et désactivation du seul utilisateur créé pour la recette",
+      "passed": true
+    }
+  ],
+  "rateLimitWaits": [
+    {
+      "path": "/api/auth/sign-in/email/",
+      "seconds": 60
+    }
+  ],
+  "createdUserDisabled": true
+}

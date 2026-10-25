@@ -1,0 +1,28 @@
+{
+  "label": "Recette du composant réel, réponses HTTP simulées uniquement pour l’incident réseau",
+  "browser": "Chromium",
+  "externalRequests": 0,
+  "browserErrors": [],
+  "reports": [
+    {
+      "check": "Analyse locale du PDF sans upload avant confirmation",
+      "result": "passed"
+    },
+    {
+      "check": "Double clic protégé, PDF privé et relecture requise, aucun auteur/date inventé",
+      "result": "passed"
+    },
+    {
+      "check": "Réponse perdue reprise avec un UUID/payload identique et un upload unique",
+      "result": "passed"
+    },
+    {
+      "check": "Ouverture du brouillon créé dans l’éditeur",
+      "result": "passed"
+    },
+    {
+      "check": "Aucun débordement aux largeurs 360/390/768/1280/1440",
+      "result": "passed"
+    }
+  ]
+}

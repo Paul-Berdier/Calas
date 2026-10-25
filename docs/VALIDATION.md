@@ -14,7 +14,7 @@
 - [ ] Diagnostic présente les cinq étapes, les facteurs de risque, les livrables et les règles de confidentialité.
 - [ ] Le rôle du binôme et la limite de ce que le diagnostic promet sont exacts.
 - [ ] Les CTA sont faciles à trouver sur mobile ; l'objet Diagnostic est présélectionné au contact.
-- [ ] Le déroulement depuis le noyau vers l’extérieur est approuvé au début, au milieu et à la fin ; les rubans apparaissent dans cet ordre et le bloc reste fixe, sans parallaxe. Le logo complet est correct sur fond clair et sombre, sans JavaScript et en mouvement réduit.
+- [ ] L’enroulement de l’extérieur vers le noyau est approuvé au début, au milieu et à la fin ; les cinq rubans se courbent progressivement et le bloc reste fixe, sans parallaxe. Le logo complet retrouve exactement sa géométrie finale et reste correct sur fond clair et sombre, sans JavaScript et en mouvement réduit.
 
 Décision à consigner : date, noms des personnes ayant relu, version du code, fichiers des captures, réserves éventuelles. Une approbation visuelle ne valide pas automatiquement les mentions légales, les comptes externes ou la délivrabilité.
 
@@ -34,18 +34,18 @@ Décision à consigner : date, noms des personnes ayant relu, version du code, f
 | Identité juridique | Nom légal, forme, SIREN/SIRET si applicable, adresse, directeur de publication | Pas de données factices |
 | Données personnelles | Responsable, destinataires, base légale, conservation, contact droits, sous-traitants | Revue nécessaire avant collecte réelle |
 | Domaine/hébergement | Propriété Calas Conseil, budget et administrateur | Aucune disponibilité ni propriété présumée |
-| Sanity | Compte Calas Conseil, dataset de test, plan, rôles et accès Sara | Démonstration isolée ; recette CMS réelle en attente |
+| CMS propriétaire | Adresse du premier responsable, accès Sara, PostgreSQL et S3 de production | Recette locale vérifiée ; accès du cabinet et hébergement à configurer |
 | Courriel | Expéditeur autorisé, transport authentifié, destinataire et test autorisé | Simulation ou boîte locale ; aucun email envoyé à Sara pendant la recette |
 
 ## Revue 2 — Avant production
 
 - [ ] Toutes les pages ont été relues, y compris les métadonnées, les pages légales et les états vides.
 - [ ] Aucun texte de travail, faux visuel, faux témoignage ou qualification non vérifiée n'apparaît publiquement.
-- [ ] Sara possède les accès administratifs ; les rôles correspondent au forfait réellement retenu.
-- [ ] Un paragraphe et une image ont été modifiés dans le Studio ; l'affichage public est vérifié après expiration du cache.
-- [ ] Un article a été créé, prévisualisé, publié puis vérifié sur le dataset de test ; aucun brouillon n'est accessible au visiteur public.
+- [ ] Sara possède les accès administratifs ; les rôles correspondent aux responsabilités retenues.
+- [ ] Un paragraphe et une image ont été modifiés dans l’administration ; l’affichage public est vérifié après publication.
+- [ ] Un article a été créé, prévisualisé, publié puis vérifié dans la recette isolée ; aucun brouillon n'est accessible au visiteur public.
 - [ ] Prévisualisation, cookies, iframe, CORS et isolation du cache sont testés dans les navigateurs retenus.
-- [ ] Une sauvegarde des documents **et des médias** a été restaurée dans un dataset de test distinct ; l'historique disponible est vérifié dans le forfait.
+- [ ] Une sauvegarde des documents **et des médias** a été restaurée dans une base et un bucket isolés ; historique, comptes et médias vérifiés.
 - [ ] Le SMTP a passé un test autorisé : destinataire, Reply-To, SPF/DKIM/DMARC, réception et indésirables vérifiés.
 - [ ] Le formulaire informe sur les traitements réels ; les journaux et copies éventuelles ont une durée de suppression définie.
 - [ ] Navigation clavier, zoom, tailles 360/390/768/1280/1440, mouvement réduit et contenus longs ont été revus.
