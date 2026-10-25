@@ -1,0 +1,7 @@
+---
+import {renderRichText} from '../lib/cms/rich-text';
+import type {RichDocument} from '../lib/cms/types';
+interface Props {value?:RichDocument}
+const html=renderRichText(Astro.props.value);
+---
+<Fragment set:html={html}/>

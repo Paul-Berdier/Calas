@@ -11,7 +11,7 @@ import {safeHref} from '../lib/links';
 import type {SiteSettings} from '../lib/cms/types';
 interface Props { title: string; description?: string; settings: SiteSettings; noindex?: boolean }
 const {title,description='Calas Conseil : prévention des risques psychosociaux, qualité du lien, accompagnement des équipes et des managers.',settings,noindex=false}=Astro.props;
-const preview=isPreview(Astro.cookies);
+const preview=await isPreview(Astro);
 const Preview=preview?(await import('../lib/cms/Preview.astro')).default:undefined;
 const production=isProductionSite();
 const hidden=noindex || !production || preview;

@@ -13,3 +13,4 @@ backups/
 artifacts/lighthouse*.json
 apps/web/public/_preview/
 apps/studio/public/ocr/
+apps/web/public/ocr/
