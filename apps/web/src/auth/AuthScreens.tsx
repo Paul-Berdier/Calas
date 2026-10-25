@@ -59,14 +59,16 @@ export default function AuthScreens({
   user,
   securityFreshUntil = 0,
   serverTime = Date.now(),
+  testPasswordOnly = false,
 }: {
   mode: "login" | "security" | "reset" | "invitation" | "users";
   user?: User;
   securityFreshUntil?: number;
   serverTime?: number;
+  testPasswordOnly?: boolean;
 }) {
   if (mode === "security" && user)
-    return <Security user={user} initialFreshUntil={securityFreshUntil} serverTime={serverTime} />;
+    return <Security user={user} initialFreshUntil={securityFreshUntil} serverTime={serverTime} testPasswordOnly={testPasswordOnly} />;
   if (mode === "users" && user) return <Users />;
   return (
     <Login mode={mode === "reset" || mode === "invitation" ? mode : "login"} />
@@ -182,7 +184,7 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
         setStep("mfa");
         return;
       }
-      window.location.assign("/admin/security/");
+      window.location.assign(destination);
     } catch (reason) {
       setError(true);
       setMessage(
@@ -350,10 +352,11 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
     </Shell>
   );
 }
-function Security({ user, initialFreshUntil, serverTime }: {
+function Security({ user, initialFreshUntil, serverTime, testPasswordOnly }: {
   user: User;
   initialFreshUntil: number;
   serverTime: number;
+  testPasswordOnly: boolean;
 }) {
   const [password, setPassword] = useState(""),
     [newPassword, setNewPassword] = useState(""),
@@ -364,6 +367,7 @@ function Security({ user, initialFreshUntil, serverTime }: {
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [error, setError] = useState(false);
+  const canManageSecurity = enabled || testPasswordOnly;
   const [sessions, setSessions] = useState<
     Array<{
       id: string;
@@ -405,7 +409,7 @@ function Security({ user, initialFreshUntil, serverTime }: {
     }
   }
   async function refreshSessions() {
-    if (!enabled || sessionsState === "stale" || serverNow() >= freshUntil) {
+    if (!canManageSecurity || sessionsState === "stale" || serverNow() >= freshUntil) {
       expireSessions();
       return;
     }
@@ -436,10 +440,10 @@ function Security({ user, initialFreshUntil, serverTime }: {
     }
   }
   useEffect(() => {
-    if (enabled) void refreshSessions();
-  }, [enabled, freshUntil]);
+    if (canManageSecurity) void refreshSessions();
+  }, [canManageSecurity, freshUntil]);
   useEffect(() => {
-    if (!enabled) return;
+    if (!canManageSecurity) return;
     const remaining = freshUntil - serverNow();
     if (remaining <= 0) { expireSessions(); return; }
     const timer = window.setTimeout(expireSessions, remaining);
@@ -451,7 +455,7 @@ function Security({ user, initialFreshUntil, serverTime }: {
       window.removeEventListener("focus", check);
       document.removeEventListener("visibilitychange", check);
     };
-  }, [enabled, freshUntil]);
+  }, [canManageSecurity, freshUntil]);
   async function disconnect(reconnect = false) {
     await execute(async () => {
       const result = await authClient.signOut();
@@ -516,6 +520,11 @@ function Security({ user, initialFreshUntil, serverTime }: {
         <Notice message={message} error={error} />
         <div className="auth-security-grid">
           <section className="auth-card">
+            {testPasswordOnly ? <>
+              <h2><KeyRound size={25} aria-hidden /> Accès au site de test</h2>
+              <p>Votre identifiant et votre mot de passe suffisent pour ce compte de recette.</p>
+              <a className="auth-button" href="/admin/">Accéder à mes contenus</a>
+            </> : <>
             <h2>
               <ShieldCheck size={25} aria-hidden /> Double authentification
             </h2>
@@ -613,8 +622,9 @@ function Security({ user, initialFreshUntil, serverTime }: {
                 Accéder à mes contenus
               </a>
             )}
+            </>}
           </section>
-          {enabled && (
+          {canManageSecurity && (
             <section className="auth-card">
               <h2>
                 <KeyRound size={25} aria-hidden /> Mot de passe
@@ -667,7 +677,7 @@ function Security({ user, initialFreshUntil, serverTime }: {
                 <button className="auth-button" disabled={busy}>
                   Modifier mon mot de passe
                 </button>
-                <button
+                {enabled && <button
                   type="button"
                   className="auth-button secondary"
                   disabled={busy || !password}
@@ -690,18 +700,18 @@ function Security({ user, initialFreshUntil, serverTime }: {
                   }
                 >
                   Renouveler les codes de secours
-                </button>
+                </button>}
               </form>
             </section>
           )}
         </div>
-        {enabled && (
+        {canManageSecurity && (
           <section className="auth-card" style={{ marginTop: 24 }}>
             <h2>Sessions ouvertes</h2>
             <p>Fermez une session sur un appareil que vous n’utilisez plus.</p>
             {sessionsState === "stale" && (
               <>
-                <Notice message={`Pour consulter vos sessions ouvertes, reconnectez-vous avec votre mot de passe et votre code de sécurité. Cette vérification est valable ${SESSION_FRESH_AGE_SECONDS / 60} minutes.`} />
+                <Notice message={`Pour consulter vos sessions ouvertes, reconnectez-vous avec votre mot de passe${testPasswordOnly ? '' : ' et votre code de sécurité'}. Cette vérification est valable ${SESSION_FRESH_AGE_SECONDS / 60} minutes.`} />
                 <button className="auth-button" disabled={busy} onClick={() => void disconnect(true)}>
                   Se reconnecter
                 </button>

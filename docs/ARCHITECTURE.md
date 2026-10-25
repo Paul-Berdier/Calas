@@ -16,6 +16,8 @@ Une restauration crée une nouvelle révision. Une archive retire la publication
 
 ## Accès et frontières
 
+Exception de recette autorisée par Paul le 25 octobre 2026 : un seul compte réservé `@example.test`, désigné par `AUTH_TEST_PASSWORD_ONLY_USER_ID`, peut accéder avec son mot de passe lorsque `SITE_ENV=staging` et que sa MFA n’est pas activée. L’exception ne valide artificiellement aucune session MFA ; elle ne s’applique ni en production ni aux autres comptes. Email vérifié, session réelle, rôle, absence de suspension, contrôle d’origine et absence de cache restent obligatoires. Les règles MFA ci-dessous restent la règle générale. Cette exception doit être retirée avant le lancement définitif.
+
 Better Auth gère mots de passe, sessions, vérification d’adresse, réinitialisation et TOTP. Le schéma Drizzle correspond à la version épinglée. Les cookies sont HttpOnly, SameSite=Lax et Secure sous HTTPS ; les sessions durent 8 h, sans cache de cookie. Aucun jeton dans localStorage. L’inscription publique et la désactivation MFA sont exclues des routes exposées.
 
 Une session avant enrollment reste marquée non validée ; elle ne devient pas autorisée parce que l’utilisateur a ensuite activé TOTP ailleurs. Chaque API privée revérifie email, session, MFA, rôle et suspension. Administrateur : utilisateurs et réglages ; éditeur : contenus autorisés. Les contrôles ne reposent pas sur les boutons visibles. Les invitations expirent après 24 h et ne sont utilisables qu’une fois ; leur secret est stocké sous empreinte. Un changement de droits ou une suspension révoque les sessions concernées. Le dernier administrateur actif est protégé.

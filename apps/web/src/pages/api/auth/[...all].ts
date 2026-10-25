@@ -4,6 +4,7 @@ import {getSession,requireEditor} from '../../../server/auth/permissions';
 import {assertSameOrigin,HttpError,jsonError,readBytes} from '../../../server/http';
 import {clientAddress} from '../../../server/client-address';
 import {consumeRateLimit} from '../../../server/auth/rate-limit';
+import {usesTestPasswordOnly} from '../../../server/auth/access-policy';
 
 const allowed=new Set(['/sign-in/email','/sign-out','/get-session','/verify-email','/send-verification-email','/request-password-reset','/reset-password','/change-password','/list-sessions','/revoke-session','/revoke-other-sessions','/revoke-sessions','/two-factor/enable','/two-factor/verify-totp','/two-factor/verify-backup-code','/two-factor/generate-backup-codes']);
 const protectedActions=new Set(['/change-password','/list-sessions','/revoke-session','/revoke-other-sessions','/revoke-sessions','/two-factor/generate-backup-codes']);
@@ -14,6 +15,10 @@ export const ALL:APIRoute=async context=>{
     if(!allowed.has(path)&&!resetCallback)throw new HttpError(404,'NOT_FOUND','Cette opération n’est pas disponible.');
     if(context.request.method!=='GET'&&context.request.method!=='POST')throw new HttpError(405,'METHOD','Méthode non autorisée.');
     if(context.request.method==='POST')assertSameOrigin(context.request);
+    if(path.startsWith('/two-factor/')){
+      const current=await getSession(context.request);
+      if(current&&usesTestPasswordOnly(current.user))throw new HttpError(409,'TEST_PASSWORD_ONLY','Ce compte de recette utilise uniquement son identifiant et son mot de passe.');
+    }
     if(protectedActions.has(path))await requireEditor(context.request);
     if(path==='/two-factor/enable'){
       const session=await getSession(context.request);

@@ -5,6 +5,7 @@
 - Astro SSR public, administration React sous `/admin`, PostgreSQL/Drizzle, Better Auth, Tiptap et médias S3 privés. La demande du 25 octobre remplace définitivement Sanity. Aucun CMS préfabriqué, CRM, paiement ou espace client.
 - Les données locales dans `apps/web/src/lib/cms/demo.ts` sont un mode explicite de recette, jamais un repli après panne du CMS.
 - Brouillons : session serveur Better Auth, email vérifié, rôle autorisé, TOTP complété, absence de cache. Le public utilise seulement la révision publiée. Les médias privés ne sont accessibles qu’après vérification serveur ; une publication PDF exige une autorisation explicite.
+- Exception demandée explicitement par Paul le 25 octobre 2026 : son compte de recette peut utiliser seulement identifiant/mot de passe, sous SITE_ENV=staging avec AUTH_TEST_PASSWORD_ONLY_USER_ID égal à son ID, adresse réservée @example.test et MFA désactivée. Cette exception ne s’applique jamais en production ni à un autre compte. Toutes les autres gardes (session, email, suspension, rôle, origine, confidentialité) restent obligatoires.
 - Ne pas publier avant validation de l’accueil/Diagnostic par Sara et Agnès puis relecture finale. Aucun achat ou service payant sans instruction explicite.
 - Aucun email de test à Sara. Utiliser la simulation ; SMTP réel exige son raccordement et l’autorisation de recette.
 - Ne pas inventer portraits, qualification IPRP, biographie, témoignage, implantations ou articles signés.
