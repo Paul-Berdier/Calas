@@ -1,5 +1,5 @@
 ---
-import {imageUrl} from '../lib/cms/images';
+import {imageUrl,imageSrcset,imageCropLayout,imageSlotSizes} from '../lib/cms/images';
 import type {ContentImage} from '../lib/cms/types';
 interface Props {
   image:ContentImage;
@@ -11,14 +11,11 @@ interface Props {
 }
 const {image,width,height,class:className,sizes='(max-width: 760px) 100vw, 80vw',loading='lazy'}=Astro.props;
 const src=imageUrl(image,width,height);
-const dimensions=image.asset?.metadata?.dimensions;
-const croppedWidth=dimensions?dimensions.width*(1-(image.crop?.left??0)-(image.crop?.right??0)):undefined;
-const croppedHeight=dimensions?dimensions.height*(1-(image.crop?.top??0)-(image.crop?.bottom??0)):undefined;
-const displayHeight=height??(croppedWidth&&croppedHeight?Math.round(width*croppedHeight/croppedWidth):undefined);
-const widths=[...new Set([Math.min(480,width),Math.min(800,width),width])];
-const srcset=widths.map(candidate=>{
-  const url=imageUrl(image,candidate,height?Math.round(candidate*height/width):undefined);
-  return url?`${url} ${candidate}w`:undefined;
-}).filter(Boolean).join(', ');
+const layout=imageCropLayout(image,width,height);
+const displayHeight=height??layout?.height??(image.width&&image.height?Math.round(width*image.height/image.width):undefined);
+const srcset=imageSrcset(image);
+const slotSizes=imageSlotSizes(sizes,(layout?.widthPercent??100)/100);
 ---
-{src&&<img class={className} src={src} srcset={srcset||undefined} sizes={sizes} alt={image.alt} width={width} height={displayHeight} loading={loading} decoding="async"/>}
+{src&&(layout?<span class:list={['cms-image-frame',className]} style={`display:block;position:relative;overflow:hidden;width:100%;aspect-ratio:${layout.aspectRatio}`}>
+  <img src={src} srcset={srcset} sizes={slotSizes} alt={image.alt} width={image.width} height={image.height} loading={loading} decoding="async" style={`display:block;position:absolute;width:${layout.widthPercent}%;max-width:none;height:${layout.heightPercent}%;left:${layout.leftPercent}%;top:${layout.topPercent}%;object-fit:fill;margin:0`}/>
+</span>:<img class={className} src={src} srcset={srcset} sizes={sizes} alt={image.alt} width={width} height={displayHeight} loading={loading} decoding="async" style={image.hotspot?`object-position:${Math.max(0,Math.min(1,image.hotspot.x))*100}% ${Math.max(0,Math.min(1,image.hotspot.y))*100}%`:undefined}/>)}

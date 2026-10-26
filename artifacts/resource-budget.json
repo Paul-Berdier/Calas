@@ -1,30 +1,35 @@
 {
-  "javascriptGzipBytes": 49059,
-  "totalDecodedBytes": 283257,
+  "javascriptGzipBytes": 32544,
+  "totalDecodedBytes": 247326,
   "resources": [
     {
       "url": "http://127.0.0.1:4322/",
-      "bytes": 34303,
+      "bytes": 35551,
       "type": "document"
+    },
+    {
+      "url": "http://127.0.0.1:4322/_astro/Layout.X27EFFRg.css",
+      "bytes": 16170,
+      "type": "stylesheet"
+    },
+    {
+      "url": "http://127.0.0.1:4322/_astro/index.BDyjYs4K.css",
+      "bytes": 13662,
+      "type": "stylesheet"
+    },
+    {
+      "url": "http://127.0.0.1:4322/brand/wordmark.svg",
+      "bytes": 14328,
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4322/brand/wordmark-dark.svg",
+      "bytes": 14328,
+      "type": "image"
     },
     {
       "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-400-normal.B-1hWBU7.woff2",
       "bytes": 22876,
-      "type": "font"
-    },
-    {
-      "url": "http://127.0.0.1:4322/_astro/Layout.Do4Swzpv.css",
-      "bytes": 15813,
-      "type": "stylesheet"
-    },
-    {
-      "url": "http://127.0.0.1:4322/_astro/index.B4SFWYG7.css",
-      "bytes": 13630,
-      "type": "stylesheet"
-    },
-    {
-      "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-400-italic.Dc_OZ8oc.woff2",
-      "bytes": 23660,
       "type": "font"
     },
     {
@@ -33,14 +38,19 @@
       "type": "font"
     },
     {
-      "url": "http://127.0.0.1:4322/_astro/Layout.astro_astro_type_script_index_0_lang.B7-JhxTn.js",
-      "bytes": 125843,
+      "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-400-italic.Dc_OZ8oc.woff2",
+      "bytes": 23660,
+      "type": "font"
+    },
+    {
+      "url": "http://127.0.0.1:4322/_astro/Layout.astro_astro_type_script_index_0_lang.BkteO47d.js",
+      "bytes": 81266,
       "type": "script"
     },
     {
-      "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-500-normal.BsRWmXhO.woff2",
-      "bytes": 23312,
-      "type": "font"
+      "url": "http://127.0.0.1:4322/_astro/preload-helper.DHhhL8Zf.js",
+      "bytes": 1665,
+      "type": "script"
     }
   ]
 }

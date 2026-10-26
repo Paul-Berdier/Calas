@@ -3,7 +3,7 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 import {shellMarkup,viewBox} from '../assets/brand/geometry.mjs';
-import {unfurlSvg} from '../assets/brand/unfurl.mjs';
+import {coilSvg,coilDuration} from '../assets/brand/coil.mjs';
 import sharp from 'sharp';
 import opentype from 'opentype.js';
 
@@ -15,8 +15,8 @@ await mkdir(output,{recursive:true});
 const fontFile=(pkg,name)=>resolve(dirname(fromWeb.resolve(`@fontsource/${pkg}/package.json`)),'files',name);
 const font=async(path)=>{const data=await readFile(path);return opentype.parse(data.buffer.slice(data.byteOffset,data.byteOffset+data.byteLength));};
 const titleFont=await font(fontFile('cormorant-garamond','cormorant-garamond-latin-500-normal.woff'));
+const brandFont=await font(fontFile('cormorant-garamond','cormorant-garamond-latin-300-normal.woff'));
 const textFont=await font(fontFile('eb-garamond','eb-garamond-latin-400-normal.woff'));
-const titleWidth=(text,size)=>titleFont.getAdvanceWidth(text,size);
 const outline=(font,text,x,y,size,fill)=>{
  const path=font.getPath(text,x,y,size);
  // Serialize explicit finite coordinates: opentype 2's optimized serializer
@@ -33,16 +33,44 @@ const outline=(font,text,x,y,size,fill)=>{
 };
 const svg=(width,height,body,title='Calas Conseil — La voie de la qualité relationnelle.')=>`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${title}"><title>${title}</title>${body}</svg>`;
 const symbol=(x,y,w,h,id,mono=null)=>`<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${viewBox}">${shellMarkup(id,mono)}</svg>`;
-function lettering(x,y,size,dark=false,mono=null){const ink=mono??(dark?'#F7F2EA':'#14213A');const bronze=mono??(dark?'#D5B37E':'#94672F');return outline(titleFont,'Calas',x,y,size,ink)+outline(titleFont,'Conseil',x+titleWidth('Calas ',size),y,size,bronze);}
-const tagline=(x,y,size,dark=false,mono=null)=>outline(textFont,'La voie de la qualité relationnelle.',x,y,size,mono??(dark?'#F7F2EA':'#14213A'));
-const nameWidth=titleWidth('Calas Conseil',72);
+// The supplied card uses fine capitals, an enlarged first C and a compact
+// CONSEIL. Keep these optical proportions identical in every exported lockup.
+const brandSize=100,brandBaseline=82,brandHeight=86;
+const word=(text,initialScale=1)=>{
+ let x=0;const glyphs=[];
+ for(const [index,letter]of [...text].entries()){
+  const size=brandSize*(index===0?initialScale:1);
+  glyphs.push({letter,x,size});
+  x+=brandFont.getAdvanceWidth(letter,size)-3.2;
+ }
+ return {glyphs,width:x+3.2};
+};
+const calas=word('CALAS',1.17),conseil=word('CONSEIL',1.17),conseilScale=.89,wordGap=17;
+const brandWidth=Number((calas.width+wordGap+conseil.width*conseilScale).toFixed(2));
+const wordPaths=(word,fill)=>word.glyphs.map(g=>outline(brandFont,g.letter,g.x,brandBaseline,g.size,fill)).join('');
+const wordmark=(dark=false,mono=null)=>wordPaths(calas,mono??(dark?'#F7F2EA':'#14213A'))+`<g transform="translate(${calas.width+wordGap} 0) scale(${conseilScale} 1)">${wordPaths(conseil,mono??(dark?'#D5B37E':'#94672F'))}</g>`;
+function lettering(x,y,size,dark=false,mono=null){const scale=size/brandSize;return `<g transform="translate(${x} ${y-brandBaseline*scale}) scale(${scale})">${wordmark(dark,mono)}</g>`;}
+const taglineText='LA VOIE DE LA QUALITÉ RELATIONNELLE';
+const taglineTracking=2.1;
+const tagline=(x,y,size,dark=false,mono=null)=>{
+ let cursor=x;
+ return [...taglineText].map(letter=>{
+  const path=outline(textFont,letter,cursor,y,size,mono??(dark?'#D5B37E':'#94672F'));
+  cursor+=textFont.getAdvanceWidth(letter,size)+taglineTracking;
+  return path;
+ }).join('');
+};
+const nameSize=65,nameWidth=brandWidth*nameSize/brandSize,taglineSize=18;
+const taglineWidth=[...taglineText].reduce((width,letter)=>width+textFont.getAdvanceWidth(letter,taglineSize),0)+taglineTracking*(taglineText.length-1);
 const assets={
- 'logo-horizontal':svg(660,180,symbol(0,0,170,180,'horizontal')+lettering(184,99,72)+tagline(188,136,24)),
- 'logo-horizontal-dark':svg(660,180,symbol(0,0,170,180,'horizontal-dark')+lettering(184,99,72,true)+tagline(188,136,24,true)),
- 'logo-stacked':svg(600,500,symbol(135,0,330,355,'stacked')+lettering((600-nameWidth)/2,420,72)+tagline((600-textFont.getAdvanceWidth('La voie de la qualité relationnelle.',24))/2,457,24)),
- 'logo-stacked-dark':svg(600,500,symbol(135,0,330,355,'stacked-dark')+lettering((600-nameWidth)/2,420,72,true)+tagline((600-textFont.getAdvanceWidth('La voie de la qualité relationnelle.',24))/2,457,24,true)),
- 'logo-monochrome':svg(660,180,symbol(0,0,170,180,'mono','#14213A')+lettering(184,99,72,false,'#14213A')+tagline(188,136,24,false,'#14213A')),
- 'logo-monochrome-light':svg(660,180,symbol(0,0,170,180,'mono-light','#F7F2EA')+lettering(184,99,72,true,'#F7F2EA')+tagline(188,136,24,true,'#F7F2EA')),
+ 'wordmark':svg(brandWidth,brandHeight,wordmark(),'Calas Conseil'),
+ 'wordmark-dark':svg(brandWidth,brandHeight,wordmark(true),'Calas Conseil'),
+ 'logo-horizontal':svg(660,180,symbol(0,0,170,180,'horizontal')+lettering(184,99,nameSize)+tagline(184+(nameWidth-taglineWidth)/2,130,taglineSize)),
+ 'logo-horizontal-dark':svg(660,180,symbol(0,0,170,180,'horizontal-dark')+lettering(184,99,nameSize,true)+tagline(184+(nameWidth-taglineWidth)/2,130,taglineSize,true)),
+ 'logo-stacked':svg(600,500,symbol(135,0,330,355,'stacked')+lettering((600-nameWidth)/2,420,nameSize)+tagline((600-taglineWidth)/2,457,taglineSize)),
+ 'logo-stacked-dark':svg(600,500,symbol(135,0,330,355,'stacked-dark')+lettering((600-nameWidth)/2,420,nameSize,true)+tagline((600-taglineWidth)/2,457,taglineSize,true)),
+ 'logo-monochrome':svg(660,180,symbol(0,0,170,180,'mono','#14213A')+lettering(184,99,nameSize,false,'#14213A')+tagline(184+(nameWidth-taglineWidth)/2,130,taglineSize,false,'#14213A')),
+ 'logo-monochrome-light':svg(660,180,symbol(0,0,170,180,'mono-light','#F7F2EA')+lettering(184,99,nameSize,true,'#F7F2EA')+tagline(184+(nameWidth-taglineWidth)/2,130,taglineSize,true,'#F7F2EA')),
  'symbol':svg(610,590,`<g transform="translate(25 30)">${shellMarkup('symbol')}</g>`,'Symbole Calas Conseil'),
  'symbol-monochrome':svg(610,590,`<g transform="translate(25 30)">${shellMarkup('symbol-mono','#14213A')}</g>`,'Symbole Calas Conseil'),
  'favicon':`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -10 530 540">${shellMarkup('favicon','#94672F')}</svg>`,
@@ -54,10 +82,11 @@ for(const[name,content]of Object.entries(assets)){
  await raster.png().toFile(resolve(output,`${name}.png`));
 }
 // Editable typography source; production exports above carry vector outlines.
-const editable=svg(660,180,symbol(0,0,170,180,'editable')+'<text x="184" y="99" font-family="Cormorant Garamond" font-weight="500" font-size="72" fill="#14213A">Calas <tspan fill="#94672F">Conseil</tspan></text><text x="188" y="136" font-family="EB Garamond" font-size="24" fill="#14213A">La voie de la qualité relationnelle.</text>');
+const editableWord=(word,x,scale,fill)=>`<g transform="translate(${x} ${99-brandBaseline*nameSize/brandSize}) scale(${scale*nameSize/brandSize} ${nameSize/brandSize})">${word.glyphs.map(g=>`<text x="${g.x}" y="${brandBaseline}" font-family="Cormorant Garamond" font-weight="300" font-size="${g.size}" fill="${fill}">${g.letter}</text>`).join('')}</g>`;
+const editable=svg(660,180,symbol(0,0,170,180,'editable')+editableWord(calas,184,1,'#14213A')+editableWord(conseil,184+(calas.width+wordGap)*nameSize/brandSize,conseilScale,'#94672F')+`<text x="${184+(nameWidth-taglineWidth)/2}" y="130" font-family="EB Garamond" font-size="${taglineSize}" letter-spacing="${taglineTracking}" fill="#94672F">${taglineText}</text>`);
 await writeFile(resolve(source,'logo-editable.svg'),editable);
-for(const[stage,time]of [['start',.2],['middle',1.15],['end',2.34]]){
- const content=unfurlSvg(time,{background:'none'});
+for(const[stage,time]of [['start',.12],['middle',1.1],['end',coilDuration]]){
+ const content=coilSvg(time,{background:'none'});
  await writeFile(resolve(source,`motion-${stage}.svg`),content);
  await sharp(Buffer.from(content)).png().toFile(resolve(source,`motion-${stage}.png`));
 }

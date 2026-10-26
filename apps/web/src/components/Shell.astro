@@ -9,6 +9,13 @@ interface Props {
 const {animated=false,class:className='',idPrefix=`shell-${crypto.randomUUID()}`,monochrome}=Astro.props;
 const gradientId=`${idPrefix}-gold`;
 ---
+{animated&&<script is:inline>
+ // Activate the CSS guard before the SVG can enter a streamed first paint.
+ // Without scripting this class is absent and the complete mark stays visible.
+ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  document.documentElement.classList.add('calas-motion-enabled');
+ }
+</script>}
 <svg class:list={['calas-shell',className]} viewBox={viewBox} fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-shell-animate={animated ? '' : undefined}>
  { !monochrome && <defs><linearGradient id={gradientId} x1="0" y1="0.65" x2="1" y2="0.25" gradientUnits="objectBoundingBox">
   {gradientStops.map(([offset,color])=><stop offset={offset} stop-color={color}/>)}
@@ -35,4 +42,7 @@ const gradientId=`${idPrefix}-gold`;
 </script>}
 <style>
  .calas-shell{display:block;width:100%;height:auto;overflow:visible}
+ @media(prefers-reduced-motion:no-preference){
+  :global(html.calas-motion-enabled) .calas-shell[data-shell-animate]:not([data-motion-ready="true"]):not([data-shell-fallback]){visibility:hidden}
+ }
 </style>

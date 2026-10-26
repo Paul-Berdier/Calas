@@ -26,16 +26,16 @@ const editorial=page.editorial??{};
     <section class="editorial-hero"><div class="wrap">
       <nav class="editorial-breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span><span aria-current="page">{page.eyebrow||page.title}</span></nav>
       <div class="editorial-hero-grid">
-        <div class="editorial-hero-copy"><p class="eyebrow">{isOffer&&<span class="offer-number" aria-hidden="true">0{offerNumber} /</span>}{page.eyebrow}</p><h1 class="line-break">{page.title}</h1><p class="editorial-intro">{page.intro}</p>{page.cta&&<div class="actions"><CTA cta={page.cta}/>{isDiagnostic&&method&&<a class="hero-method-link" href={`#${sectionId(method._key)}`}>{editorial.methodLinkLabel??'Explorer la démarche'} <span aria-hidden="true">↓</span></a>}</div>}</div>
+        <div class="editorial-hero-copy"><p class="eyebrow">{isOffer&&<span class="offer-number" aria-hidden="true">0{offerNumber} /</span>}{page.eyebrow}</p><h1 class="line-break">{page.title}</h1><p class="editorial-intro">{page.intro}</p>{page.cta&&<div class="actions"><CTA cta={page.cta}/>{isDiagnostic&&method&&<a class="hero-method-link" href={`#${sectionId(method.key)}`}>{editorial.methodLinkLabel??'Explorer la démarche'} <span aria-hidden="true">↓</span></a>}</div>}</div>
         {!legal&&<div class="editorial-hero-art" aria-hidden="true"><span class="art-annotation top">{editorial.artTop??(isOffer?'LIRE LE TRAVAIL AUTREMENT':'LA QUALITÉ DU LIEN')}</span><LinkArt variant={isOffer?'converge':'orbit'} tone="light"/><span class="art-annotation bottom">{editorial.artBottom??'ORGANISATION · MANAGEMENT · RELATIONS'}</span></div>}
       </div>
     </div></section>
-    {!legal&&anchors.length>2&&<nav class="editorial-anchor-nav" aria-label="Dans cette page"><div class="wrap"><span class="anchor-nav-label">Dans cette page</span><ul>{anchors.map(s=><li><a href={`#${sectionId(s._key)}`}>{s.navigationLabel??anchorLabels[s._key]??s.eyebrow??s.title?.replace(/\n/g,' ')}</a></li>)}</ul></div></nav>}
+    {!legal&&anchors.length>2&&<nav class="editorial-anchor-nav" aria-label="Dans cette page"><div class="wrap"><span class="anchor-nav-label">Dans cette page</span><ul>{anchors.map(s=><li><a href={`#${sectionId(s.key)}`}>{s.navigationLabel??anchorLabels[s.key]??s.eyebrow??s.title?.replace(/\n/g,' ')}</a></li>)}</ul></div></nav>}
     {isPeople&&<section class="editorial-profiles" aria-label="Les deux regards de Calas Conseil"><div class="wrap profile-grid">{people.map((person,i)=><article class="editorial-profile">
       <div class="profile-topline"><span aria-hidden="true">0{i+1}</span><span>{person.name}</span></div>
       {person.portrait?<CmsImage class="editorial-portrait" image={person.portrait} width={800} height={1000} sizes="(max-width: 599px) 90vw, 40vw"/>:<div class="profile-letter" aria-hidden="true">{person.name.slice(0,1)}<span>.</span></div>}
       <h2>{person.name}</h2><p class="editorial-profile-role">{person.role}</p>{person.bio&&<p class="editorial-profile-bio">{person.bio}</p>}
-      {person._id===settings.qualification.personId&&settings.qualification.status==='verified'&&<p class="editorial-profile-qualification">{settings.qualification.label}</p>}
+      {person.id===settings.qualification.personId&&settings.qualification.status==='verified'&&<p class="editorial-profile-qualification">{settings.qualification.label}</p>}
     </article>)}</div></section>}
     {page.image&&<figure class="wrap editorial-page-image"><CmsImage image={page.image} width={1280} height={720} sizes="90vw"/></figure>}
     <ContentSections sections={page.sections} context={page.slug}/>

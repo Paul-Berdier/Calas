@@ -1,0 +1,28 @@
+---
+import AuthScreens from '../../auth/AuthScreens';
+import AdminApp from '../../admin/AdminApp';
+import {getSession,requireEditor,requireAdministrator} from '../../server/auth/permissions';
+import {sessionFreshUntil} from '../../auth/policy';
+import {usesTestPasswordOnly} from '../../server/auth/access-policy';
+const path=(Astro.params.path||'').replace(/\/$/,'');
+const publicScreens=new Map<string,'login'|'reset'|'invitation'>([['login','login'],['reset-password','reset'],['invitation','invitation']]);
+const publicMode=publicScreens.get(path);
+const mode=publicMode|| (path==='security'?'security':path==='users'?'users':null);
+let user:{id:string;name:string;email:string;role:'administrator'|'editor';twoFactorEnabled:boolean}|undefined;
+let securityFreshUntil=0;
+let testPasswordOnly=false;
+if(mode==='security'){
+  const current=await getSession(Astro.request);
+  if(!current||current.user.disabled||!current.user.emailVerified)return Astro.redirect('/admin/login/');
+  if(current.user.role!=='administrator'&&current.user.role!=='editor')return Astro.redirect('/admin/login/');
+  user={id:current.user.id,name:current.user.name,email:current.user.email,role:current.user.role,twoFactorEnabled:current.user.twoFactorEnabled??false};
+  securityFreshUntil=sessionFreshUntil(current.session.createdAt);
+  testPasswordOnly=usesTestPasswordOnly(current.user);
+}else if(!publicMode){
+  try{const actor=await(path==='users'?requireAdministrator(Astro.request):requireEditor(Astro.request));const current=await getSession(Astro.request);user={...actor,twoFactorEnabled:current?.user.twoFactorEnabled??false};}
+  catch(error){const code=error&&typeof error==='object'&&'code'in error?error.code:'';if(code==='MFA_REQUIRED')return Astro.redirect('/admin/security/');if(code==='FORBIDDEN')return new Response('Accès réservé aux administrateurs.',{status:403});return Astro.redirect('/admin/login/');}
+}
+Astro.response.headers.set('Cache-Control','private, no-store');
+Astro.response.headers.set('X-Robots-Tag','noindex, nofollow, noarchive');
+---
+<!doctype html><html lang="fr"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="robots" content="noindex,nofollow"/><meta name="referrer" content="no-referrer"/><title>Administration — Calas Conseil</title><link rel="icon" href="/brand/favicon.svg"/></head><body style="margin:0">{mode?<AuthScreens mode={mode} user={user} testPasswordOnly={testPasswordOnly} securityFreshUntil={securityFreshUntil} serverTime={Date.now()} client:only="react"/>:user&&<AdminApp user={user} initialPath={Astro.url.pathname} client:only="react"/>}<noscript>Activez JavaScript pour utiliser l’administration.</noscript></body></html>

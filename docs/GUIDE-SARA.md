@@ -1,104 +1,117 @@
-# Modifier le site avec Sanity — guide pour Sara
+# Faire vivre le site — guide pour Sara
 
-Votre travail quotidien se fait dans l'interface graphique Sanity Studio. Vous n'avez besoin ni de Git, ni d'un terminal, ni de Codex pour changer un texte, une image ou un article.
+L’**Atelier éditorial Calas Conseil** est l’administration privée du site. Vous y modifiez les textes et les images, préparez vos articles et choisissez leur publication. Aucun compte Sanity, terminal ou outil de programmation n’est nécessaire.
 
-Ce guide décrit le parcours préparé dans les sources du Studio. **Il doit être accompagné d'une première séance sur le vrai projet Calas Conseil** : les comptes, la prévisualisation, la publication, le délai de visibilité et la restauration ne sont pas réputés testés avant cette connexion. L'adresse définitive du Studio vous sera remise après configuration.
+L’administration se trouve à l’adresse du site suivie de `/admin/`. L’adresse définitive sera fournie après installation de la préproduction. Les captures montrent la recette locale du 25 octobre 2026 : le compte « Recette Calas » et les articles « Recette » sont des tests, sans signature de Sara ou d’Agnès.
 
-## Avant la première utilisation
+## Se connecter la première fois
 
-Sanity est l’administration du site. Le **projet Calas Conseil** rassemble vos contenus ; le **Studio** est l’écran dans lequel vous les modifiez ; le **dataset** est un espace de stockage. Pour commencer, `staging` sera l’espace de test. Un brouillon permet de préparer une modification avant de la publier.
+1. Ouvrez le lien d’invitation envoyé par votre administrateur. Il est personnel et valable 24 heures.
+2. Choisissez un mot de passe unique d’au moins 12 caractères, puis cliquez sur **Créer mon compte**.
+3. Ouvrez le message de vérification d’adresse email et validez votre adresse.
+4. Connectez-vous avec votre email et votre mot de passe. Dans **Compte et sécurité**, confirmez votre mot de passe puis cliquez sur **Configurer mon application**.
+5. Scannez le QR code dans votre application d’authentification, saisissez les six chiffres affichés et cliquez sur **Activer la protection**.
+6. Conservez vos **codes de secours** dans votre gestionnaire de mots de passe. Chaque code s’utilise une seule fois. **Enregistrer mes codes** permet aussi de les télécharger ; gardez ce fichier dans un endroit privé.
+7. Cliquez sur **Accéder à mes contenus**.
 
-La première étape est de créer votre compte depuis [Sanity Manage](https://www.sanity.io/manage), puis un projet nommé **Calas Conseil** appartenant au cabinet. Le forfait Free peut servir à cette préparation ; ses limites sont décrites sur la [page officielle des tarifs](https://www.sanity.io/pricing). Il n’est pas nécessaire de réinstaller ou de générer un autre site : le Studio est déjà préparé dans ce dépôt.
+Lors des connexions suivantes, le site demande votre mot de passe puis le code temporaire de votre application. Ne partagez jamais le QR code, le mot de passe ou les codes de secours.
 
-La personne chargée du raccordement aura besoin du **Project ID** affiché dans ce projet et du nom de l’espace de test. Elle vous accompagnera ensuite pour les accès techniques, à renseigner localement. Votre mot de passe ne doit pas être partagé. La création du compte ne suffit pas encore à activer l’édition : la première connexion et le chargement des textes actuels doivent être terminés.
+![L’écran de connexion](../artifacts/custom-cms/admin/login-1440.png)
 
-Le projet doit appartenir à Calas Conseil et vous devez en avoir les accès administratifs. Choisissez avec la personne qui raccorde le site le bon environnement : le dataset de test sert à la prise en main, le dataset de production contient le site publié.
+Les invitations et messages de vérification doivent être raccordés au service email avant la première utilisation réelle. La recette locale les reçoit dans une boîte de test ; aucun message de recette n’a été envoyé à Sara.
 
-Le forfait gratuit ne propose pas un rôle Editor distinct. Les rôles et le coût éventuel d'un forfait permettant des permissions éditoriales séparées sont à vérifier avant tout abonnement. Un compte Administrator donne plus de droits que la seule rédaction : ne partagez pas vos identifiants.
+## Retrouver ses contenus
 
-## Changer une page
+Le tableau de bord donne accès à l’accueil, à Diagnostic, au nouvel article et à la médiathèque. Ses compteurs correspondent aux données enregistrées. L’activité récente indique les personnes et les dates des modifications.
 
-1. Connectez-vous au Studio et ouvrez **Accueil** ou la page concernée dans la navigation.
-2. Modifiez le champ voulu : surtitre, titre principal, introduction, section ou lien de contact. Les libellés et aides sont en français.
-3. Conservez l'adresse de la page. Par exemple, `diagnostic-rps` correspond à la page Diagnostic ; la changer sans accompagnement casserait les liens existants.
-4. Regardez les messages de validation. Ils signalent notamment les champs obligatoires, les textes trop longs et les liens incorrects.
-5. Ouvrez l'outil de prévisualisation du Studio et vérifiez la page sur ordinateur puis mobile.
-6. Gardez le document en brouillon pour une relecture. Publiez seulement le contenu approuvé dans l'environnement choisi.
+Le menu rassemble **Pages du site**, **Réflexions**, **Médiathèque**, **Équipe**, **Chiffres et sources** et **Historique**. Sur téléphone, le bouton de menu ouvre ces rubriques. **Paramètres du site** et **Utilisateurs** sont réservés aux administrateurs.
 
-Le site garde sa composition, ses couleurs et ses animations. Les formats de section autorisés sont encadrés : texte, étapes, points clés, idées complémentaires ou précision. Les champs éditoriaux ne donnent pas accès à un outil de mise en page illimité.
+![Le tableau de bord](../artifacts/custom-cms/admin/dashboard-1440.png)
 
-Les groupes éditoriaux de l’accueil permettent aussi de modifier les petites phrases autour du logo, les repères de section, les notes et les liens. Dans Diagnostic, la présentation de la méthode et des questions fréquentes se choisit par leur libellé ; les clés techniques n’ont pas à être modifiées. Les textes de la rubrique Réflexions, même lorsqu’aucun article n’est publié, s’éditent dans sa page.
+## Modifier une page
 
-Pour les boutons de contact, les destinations prévues sont :
+1. Ouvrez **Pages du site**, puis **Accueil**, **Diagnostic RPS** ou la page concernée.
+2. Dépliez la section à modifier et ajustez ses textes. L’accueil conserve ses six blocs et Diagnostic ses étapes : la composition reste protégée.
+3. Attendez **Brouillon enregistré**. La sauvegarde automatique intervient après une courte pause de saisie ; vous pouvez aussi utiliser **Enregistrer le brouillon**, ou `Ctrl+S` / `Cmd+S`.
+4. Cliquez sur **Prévisualiser**. Vérifiez le résultat aux largeurs Ordinateur, Tablette et Mobile.
+5. Faites relire, puis cliquez sur **Publier** lorsque le texte est approuvé. Confirmez l’action ; la réussite n’est annoncée qu’après enregistrement par le serveur.
 
-| Offre | Destination |
-| --- | --- |
-| Diagnostic | `/contact/?objet=diagnostic` |
-| Équipes | `/contact/?objet=equipes` |
-| Managers | `/contact/?objet=managers` |
-| Contact général | `/contact/` |
+**Enregistrer un brouillon ne change pas le site public.** Celui-ci conserve la dernière version publiée. L’aperçu montre le dernier brouillon enregistré et nécessite votre connexion. Envoyer son adresse seule à une personne sans accès ne lui ouvre pas le brouillon.
 
-## Remplacer un portrait ou une image
+![L’édition structurée de l’accueil](../artifacts/custom-cms/admin/home-editor-1440.png)
 
-Ouvrez la personne ou le document concerné, sélectionnez le champ image et choisissez un fichier authentique dont vous détenez les droits. Ajustez le cadrage et le point d'intérêt si nécessaire. Renseignez la description de l'image : elle permet aux personnes qui ne la voient pas d'en comprendre le contenu utile.
+Les liens de contact prévus sont `/contact/?objet=diagnostic`, `/contact/?objet=equipes`, `/contact/?objet=managers` ou `/contact/`. Utilisez une adresse complète commençant par `https://` pour les liens externes.
 
-Vérifiez le rendu mobile, le recadrage du visage et la cohérence avec l'autre portrait avant publication. N'utilisez ni portrait généré, ni justificatif IPRP comme image publique. Les attestations privées n'ont pas leur place dans le CMS éditorial.
+Si l’enregistrement échoue, votre saisie reste à l’écran : corrigez les champs indiqués ou réessayez. Sans confirmation, la modification n’est pas enregistrée. Si une autre personne a modifié le même document, comparez les versions puis rechargez celle du serveur ; recopiez auparavant les passages à conserver. L’outil n’écrase pas automatiquement le travail de votre collègue.
 
-## Créer un article
+## Ajouter une image ou remplacer un portrait
 
-### À partir d’un PDF
+Dans un champ image, ouvrez la médiathèque et choisissez un fichier existant ou ajoutez une photographie authentique dont vous détenez les droits. Formats acceptés : JPEG, PNG et WebP, jusqu’à 12 Mo par image.
 
-1. Ouvrez **Importer un PDF**, dans les outils du Studio, puis choisissez votre document.
-2. L’outil lit le texte et reconnaît les caractères des pages scannées. Attendez la fin de l’analyse ; vous pouvez l’annuler. Le document reste sur votre ordinateur à cette étape.
-3. Vérifiez l’aperçu, ajustez le titre et le résumé proposés. Le résumé est un extrait du début du document, pas un résumé rédigé automatiquement. Si une page mêle texte et zones scannées et que des passages manquent, utilisez **Refaire avec reconnaissance complète** pour traiter toutes les pages.
-4. Cliquez sur **Créer le brouillon**. Le PDF est alors envoyé à Sanity et joint à un nouvel article ; les articles existants ne sont pas remplacés.
-5. Ouvrez le brouillon, relisez le texte, corrigez la mise en forme et renseignez l’auteure réelle ainsi que la date. Cochez la relecture de l’import une fois le texte vérifié.
-6. Prévisualisez et publiez quand le contenu est prêt. La page de l’article proposera **Télécharger le PDF original**.
+Renseignez le **texte alternatif**, qui décrit le contenu utile aux personnes qui ne voient pas l’image. Ajustez le cadrage et le point d’intérêt, puis vérifiez l’aperçu mobile. Un portrait s’édite dans **Équipe**, sur la fiche de la personne.
 
-La limite initiale est de **20 Mo, 40 pages et 200 000 caractères** par import. La reconnaissance des scans peut prendre plus de temps et faire des erreurs, notamment sur les noms, chiffres, colonnes et tableaux. L’article reprend du texte modifiable ; il ne reproduit pas automatiquement les illustrations et la mise en page du PDF. Le fichier original conserve cette présentation.
+Les médias restent privés tant qu’ils ne sont pas utilisés par un contenu publié. Remplacer le fichier d’une image partagée peut modifier ses différentes utilisations : l’opération est réservée à l’administrateur et demande une confirmation explicite. Pour changer seulement une page, sélectionnez une nouvelle image dans cette page. Un fichier lié à un contenu ou à une version conservée ne peut pas être supprimé.
 
-**Choisissez seulement des PDF destinés à la diffusion.** Après ajout à Sanity, le fichier peut être ouvert par toute personne disposant de son lien, même si l’article est encore en brouillon. Le brouillon protège le texte éditorial, pas le fichier joint sur le CDN.
+![La médiathèque](../artifacts/custom-cms/admin/media-1440.png)
 
-### En écrivant directement dans le Studio
+## Créer une réflexion à partir d’un PDF
 
-1. Ouvrez **Articles** et créez un document.
-2. Renseignez le titre, l'adresse lisible, le résumé et la date approuvée.
-3. Sélectionnez l'auteure réelle dans les personnes disponibles et, si utile, une catégorie.
-4. Écrivez le texte dans le champ Article. Utilisez les titres de section et sous-titres pour organiser le contenu ; le titre principal est déjà fourni par le champ Titre.
-5. Ajoutez éventuellement une image avec sa description et vérifiez les liens.
-6. Prévisualisez puis faites relire le brouillon. Publiez seulement le texte final approuvé.
+1. Depuis le tableau de bord ou **Réflexions**, cliquez sur **Importer un PDF** et choisissez votre document.
+2. Attendez l’analyse dans votre navigateur. Le texte sélectionnable est lu directement ; les pages scannées passent par la reconnaissance de caractères. Vous pouvez annuler l’analyse.
+3. Vérifiez le titre, le résumé et le texte extrait. Le résumé reprend le début du document : ajustez-le. Si une page mélange texte et image et que des passages manquent, utilisez la reconnaissance complète proposée.
+4. Cliquez sur **Créer le brouillon**. Le PDF est alors enregistré dans la médiathèque privée et un nouvel article modifiable est créé.
+5. Cliquez sur **Ouvrir le brouillon**. Renseignez l’auteure réelle, une catégorie et la date approuvée. Relisez les noms, chiffres, listes, tableaux et paragraphes reconnus, puis remettez le texte en forme.
+6. Dans **PDF original et relecture**, confirmez la relecture seulement après cette vérification.
+7. Pour proposer le document original aux visiteurs, cochez l’autorisation de téléchargement du PDF. Sans cette autorisation, publier le texte laisse le PDF privé.
+8. Prévisualisez, faites relire, puis publiez. Le lien de téléchargement apparaît uniquement si vous l’avez autorisé dans la version publiée.
 
-Un article de démonstration ne doit pas être publié sous votre signature. Tant qu'aucun article final n'est approuvé, la rubrique Réflexions affiche son état vide prévu. Ne créez pas de date, témoignage, client ou résultat pour remplir la page.
+![L’import d’un PDF](../artifacts/custom-cms/admin/pdf-import-1440.png)
 
-## Mettre à jour un chiffre
+Limites par import : **20 Mo, 40 pages et 200 000 caractères**. L’OCR peut prendre du temps et faire des erreurs. Le texte devient modifiable ; les illustrations et la mise en page du PDF ne sont pas automatiquement reproduites dans l’article. Le fichier original conserve cette présentation.
 
-Les chiffres sont des documents distincts réutilisés par l'accueil. Chaque chiffre comporte sa valeur, ce qu'il mesure, sa source, le lien primaire, le millésime et une note de périmètre. Vérifiez la source avant de cocher la vérification.
+En cas de coupure lors de la création, utilisez **Réessayer la création** sur le même écran : la reprise retrouve le même brouillon. Vérifiez ensuite la liste Réflexions avant de recommencer un import.
 
-Conservez les années demandées tant qu'une actualisation n'a pas été approuvée. Ne confondez pas stress de la veille et stress causé par le travail, signe de détresse et diagnostic médical, arrêts longs et tous les arrêts, ou coût global de l'absentéisme et coût des seuls RPS. Le document `SOURCES.md` explique les formulations retenues.
+## Écrire directement un article
 
-Le champ de vérification protège la cohérence d'affichage, pas la confidentialité. Une information non validée doit rester un **vrai brouillon**, et non être publiée en comptant sur un interrupteur pour la cacher.
+1. Dans **Réflexions**, cliquez sur **Nouvelle réflexion**.
+2. Renseignez le titre, le résumé et l’adresse lisible proposée à partir du titre. L’adresse d’un article déjà publié est protégée pour préserver les liens.
+3. Choisissez l’auteure réelle, une catégorie et la date, nécessaires à la publication. Si une catégorie ou une personne manque, enregistrez d’abord l’article, puis créez et publiez cette fiche avant de revenir.
+4. Rédigez dans **Texte de l’article**. La barre propose gras, italique, titres 2 et 3, listes, citation, liens, image, séparation et annulation. Le titre principal vient du champ Titre de l’article.
+5. Ajoutez éventuellement une image de couverture et un PDF original. Un PDF ajouté manuellement exige aussi une relecture et une autorisation distincte pour le téléchargement.
+6. Cliquez sur **Créer le brouillon**. Vous pourrez ensuite utiliser la sauvegarde automatique, l’aperçu et la publication.
 
-## Coordonnées et qualification
+![L’éditeur d’article](../artifacts/custom-cms/admin/tiptap-1440.png)
 
-Les paramètres communs rassemblent téléphone, courriel, signature, pied de page et LinkedIn. Laissez LinkedIn vide jusqu'à validation de l'adresse exacte. La marque reste « Calas Conseil », avec un seul s.
+La mise en forme collée depuis un traitement de texte est nettoyée. Relisez les titres et les listes. Aucun article, témoignage, client, portrait ou résultat ne doit être inventé pour remplir le site.
 
-Le statut IPRP est centralisé et masqué lorsqu'il n'est pas vérifié. La formulation proposée est « IPRP enregistrée auprès de la DREETS ». Ne passez le statut à « Justificatif contrôlé » qu'après vérification réelle de l'attestation, du libellé et des éventuels numéro, région et validité. Le document privé reste conservé séparément.
+## Vérifier les chiffres et les informations communes
 
-## Brouillons, publication et retour arrière
+Dans **Chiffres et sources**, chaque indicateur possède sa valeur, son libellé, sa source, son lien, son millésime et ses précisions de périmètre. Vérifiez la source avant de cocher sa validation puis de publier. L’accueil permet de choisir les quatre chiffres affichés. Consultez [SOURCES.md](SOURCES.md) pour les formulations retenues.
 
-La prévisualisation vous permet de voir les brouillons grâce à une session réservée aux personnes autorisées. Une simple adresse de page publique ne donne pas accès à ces contenus. Fermez la prévisualisation ou quittez son mode pour vérifier la version publiée comme un visiteur.
+Les administrateurs modifient les coordonnées dans **Paramètres du site**. La marque et la signature sont protégées. LinkedIn reste vide tant que son adresse n’est pas confirmée. Le statut IPRP ne doit être activé qu’après contrôle réel de l’attestation ; les justificatifs privés restent conservés séparément.
 
-Après publication, la page est rendue depuis le CMS. Le projet prévoit un cache partagé de 30 secondes ; le délai réel doit être mesuré sur l'hébergement retenu. Si votre modification reste absente au-delà du délai constaté pendant la recette, contactez la personne chargée de la maintenance. Ne republiez pas de multiples copies du document.
+## Revenir à une version précédente
 
-Pour annuler une modification encore en brouillon, utilisez les actions du document après avoir vérifié quelle version est publiée. Pour une modification déjà publiée, demandez une restauration depuis l'historique disponible ou une sauvegarde. L'existence et la durée de cet historique doivent être contrôlées avec le forfait réel. Toute restauration importante est d'abord testée dans un environnement distinct.
+Le bouton **Historique** présente les versions du contenu, les dates et les personnes intervenues. Sélectionnez une version pour comparer ses champs avec le brouillon actuel. **Restaurer cette version** crée un nouveau brouillon : le site public ne change pas tant que la restauration n’est pas publiée.
 
-## Recette de prise en main à faire ensemble
+**Annuler le brouillon** reprend la dernière version publiée, après confirmation. Pour retirer un article du site, utilisez son action de retrait ou d’archivage puis vérifiez le résultat. L’historique général retrace l’activité du site.
 
-- Modifier un paragraphe de l'accueil, le prévisualiser puis le publier dans l'environnement de test.
-- Remplacer une image, contrôler son texte alternatif et ses cadrages.
-- Créer un article de test clairement identifié, vérifier son brouillon, publier puis retirer ce test.
-- Vérifier dans une fenêtre sans session de preview que les brouillons restent invisibles.
-- Mesurer l'apparition d'une publication après expiration du cache.
-- Essayer la restauration disponible sans toucher au contenu de production.
+![L’historique et la comparaison](../artifacts/custom-cms/admin/revisions-1440.png)
 
-Ne placez jamais dans le Studio les demandes reçues via le formulaire, des données médicales, des renseignements privés concernant un tiers, des mots de passe ou des attestations. Le CMS sert aux contenus destinés au site.
+Les versions facilitent les retours éditoriaux. Les sauvegardes de l’ensemble du site sont gérées séparément par la maintenance.
+
+## Retrouver son accès et se déconnecter
+
+**Mot de passe oublié ?** permet de demander un lien personnel. Changer le mot de passe ne supprime pas la double authentification. Si votre téléphone est indisponible, choisissez **Utiliser un code de secours**. Si vous n’avez plus ni application ni code, contactez votre administrateur pour la récupération.
+
+Dans **Compte et sécurité**, vous pouvez changer votre mot de passe, renouveler les codes de secours et fermer des sessions ouvertes. Les anciens codes deviennent inutilisables après leur renouvellement. Terminez avec **Se déconnecter**, surtout sur un ordinateur partagé.
+
+La liste des sessions nécessite une connexion datant de moins de quinze minutes. Si le bouton **Se reconnecter** apparaît, cliquez dessus puis saisissez votre mot de passe et votre code de sécurité : vous reviendrez directement à **Compte et sécurité**. Vous pouvez continuer à travailler sur vos contenus.
+
+## Première prise en main accompagnée
+
+À réaliser en préproduction : modifier un paragraphe de l’accueil, vérifier son aperçu mobile ; remplacer une image ; importer un PDF de test clairement identifié ; relire et publier l’article de test ; vérifier dans une fenêtre non connectée que seul le contenu publié est accessible ; restaurer une version en brouillon puis retirer le test.
+
+La mise en ligne publique reste conditionnée à la validation de l’accueil et de Diagnostic par Sara et Agnès, puis à la relecture finale. Les fonctions décrites ont été vérifiées localement ; l’adresse, les emails et les sauvegardes doivent aussi être vérifiés sur l’hébergement définitif.
+
+Le CMS contient les contenus destinés au site. N’y placez pas de dossiers RH, données médicales, demandes reçues par le formulaire, mots de passe ou documents privés de tiers.

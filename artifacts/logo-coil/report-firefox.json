@@ -1,0 +1,26 @@
+{
+  "base": "http://127.0.0.1:4336",
+  "at": "2026-10-25T10:12:15.291Z",
+  "reports": [
+    {
+      "browser": "firefox",
+      "width": 1440,
+      "base": "http://127.0.0.1:4336",
+      "duration": 2.2,
+      "checks": 12,
+      "frames": 90,
+      "result": "passed",
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "width": 390,
+      "base": "http://127.0.0.1:4336",
+      "duration": 2.2,
+      "checks": 12,
+      "frames": 93,
+      "result": "passed",
+      "errors": []
+    }
+  ]
+}

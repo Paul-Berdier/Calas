@@ -25,7 +25,7 @@ const exploreLabel=editorial.exploreLabel??'Explorer notre démarche';
         <div class="hero-copy">
           <p class="eyebrow"><span class="hero-dot" aria-hidden="true"></span>{home.eyebrow}</p>
           <h1 id="hero-title">{titleParts.length===2?<>{titleParts[0]}&#160;:<em>{titleParts[1]}</em></>:home.title}</h1>
-          <p class="hero-intro">{home.intro}</p>
+          <div class="hero-intro">{home.intro.split(/\n\s*\n/).filter(paragraph=>paragraph.trim()).map(paragraph=><p>{paragraph}</p>)}</div>
           <div class="actions"><CTA cta={home.primaryCta} variant="light" /><CTA cta={home.secondaryCta} variant="link" /></div>
         </div>
         <div class="hero-art" aria-hidden="true">

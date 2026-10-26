@@ -2,8 +2,36 @@ import {ribbonPaths} from '../assets/brand/geometry.mjs';
 import {ribbonGuides,ribbonFrame,unfurlSvg,unfurlDuration} from '../assets/brand/unfurl.mjs';
 import sharp from 'sharp';
 import assert from 'node:assert/strict';
+import {coilPoint,coilFrame,coilState,coilDuration} from '../assets/brand/coil.mjs';
+import {nucleus} from '../assets/brand/geometry.mjs';
 
-// Validate the current progressive reveal, not the superseded radial motion.
+// Current coiling: differential bending and radial convergence, not a rotation.
+let coilChecks=0;
+for(const variant of ['A','B','C'])for(let index=0;index<5;index++){
+ assert.equal(coilFrame(index,1,variant),ribbonPaths[index]);
+ for(let step=0;step<=100;step++){
+  const p=step/100,contour=coilFrame(index,p,variant);
+  assert(!/NaN|Infinity/.test(contour));
+  const coordinates=[...contour.matchAll(/(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g)];
+  for(const match of coordinates){assert(+match[1]>=-25&&+match[1]<=585,'Motion stays inside the SVG horizontally');assert(+match[2]>=-30&&+match[2]<=560,'Motion stays inside the SVG vertically');}
+  assert.deepEqual(coilPoint(...nucleus,p,variant),nucleus,'The nucleus never translates');
+  coilChecks++;
+ }
+}
+for(const radius of [20,80,160,300,420]){
+ let previous=Infinity;
+ for(let step=0;step<=100;step++){
+  const [x,y]=coilPoint(nucleus[0]+radius,nucleus[1],step/100);
+  const distance=Math.hypot(x-nucleus[0],y-nucleus[1]);assert(distance<=previous+1e-8,'Every sampled radius contracts towards the fixed nucleus');previous=distance;
+ }
+}
+const angles=[40,400].map(r=>{const [x,y]=coilPoint(nucleus[0]+r,nucleus[1],0);return Math.atan2(y-nucleus[1],x-nucleus[0]);});
+assert(angles[1]-angles[0]>.2,'Outer and inner portions bend differently: no rigid rotation');
+assert(coilState(4,.12).opacity>0&&coilState(3,.12).opacity===0,'The outer ribbon arrives before the nucleus');
+assert(coilDuration>=1.8&&coilDuration<=2.5);
+console.log(`PASS: ${coilChecks} current coil frames, all 3 studies bounded; fixed nucleus; radial convergence; exact final paths.`);
+
+// Preserve geometry coverage for the previous unfurl study kept as an archive.
 const progressSamples=[0,.01,.05,.125,.25,.375,.5,.625,.75,.875,.95,.99,.999,1];
 for(const guide of ribbonGuides){
  assert.equal(ribbonFrame(guide.index,1).contour,ribbonPaths[guide.index],`Ribbon ${guide.index}: exact final source`);

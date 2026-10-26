@@ -26,7 +26,7 @@ const seriesCta=journal.seriesCta??{label:'Découvrir notre conviction',href:'/n
     {articles.map((article,index)=><article class:list={['journal-entry',{'journal-entry-featured':index===0}]}>
       <a class="journal-entry-link" href={`/reflexions/${article.slug}/`}>
         {article.image&&<div class="journal-entry-image"><CmsImage image={article.image} width={index===0?1000:700} height={index===0?650:455} sizes="(max-width: 430px) 90vw, 45vw"/></div>}
-        <div class="journal-entry-content"><p class="journal-meta"><time datetime={article.date}>{new Intl.DateTimeFormat('fr-FR',{dateStyle:'long'}).format(new Date(article.date))}</time>{article.category&&<span>{article.category.title}</span>}</p><h2>{article.title}</h2><p class="journal-entry-excerpt">{article.excerpt}</p><div class="journal-entry-footer"><span>Par {article.author.name}</span><span>Lire la réflexion <span aria-hidden="true">↗</span></span></div></div>
+        <div class="journal-entry-content"><p class="journal-meta"><time datetime={article.date}>{article.date?new Intl.DateTimeFormat('fr-FR',{dateStyle:'long'}).format(new Date(article.date)):'Brouillon'}</time>{article.category&&<span>{article.category.title}</span>}</p><h2>{article.title}</h2><p class="journal-entry-excerpt">{article.excerpt}</p><div class="journal-entry-footer"><span>Par {article.author?.name||'Auteur à renseigner'}</span><span>Lire la réflexion <span aria-hidden="true">↗</span></span></div></div>
       </a>
     </article>)}
   </section> : <section class="journal-coming wrap" aria-labelledby="first-series-title">

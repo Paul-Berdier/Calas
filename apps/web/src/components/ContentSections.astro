@@ -1,19 +1,19 @@
 ---
-import {PortableText} from '@portabletext/astro';
-import PortableLink from './PortableLink.astro';
+
+import RichText from './RichText.astro';
 import StepIcon from './StepIcon.astro';
 import SectionMedia from './SectionMedia.astro';
 import type {Section} from '../lib/cms/types';
 import '../styles/editorial.css';
 interface Props {sections:Section[]; context?:string}
 const {sections=[],context='page'}=Astro.props;
-const sectionId=(section:Section)=>`section-${section._key.replace(/[^a-zA-Z0-9_-]/g,'-')}`;
+const sectionId=(section:Section)=>`section-${section.key.replace(/[^a-zA-Z0-9_-]/g,'-')}`;
 ---
 {sections.map((section,sectionIndex)=>{
   const id=sectionId(section);
   const isMethod=section.kind==='steps'&&(section.presentation==='method'||(!section.presentation&&section.items?.length===5));
-  const isQuestions=section.kind==='list'&&(section.presentation==='faq'||(!section.presentation&&section._key==='questions'));
-  const isDeliverables=section.kind==='list'&&(section.presentation==='deliverables'||(!section.presentation&&section._key==='livrables'));
+  const isQuestions=section.kind==='list'&&(section.presentation==='faq'||(!section.presentation&&section.key==='questions'));
+  const isDeliverables=section.kind==='list'&&(section.presentation==='deliverables'||(!section.presentation&&section.key==='livrables'));
   return isMethod ?
   <section class="editorial-method dark" id={id} aria-labelledby={`${id}-title`} data-method>
     <div class="wrap method-layout">
@@ -25,7 +25,7 @@ const sectionId=(section:Section)=>`section-${section._key.replace(/[^a-zA-Z0-9_
         <p class="method-instruction">{section.instruction??'Explorez les étapes de la démarche.'}</p>
       </div>
       <ol class="method-sequence">
-        {section.items?.map((item,i)=><li class="method-step" data-step><details name={`method-${context}-${section._key}`} open={i===0}><summary><span class="method-index" aria-hidden="true">{item.number??String(i+1).padStart(2,'0')}</span><span class="method-step-heading"><StepIcon index={i}/><span>{item.title}</span></span><span class="disclosure-icon" aria-hidden="true"></span></summary><div class="method-step-body"><p>{item.text}</p></div></details></li>)}
+        {section.items?.map((item,i)=><li class="method-step" data-step><details name={`method-${context}-${section.key}`} open={i===0}><summary><span class="method-index" aria-hidden="true">{item.number??String(i+1).padStart(2,'0')}</span><span class="method-step-heading"><StepIcon index={i}/><span>{item.title}</span></span><span class="disclosure-icon" aria-hidden="true"></span></summary><div class="method-step-body"><p>{item.text}</p></div></details></li>)}
       </ol>
     </div>
     <SectionMedia image={section.image}/>
@@ -40,5 +40,5 @@ const sectionId=(section:Section)=>`section-${section._key.replace(/[^a-zA-Z0-9_
   <section class:list={['editorial-list-section',{'is-deliverables':isDeliverables}]} id={id} aria-labelledby={`${id}-title`}><div class="wrap"><div class="editorial-heading"><div>{section.eyebrow&&<p class="eyebrow">{section.eyebrow}</p>}<h2 id={`${id}-title`} class="line-break">{section.title}</h2></div>{section.text&&<p class="editorial-deck">{section.text}</p>}</div><div class="editorial-list">{section.items?.map((item,i)=><article class="editorial-list-item" data-reveal><span class="editorial-item-index" aria-hidden="true">{item.number??String(i+1).padStart(2,'0')}{isDeliverables&&<span class="deliverable-mark"></span>}</span><div><h3>{item.title}</h3><p>{item.text}</p></div></article>)}</div></div><SectionMedia image={section.image}/></section>
   : section.kind==='split' ?
   <section class:list={['editorial-perspective',{'alternate':sectionIndex%2===0}]} id={id} aria-labelledby={`${id}-title`}><div class="wrap editorial-perspective-grid"><div class="editorial-perspective-heading">{section.eyebrow&&<p class="eyebrow">{section.eyebrow}</p>}<h2 id={`${id}-title`} class="line-break">{section.title}</h2>{section.text&&<p class="editorial-deck">{section.text}</p>}</div>{section.items?.length?<div class="perspective-points">{section.items.map((item,i)=><article class="perspective-point" data-reveal><span aria-hidden="true">{item.number??String(i+1).padStart(2,'0')}</span><div><h3>{item.title}</h3><p>{item.text}</p></div></article>)}</div>:<div class="editorial-line-art" aria-hidden="true"><i></i><i></i><i></i></div>}</div><SectionMedia image={section.image}/></section>
-  : <section class="editorial-essay" id={id} aria-labelledby={`${id}-title`}><div class="wrap essay-grid"><div><span class="essay-rule" aria-hidden="true"></span>{section.eyebrow&&<p class="eyebrow">{section.eyebrow}</p>}<h2 id={`${id}-title`}>{section.title}</h2></div><div class="prose">{section.text&&<p>{section.text}</p>}{section.body&&<PortableText value={section.body} components={{mark:{link:PortableLink}}}/>}</div></div><SectionMedia image={section.image}/></section>;
+  : <section class="editorial-essay" id={id} aria-labelledby={`${id}-title`}><div class="wrap essay-grid"><div><span class="essay-rule" aria-hidden="true"></span>{section.eyebrow&&<p class="eyebrow">{section.eyebrow}</p>}<h2 id={`${id}-title`}>{section.title}</h2></div><div class="prose">{section.text&&<p>{section.text}</p>}{section.body&&<RichText value={section.body}/>}</div></div><SectionMedia image={section.image}/></section>;
 })}

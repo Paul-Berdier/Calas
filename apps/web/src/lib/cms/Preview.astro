@@ -1,14 +1,6 @@
 ---
-import { getPreviewPerspective } from './preview';
-interface Props { enabled: boolean }
-const { enabled } = Astro.props;
-const published = getPreviewPerspective(Astro.cookies) === 'published';
+interface Props{enabled:boolean}
+const exit=new URL(Astro.url);exit.searchParams.delete('preview');
 ---
-{enabled && <>
-  <link rel="stylesheet" href="/_preview/editor.css" />
-  <aside class="private-preview" data-calas-preview aria-label="Prévisualisation privée">
-    <span data-preview-status>{published ? 'Contenu publié — prévisualisation privée' : 'Brouillon — prévisualisation privée'}</span>
-    <a href="/api/preview/disable/">Quitter la prévisualisation</a>
-  </aside>
-  <script is:inline type="module" src="/_preview/editor.js"></script>
-</>}
+{Astro.props.enabled&&<aside class="private-preview" data-calas-preview aria-label="Prévisualisation privée"><span>Brouillon — prévisualisation privée</span><a href={exit.pathname+exit.search}>Quitter la prévisualisation</a></aside>}
+<style>.private-preview{position:fixed;z-index:9999;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:18px;align-items:center;max-width:90vw;background:#14213a;color:#fff;padding:12px 20px;border:1px solid #94672f;border-radius:8px;font:13px/1.4 Arial,sans-serif;box-shadow:0 5px 30px #0003}.private-preview a{color:#fff;text-decoration:underline}</style>

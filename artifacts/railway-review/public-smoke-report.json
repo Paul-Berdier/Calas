@@ -1,0 +1,414 @@
+{
+  "url": "https://calas-web-test-production.up.railway.app",
+  "startedAt": "2026-10-25T14:26:01.873Z",
+  "readOnly": true,
+  "authenticated": false,
+  "checks": [
+    {
+      "name": "Process health",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Database and private S3 readiness",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Robots disallow indexing",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "body": "User-agent: *\nDisallow: /\n"
+      }
+    },
+    {
+      "name": "Staging sitemap absent",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "name": "Anonymous access rejected /api/admin/content/pages/",
+      "pass": true,
+      "detail": {
+        "status": 401,
+        "cache": "private, no-store"
+      }
+    },
+    {
+      "name": "Anonymous access rejected /api/admin/media/",
+      "pass": true,
+      "detail": {
+        "status": 401,
+        "cache": "private, no-store"
+      }
+    },
+    {
+      "name": "Anonymous access rejected /api/admin/users/",
+      "pass": true,
+      "detail": {
+        "status": 401,
+        "cache": "private, no-store"
+      }
+    },
+    {
+      "name": "Admin redirects anonymous visitor to login",
+      "pass": true,
+      "detail": {
+        "status": 302,
+        "location": "/admin/login/"
+      }
+    },
+    {
+      "name": "Anonymous preview parameter does not expose editor controls",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "cache": "private, no-store",
+        "note": "The server falls back to the published page for anonymous visitors; draft-content access is tested separately by the authenticated checks."
+      }
+    },
+    {
+      "name": "desktop / HTTP 200",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "desktop / heading rendered",
+      "pass": true,
+      "detail": {
+        "h1": "Prévenir les risques psychosociaux à leur racine :la qualité du lien au cœur de la performance collective"
+      }
+    },
+    {
+      "name": "desktop / no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "scrollWidth": 1440,
+        "viewport": 1440
+      }
+    },
+    {
+      "name": "desktop / noindex meta and header",
+      "pass": true,
+      "detail": {
+        "meta": "noindex, nofollow",
+        "header": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "name": "desktop / staging canonical omitted and HTTPS media origin",
+      "pass": true,
+      "detail": {
+        "canonical": null,
+        "ogImage": "https://calas-web-test-production.up.railway.app/brand/open-graph.png"
+      }
+    },
+    {
+      "name": "desktop / no browser or asset errors",
+      "pass": true,
+      "detail": {
+        "errors": [],
+        "badResources": [],
+        "failedRequests": []
+      }
+    },
+    {
+      "name": "desktop /diagnostic-rps/ HTTP 200",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "desktop /diagnostic-rps/ heading rendered",
+      "pass": true,
+      "detail": {
+        "h1": "Voir clair\navant d’agir."
+      }
+    },
+    {
+      "name": "desktop /diagnostic-rps/ no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "scrollWidth": 1440,
+        "viewport": 1440
+      }
+    },
+    {
+      "name": "desktop /diagnostic-rps/ noindex meta and header",
+      "pass": true,
+      "detail": {
+        "meta": "noindex, nofollow",
+        "header": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "name": "desktop /diagnostic-rps/ staging canonical omitted and HTTPS media origin",
+      "pass": true,
+      "detail": {
+        "canonical": null,
+        "ogImage": "https://calas-web-test-production.up.railway.app/brand/open-graph.png"
+      }
+    },
+    {
+      "name": "desktop /diagnostic-rps/ no browser or asset errors",
+      "pass": true,
+      "detail": {
+        "errors": [],
+        "badResources": [],
+        "failedRequests": []
+      }
+    },
+    {
+      "name": "mobile / HTTP 200",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "mobile / heading rendered",
+      "pass": true,
+      "detail": {
+        "h1": "Prévenir les risques psychosociaux à leur racine :la qualité du lien au cœur de la performance collective"
+      }
+    },
+    {
+      "name": "mobile / no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "scrollWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "name": "mobile / noindex meta and header",
+      "pass": true,
+      "detail": {
+        "meta": "noindex, nofollow",
+        "header": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "name": "mobile / staging canonical omitted and HTTPS media origin",
+      "pass": true,
+      "detail": {
+        "canonical": null,
+        "ogImage": "https://calas-web-test-production.up.railway.app/brand/open-graph.png"
+      }
+    },
+    {
+      "name": "mobile / no browser or asset errors",
+      "pass": true,
+      "detail": {
+        "errors": [],
+        "badResources": [],
+        "failedRequests": []
+      }
+    },
+    {
+      "name": "mobile /diagnostic-rps/ HTTP 200",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "mobile /diagnostic-rps/ heading rendered",
+      "pass": true,
+      "detail": {
+        "h1": "Voir clair\navant d’agir."
+      }
+    },
+    {
+      "name": "mobile /diagnostic-rps/ no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "scrollWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "name": "mobile /diagnostic-rps/ noindex meta and header",
+      "pass": true,
+      "detail": {
+        "meta": "noindex, nofollow",
+        "header": "noindex, nofollow, noarchive"
+      }
+    },
+    {
+      "name": "mobile /diagnostic-rps/ staging canonical omitted and HTTPS media origin",
+      "pass": true,
+      "detail": {
+        "canonical": null,
+        "ogImage": "https://calas-web-test-production.up.railway.app/brand/open-graph.png"
+      }
+    },
+    {
+      "name": "mobile /diagnostic-rps/ no browser or asset errors",
+      "pass": true,
+      "detail": {
+        "errors": [],
+        "badResources": [],
+        "failedRequests": []
+      }
+    },
+    {
+      "name": "Public navigation /",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Public navigation /diagnostic-rps/",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Public navigation /equipes/",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Public navigation /managers/",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Public navigation /notre-approche/",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Public navigation /qui-sommes-nous/",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Public navigation /reflexions/",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Public navigation /contact/",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Public navigation /mentions-legales/",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Public navigation /confidentialite/",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Mobile menu opens and Diagnostic navigation works",
+      "pass": true,
+      "detail": {
+        "destination": "/diagnostic-rps/"
+      }
+    },
+    {
+      "name": "Public login UI hydrates without exposing CMS",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "errors": []
+      }
+    }
+  ],
+  "pages": [
+    {
+      "viewport": 1440,
+      "path": "/",
+      "status": 200,
+      "title": "Calas Conseil — Diagnostic RPS et qualité du lien",
+      "h1": "Prévenir les risques psychosociaux à leur racine :la qualité du lien au cœur de la performance collective",
+      "robots": "noindex, nofollow",
+      "ogImage": "https://calas-web-test-production.up.railway.app/brand/open-graph.png",
+      "scrollWidth": 1440,
+      "body": "Aller au contenu\nVersion de travail · Relecture avant publication · Formulaire de test, aucun courriel envoyé\nCalas Conseil\nDiagnostic RPS\nÉquipes\nManagers\nNotre approche\nQui sommes-nous\nRéflexions\nContact\n\nPRÉVENTION DES RISQUES PSYCHOSOCIAUX · QUALITÉ DU LIEN\n\nPrévenir les risques psychosociaux à leur racine :\nla qualité du lien au cœur de la performance collective\n\nTensions, désengagement, relations tendues, départs : les fragilités d’une organisation se jouent souvent dans les relations de t",
+      "errors": [],
+      "badResources": [],
+      "failedRequests": []
+    },
+    {
+      "viewport": 1440,
+      "path": "/diagnostic-rps/",
+      "status": 200,
+      "title": "Diagnostic RPS — Voir clair avant d’agir | Calas Conseil",
+      "h1": "Voir clair\navant d’agir.",
+      "robots": "noindex, nofollow",
+      "ogImage": "https://calas-web-test-production.up.railway.app/brand/open-graph.png",
+      "scrollWidth": 1440,
+      "body": "Aller au contenu\nVersion de travail · Relecture avant publication · Formulaire de test, aucun courriel envoyé\nCalas Conseil\nDiagnostic RPS\nÉquipes\nManagers\nNotre approche\nQui sommes-nous\nRéflexions\nContact\nAccueil\n/\nDiagnostic & prévention des RPS\n\n01 /DIAGNOSTIC & PRÉVENTION DES RPS\n\nVoir clair\navant d’agir.\n\nLes tensions ont toujours un sens. Notre diagnostic permet de les lire avec justesse : ce qui relève de l’organisation du travail, ce qui relève des relations, ce qui fragilise les personn",
+      "errors": [],
+      "badResources": [],
+      "failedRequests": []
+    },
+    {
+      "viewport": 390,
+      "path": "/",
+      "status": 200,
+      "title": "Calas Conseil — Diagnostic RPS et qualité du lien",
+      "h1": "Prévenir les risques psychosociaux à leur racine :la qualité du lien au cœur de la performance collective",
+      "robots": "noindex, nofollow",
+      "ogImage": "https://calas-web-test-production.up.railway.app/brand/open-graph.png",
+      "scrollWidth": 390,
+      "body": "Aller au contenu\nVersion de travail · Relecture avant publication · Formulaire de test, aucun courriel envoyé\nCalas Conseil\nMenu\n\nPRÉVENTION DES RISQUES PSYCHOSOCIAUX · QUALITÉ DU LIEN\n\nPrévenir les risques psychosociaux à leur racine :\nla qualité du lien au cœur de la performance collective\n\nTensions, désengagement, relations tendues, départs : les fragilités d’une organisation se jouent souvent dans les relations de travail. Calas Conseil vous aide à comprendre l’origine des difficultés, puis ",
+      "errors": [],
+      "badResources": [],
+      "failedRequests": []
+    },
+    {
+      "viewport": 390,
+      "path": "/diagnostic-rps/",
+      "status": 200,
+      "title": "Diagnostic RPS — Voir clair avant d’agir | Calas Conseil",
+      "h1": "Voir clair\navant d’agir.",
+      "robots": "noindex, nofollow",
+      "ogImage": "https://calas-web-test-production.up.railway.app/brand/open-graph.png",
+      "scrollWidth": 390,
+      "body": "Aller au contenu\nVersion de travail · Relecture avant publication · Formulaire de test, aucun courriel envoyé\nCalas Conseil\nMenu\nAccueil\n/\nDiagnostic & prévention des RPS\n\n01 /DIAGNOSTIC & PRÉVENTION DES RPS\n\nVoir clair\navant d’agir.\n\nLes tensions ont toujours un sens. Notre diagnostic permet de les lire avec justesse : ce qui relève de l’organisation du travail, ce qui relève des relations, ce qui fragilise les personnes. Vous savez où agir, et par où commencer.\n\nParlons de votre diagnostic\n↗\nE",
+      "errors": [],
+      "badResources": [],
+      "failedRequests": []
+    }
+  ],
+  "failures": [],
+  "finishedAt": "2026-10-25T14:26:39.303Z",
+  "deployedCommit": "0c4e0b97cae6e6418f0b0b078eb6ae344ee023aa",
+  "deploymentId": "757213ce-9369-4bcb-abf4-8ef80d20cb3e",
+  "revisionSource": "Railway deployment identifiers supplied by coordinating agent"
+}

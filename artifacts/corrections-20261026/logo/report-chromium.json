@@ -1,0 +1,26 @@
+{
+  "base": "http://localhost:4336",
+  "at": "2026-10-26T10:55:40.553Z",
+  "reports": [
+    {
+      "browser": "chromium",
+      "width": 1440,
+      "base": "http://localhost:4336",
+      "duration": 2.2,
+      "checks": 12,
+      "frames": 127,
+      "result": "passed",
+      "errors": []
+    },
+    {
+      "browser": "chromium",
+      "width": 390,
+      "base": "http://localhost:4336",
+      "duration": 2.2,
+      "checks": 12,
+      "frames": 132,
+      "result": "passed",
+      "errors": []
+    }
+  ]
+}

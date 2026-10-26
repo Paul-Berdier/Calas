@@ -1,31 +1,33 @@
-import type { PortableTextBlock } from '@portabletext/types';
+export interface RichMark { type: 'bold' | 'italic' | 'link' | 'strike' | 'code' | 'underline'; attrs?: Record<string, unknown> }
+export interface RichNode { type: string; text?: string; attrs?: Record<string, unknown>; marks?: RichMark[]; content?: RichNode[] }
+export interface RichDocument extends RichNode { type: 'doc'; content: RichNode[] }
 
 export interface Cta { label: string; href: string }
 export interface Seo { title?: string; description?: string }
 export interface ContentImage {
   alt: string;
-  asset: { _ref?: string; _id?: string; url?: string; metadata?: { dimensions?: { width: number; height: number }; lqip?: string } };
+  mediaId: string; width?: number; height?: number;
   crop?: { top: number; bottom: number; left: number; right: number };
   hotspot?: { x: number; y: number; width: number; height: number };
 }
 export interface ContentFile {
-  asset?: { _id?: string; url?: string; originalFilename?: string; size?: number; mimeType?: string };
+  mediaId: string; originalFilename?: string; size?: number; mimeType?: string;
 }
 export interface Statistic {
-  _id: string; value: string; label: string; source: string; sourceUrl: string;
+  id: string; value: string; label: string; source: string; sourceUrl: string;
   year: string; note: string; verified: boolean;
 }
-export interface Person { _id: string; name: string; role: string; bio?: string; portrait?: ContentImage }
+export interface Person { id: string; name: string; role: string; bio?: string; portrait?: ContentImage }
 export interface Section {
-  _key: string; title?: string; eyebrow?: string; text?: string;
+  key: string; title?: string; eyebrow?: string; text?: string;
   kind?: 'text' | 'steps' | 'list' | 'split' | 'notice';
   presentation?: 'default' | 'method' | 'faq' | 'deliverables';
   navigationLabel?: string; instruction?: string; image?: ContentImage;
-  items?: Array<{ _key?: string; title: string; text: string; number?: string }>;
-  body?: PortableTextBlock[];
+  items?: Array<{ key?: string; title: string; text: string; number?: string }>;
+  body?: RichDocument;
 }
 export interface Page {
-  _id: string; slug: string; title: string; eyebrow?: string; intro: string;
+  id: string; slug: string; title: string; eyebrow?: string; intro: string;
   sections: Section[]; cta?: Cta; image?: ContentImage; seo?: Seo;
   format?: { duration?: string; rhythm?: string; delivery?: string };
   offerExcerpt?: string;
@@ -34,8 +36,8 @@ export interface Page {
   contact?: { formEyebrow?: string; formTitle?: string; directHeading?: string; context?: string; linkedinLabel?: string };
 }
 export interface Article {
-  _id: string; slug: string; title: string; date: string; excerpt: string;
-  body: PortableTextBlock[]; author: Person; category?: { title: string; slug?: string };
+  id: string; slug: string; title: string; date: string; excerpt: string;
+  body: RichDocument; author?: Person; category?: { title: string; slug?: string };
   image?: ContentImage; sourcePdf?: ContentFile; seo?: Seo;
 }
 export interface SiteSettings {
@@ -48,7 +50,7 @@ export interface Home {
   eyebrow: string; title: string; intro: string; primaryCta: Cta; secondaryCta: Cta;
   statistics: Statistic[]; statisticsTitle?: string; statisticsTransition?: string;
   diagnostic: { title: string; text: string; cta: Cta; image?: ContentImage };
-  reasons: Array<{ _key?: string; title: string; text: string }>;
+  reasons: Array<{ key?: string; title: string; text: string }>;
   reasonsTitle?: string;
   domainsTitle?: string; domainsIntro?: string;
   conviction: { title: string; text: string; cta: Cta };

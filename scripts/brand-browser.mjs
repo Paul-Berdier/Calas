@@ -55,6 +55,9 @@ for(const [name,type]of [['chromium',chromium],['firefox',firefox]].filter(([nam
  if(name==='chromium')await artwork.screenshot({path:resolve(output,'logo-link-art-start.png')});
  await page.waitForFunction(()=>Array.from(document.querySelectorAll('.diagnostic-visual [data-line]')).every(line=>!line.style.strokeDasharray));
  if(name==='chromium')await artwork.screenshot({path:resolve(output,'logo-link-art-end.png')});
+  // A reveal is intentionally one-shot. Isolate its first entry from the
+  // preceding preference changes and screenshots, which may scroll the page.
+  await page.goto(base,{waitUntil:'networkidle'});
  const revealObserved=await page.evaluate(()=>new Promise(resolve=>{
   const offer=document.querySelector('.offer-row');
   if(!offer){resolve(false);return;}

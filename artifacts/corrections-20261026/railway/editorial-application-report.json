@@ -1,0 +1,33 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "mode": "apply",
+  "startedAt": "2026-10-26T12:05:32.158Z",
+  "contentMutated": true,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "beforeVersion": 1,
+  "changedFields": [
+    "intro",
+    "diagnostic.text",
+    "reasons[0].text",
+    "reasons[1].text",
+    "reasons[2].text"
+  ],
+  "otherUnpublishedChanges": false,
+  "currentHasUnpublishedChanges": false,
+  "savedVersion": 2,
+  "publishedVersion": 3,
+  "publicVerified": {
+    "widths": [
+      390,
+      1440
+    ],
+    "allFiveTexts": true,
+    "noOverflow": true,
+    "noRuntimeErrors": true,
+    "anonymousPrivateApiStatus": 401
+  },
+  "completedAt": "2026-10-26T12:05:38.594Z",
+  "commit": "6640b991a74654f32ffbd16acbbf8f68d52516f4",
+  "deploymentId": "e52d5014-83ce-4fb7-a98e-c9f95640ea78"
+}

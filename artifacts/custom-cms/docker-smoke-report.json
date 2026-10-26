@@ -1,0 +1,34 @@
+{
+  "image": "calas-cms:local-check",
+  "checks": [
+    {
+      "name": "Linux HTTP liveness",
+      "status": 200
+    },
+    {
+      "name": "Unconfigured readiness fails closed",
+      "status": 503
+    },
+    {
+      "name": "Explicit demo renders without private services",
+      "status": 200
+    },
+    {
+      "name": "Non-root Node and native Sharp; no source or environment file",
+      "uid": 1000,
+      "node": "v24.19.0",
+      "webp": "webp",
+      "width": 4,
+      "height": 3,
+      "envPresent": false,
+      "sourcePresent": false
+    },
+    {
+      "name": "Official Astro runtime logger loaded",
+      "jsonStartup": true
+    }
+  ],
+  "stopped": true,
+  "imageId": "sha256:90d07d0fde54056f9ba7a42ae13fc14f531865cfcf313752b7e87cb3107b249a",
+  "status": "passed"
+}

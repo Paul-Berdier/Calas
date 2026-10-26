@@ -1,7 +1,7 @@
 import type { SiteContent } from './types';
 
 // Contenu de travail isolé, enrichi depuis le brief et l’ODT. Relecture éditoriale requise avant publication.
-// Jamais utilisé comme repli d’une requête Sanity.
+// Jamais utilisé comme repli d’une panne de la base de données.
 export const demoContent: SiteContent = {
   "settings": {
     "brand": "Calas Conseil",
@@ -17,7 +17,7 @@ export const demoContent: SiteContent = {
   "home": {
     "eyebrow": "Prévention des risques psychosociaux · Qualité du lien",
     "title": "Prévenir les risques psychosociaux à leur racine : la qualité du lien au cœur de la performance collective",
-    "intro": "Tensions, désengagement, relations tendues, départs : les fragilités d’une organisation se jouent souvent dans les relations de travail. Calas Conseil vous aide à comprendre l’origine des difficultés, puis à agir concrètement sur l’organisation, le management et les dynamiques d’équipe.",
+    "intro": "Stress, tensions, désengagement, départs : ce qui fragilise une entreprise commence souvent dans la relation.\n\nCALAS Conseil vous aide à comprendre l’origine des difficultés, puis à agir concrètement sur l’organisation, le management et les dynamiques d’équipe.",
     "primaryCta": {
       "label": "Faire le point sur vos risques",
       "href": "/diagnostic-rps/"
@@ -30,7 +30,7 @@ export const demoContent: SiteContent = {
     "statisticsTransition": "Quand le lien se fragilise, cela finit par se ressentir dans toute l’organisation.",
     "statistics": [
       {
-        "_id": "stat-stress",
+        "id": "stat-stress",
         "value": "39 %",
         "label": "des salariés interrogés en France ont ressenti beaucoup de stress une grande partie de la veille.",
         "source": "Gallup · State of the Global Workplace 2026",
@@ -40,7 +40,7 @@ export const demoContent: SiteContent = {
         "verified": true
       },
       {
-        "_id": "stat-detresse",
+        "id": "stat-detresse",
         "value": "1 sur 2",
         "label": "salarié présente un signe de détresse psychologique.",
         "source": "Empreinte Humaine / Ipsos bva · juin 2026",
@@ -50,7 +50,7 @@ export const demoContent: SiteContent = {
         "verified": true
       },
       {
-        "_id": "stat-arrets",
+        "id": "stat-arrets",
         "value": "36 %",
         "label": "des arrêts longs sont liés aux risques psychosociaux dans les données WTW.",
         "source": "WTW · Baromètre absentéisme 2025",
@@ -60,7 +60,7 @@ export const demoContent: SiteContent = {
         "verified": true
       },
       {
-        "_id": "stat-cout",
+        "id": "stat-cout",
         "value": "> 120 Md€",
         "label": "par an : le coût global estimé de l’absentéisme pour les entreprises françaises.",
         "source": "Estimation relayée par WTW · 2025",
@@ -72,7 +72,7 @@ export const demoContent: SiteContent = {
     ],
     "diagnostic": {
       "title": "Voir clair avant d’agir.",
-      "text": "Écouter le travail réel. Comprendre ce qui fragilise l’organisation, les relations et les personnes. Faire émerger des priorités d’action concrètes, avec les acteurs de votre entreprise.",
+      "text": "L’évaluation des risques psychosociaux est une obligation. Nous en faisons un vrai outil de pilotage : une lecture précise de ce qui fragilise le travail (l’organisation, les relations, les personnes) et des priorités d’action concrètes.",
       "cta": {
         "label": "Découvrir le diagnostic",
         "href": "/diagnostic-rps/"
@@ -82,15 +82,15 @@ export const demoContent: SiteContent = {
     "reasons": [
       {
         "title": "Un binôme complémentaire",
-        "text": "L’expérience de la direction RH et le regard de la psychologie clinique se rencontrent pour comprendre les réalités de l’entreprise et les dynamiques humaines."
+        "text": "Au croisement de l’entreprise et de l’humain : une ancienne DRH habilitée IPRP, qui connaît les réalités et les contraintes de l’entreprise, et une psychologue clinicienne, qui apporte un éclairage sur les dynamiques humaines et relationnelles."
       },
       {
         "title": "Agir à la source",
-        "text": "Les émotions, les croyances et les mécanismes relationnels influencent les comportements. Nous les examinons avec les conditions et l’organisation du travail, sans réduire les difficultés aux personnes."
+        "text": "Derrière les tensions, des émotions, des croyances et des mécanismes relationnels influencent les comportements. C’est à ce niveau que nous intervenons, pour comprendre ce qui se joue et faire évoluer durablement les situations."
       },
       {
         "title": "Une démarche cohérente",
-        "text": "Du diagnostic à l’action, nous accompagnons les évolutions dans la durée pour les ancrer dans les pratiques quotidiennes, au-delà des formations ponctuelles."
+        "text": "Du diagnostic à l’action : nous mobilisons nos propres outils pour accompagner les transformations dans la durée, au-delà des formations ponctuelles, afin d’ancrer les changements dans les pratiques quotidiennes."
       }
     ],
     "domainsTitle": "Trois entrées.\nUne même attention au lien.",
@@ -147,7 +147,7 @@ export const demoContent: SiteContent = {
   },
   "pages": [
     {
-      "_id": "page-contact",
+      "id": "page-contact",
       "slug": "contact",
       "eyebrow": "Le premier pas",
       "title": "Et si nous prenions\nle temps d’en parler ?",
@@ -166,7 +166,7 @@ export const demoContent: SiteContent = {
       }
     },
     {
-      "_id": "page-reflexions",
+      "id": "page-reflexions",
       "slug": "reflexions",
       "eyebrow": "Prendre du recul",
       "title": "Réflexions",
@@ -191,7 +191,7 @@ export const demoContent: SiteContent = {
       }
     },
     {
-      "_id": "page-diagnostic",
+      "id": "page-diagnostic",
       "slug": "diagnostic-rps",
       "eyebrow": "Diagnostic & prévention des RPS",
       "title": "Voir clair\navant d’agir.",
@@ -206,7 +206,7 @@ export const demoContent: SiteContent = {
       },
       "sections": [
         {
-          "_key": "signaux",
+          "key": "signaux",
           "kind": "list",
           "eyebrow": "Reconnaître les signaux",
           "title": "Quand les difficultés\nfinissent par se répéter.",
@@ -233,7 +233,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Les signaux"
         },
         {
-          "_key": "etapes",
+          "key": "etapes",
           "kind": "steps",
           "eyebrow": "Une démarche en cinq temps",
           "title": "De l’écoute\naux priorités d’action.",
@@ -265,7 +265,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "La démarche"
         },
         {
-          "_key": "regards",
+          "key": "regards",
           "kind": "split",
           "eyebrow": "L’organisation et les relations",
           "title": "Deux regards.\nUne lecture d’ensemble.",
@@ -288,7 +288,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Nos regards"
         },
         {
-          "_key": "livrables",
+          "key": "livrables",
           "kind": "list",
           "eyebrow": "Ce que vous obtenez",
           "title": "Des repères pour décider.\nDes priorités pour agir.",
@@ -315,14 +315,14 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Les livrables"
         },
         {
-          "_key": "confiance",
+          "key": "confiance",
           "kind": "notice",
           "title": "La confiance se prépare\navant la première écoute.",
           "text": "Confidentialité, restitution collective et règles de partage sont précisées avant chaque mission. Ces modalités tiennent compte de la taille de l’équipe et de la situation. Un anonymat absolu ne peut pas être promis dans tous les contextes, notamment dans un petit collectif.",
           "presentation": "default"
         },
         {
-          "_key": "questions",
+          "key": "questions",
           "kind": "list",
           "eyebrow": "Avant de commencer",
           "title": "Vos premières\nquestions.",
@@ -344,7 +344,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Vos questions"
         },
         {
-          "_key": "prevention",
+          "key": "prevention",
           "kind": "text",
           "title": "Un appui à votre démarche\nde prévention.",
           "text": "L’évaluation des RPS fait partie des obligations de prévention de l’employeur. Notre accompagnement aide à structurer cette démarche ; le recours à un diagnostic externe n’est pas une obligation en soi.\n\nLe diagnostic fournit des repères pour agir. Ses conclusions se discutent dans le cadre défini avec vous, puis servent à préciser les suites de la démarche.",
@@ -361,7 +361,7 @@ export const demoContent: SiteContent = {
       }
     },
     {
-      "_id": "page-equipes",
+      "id": "page-equipes",
       "slug": "equipes",
       "eyebrow": "Accompagner les équipes",
       "title": "Apprendre à dire\nsans casser le lien.",
@@ -372,7 +372,7 @@ export const demoContent: SiteContent = {
       },
       "sections": [
         {
-          "_key": "situations",
+          "key": "situations",
           "kind": "list",
           "eyebrow": "Quand la parole devient difficile",
           "title": "Mieux comprendre\nce qui se joue entre nous.",
@@ -398,7 +398,7 @@ export const demoContent: SiteContent = {
           "presentation": "default"
         },
         {
-          "_key": "conference",
+          "key": "conference",
           "kind": "split",
           "eyebrow": "Pour ouvrir la conversation",
           "title": "Stress et émotions au travail,\ndu signal à l’action.",
@@ -417,7 +417,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "La conférence"
         },
         {
-          "_key": "ateliers",
+          "key": "ateliers",
           "kind": "list",
           "eyebrow": "La Boussole émotionnelle",
           "title": "Un espace pour\npasser à la pratique.",
@@ -436,7 +436,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Les ateliers"
         },
         {
-          "_key": "pratique",
+          "key": "pratique",
           "kind": "steps",
           "eyebrow": "Une même direction",
           "title": "Reconnaître.\nExprimer. Ajuster.",
@@ -457,14 +457,14 @@ export const demoContent: SiteContent = {
           "presentation": "default"
         },
         {
-          "_key": "limites",
+          "key": "limites",
           "kind": "notice",
           "title": "Le travail reste\nnotre point d’ancrage.",
           "text": "Ce n’est pas de la thérapie, et cela ne remplace pas les actions sur l’organisation du travail. Les émotions et les croyances sont abordées en lien avec les situations professionnelles et les relations dans l’équipe.",
           "presentation": "default"
         },
         {
-          "_key": "questions",
+          "key": "questions",
           "kind": "list",
           "eyebrow": "Choisir un point d’entrée",
           "title": "Quel format pour\nvotre équipe ?",
@@ -495,7 +495,7 @@ export const demoContent: SiteContent = {
       }
     },
     {
-      "_id": "page-managers",
+      "id": "page-managers",
       "slug": "managers",
       "eyebrow": "Managers & dirigeants",
       "title": "Faire du manager\nun professionnel du lien.",
@@ -506,7 +506,7 @@ export const demoContent: SiteContent = {
       },
       "sections": [
         {
-          "_key": "posture",
+          "key": "posture",
           "kind": "list",
           "eyebrow": "Une posture qui se travaille",
           "title": "Clarifier. Soutenir.\nFaire grandir.",
@@ -528,7 +528,7 @@ export const demoContent: SiteContent = {
           "presentation": "default"
         },
         {
-          "_key": "cycles",
+          "key": "cycles",
           "kind": "steps",
           "eyebrow": "Le manager, professionnel du lien",
           "title": "Soi. L’équipe.\nLe système.",
@@ -551,7 +551,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Les trois cycles"
         },
         {
-          "_key": "experience",
+          "key": "experience",
           "kind": "split",
           "eyebrow": "Apprendre dans la durée",
           "title": "Partir du vécu.\nRevenir à la pratique.",
@@ -574,7 +574,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Dans la durée"
         },
         {
-          "_key": "cadre",
+          "key": "cadre",
           "kind": "notice",
           "title": "Le manager n’agit\npas hors du système.",
           "text": "Développer une posture relationnelle ne dispense pas de regarder la charge, les règles, les décisions et les marges de manœuvre. La responsabilité du lien s’inscrit dans l’organisation ; elle ne repose pas sur le seul effort individuel du manager.",
@@ -582,7 +582,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Le cadre de travail"
         },
         {
-          "_key": "questions",
+          "key": "questions",
           "kind": "list",
           "eyebrow": "Construire votre parcours",
           "title": "Un accompagnement\nà situer dans votre contexte.",
@@ -617,7 +617,7 @@ export const demoContent: SiteContent = {
       }
     },
     {
-      "_id": "page-approche",
+      "id": "page-approche",
       "slug": "notre-approche",
       "eyebrow": "Notre conviction",
       "title": "Le lien ne se décrète pas.\nIl se construit.",
@@ -628,7 +628,7 @@ export const demoContent: SiteContent = {
       },
       "sections": [
         {
-          "_key": "besoins",
+          "key": "besoins",
           "kind": "steps",
           "eyebrow": "Trois repères pour regarder le travail",
           "title": "Exister. Compter.\nPouvoir grandir.",
@@ -651,7 +651,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Nos repères"
         },
         {
-          "_key": "surface",
+          "key": "surface",
           "kind": "text",
           "title": "Comprendre ce qui se joue\nsous la surface.",
           "text": "Nos émotions nous aident à identifier ce qui est important pour nous, tandis que nos croyances influencent nos réactions, souvent sans que nous en ayons conscience. Sous pression, ces mécanismes peuvent modifier notre façon de travailler et d’entrer en relation.\n\nQuand la possibilité d’exister, de compter ou de grandir semble fragilisée, chacun peut chercher à se protéger : en se retirant, en s’opposant ou en prenant de la distance. Ces réactions méritent d’être comprises dans leur contexte, sans les réduire à un trait de personnalité.\n\nApprendre à reconnaître ce qui se passe en soi aide à mieux comprendre l’échange. Mais cette compréhension, à elle seule, ne transforme pas le cadre de travail.",
@@ -659,7 +659,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Sous la surface"
         },
         {
-          "_key": "cadre",
+          "key": "cadre",
           "kind": "split",
           "eyebrow": "Le cadre compte autant que les personnes",
           "title": "Des règles claires.\nUne parole possible.",
@@ -682,7 +682,7 @@ export const demoContent: SiteContent = {
           "navigationLabel": "Le cadre de travail"
         },
         {
-          "_key": "coherence",
+          "key": "coherence",
           "kind": "split",
           "eyebrow": "Du diagnostic à l’action",
           "title": "Tenir ensemble\nles trois dimensions.",
@@ -704,7 +704,7 @@ export const demoContent: SiteContent = {
           "presentation": "default"
         },
         {
-          "_key": "conviction",
+          "key": "conviction",
           "kind": "notice",
           "title": "Le lien est\nune compétence.",
           "text": "Il s’apprend, se développe et peut devenir un levier de performance collective. C’est la conviction qui guide Calas Conseil : aider les entreprises à en faire une compétence, pas à pas.",
@@ -723,7 +723,7 @@ export const demoContent: SiteContent = {
       }
     },
     {
-      "_id": "page-nous",
+      "id": "page-nous",
       "slug": "qui-sommes-nous",
       "eyebrow": "Calas Conseil",
       "title": "L’entreprise et l’humain.\nDeux regards qui se rencontrent.",
@@ -734,7 +734,7 @@ export const demoContent: SiteContent = {
       },
       "sections": [
         {
-          "_key": "binome",
+          "key": "binome",
           "kind": "split",
           "eyebrow": "Ce qui nous réunit",
           "title": "Croiser les regards\npour mieux comprendre.",
@@ -756,7 +756,7 @@ export const demoContent: SiteContent = {
           "presentation": "default"
         },
         {
-          "_key": "attention",
+          "key": "attention",
           "kind": "notice",
           "title": "Une même attention\nau travail et au lien.",
           "text": "Notre point de départ est votre situation. Nous prenons le temps d’en comprendre les enjeux pour situer la demande et définir un cadre d’intervention, avec les acteurs concernés.",
@@ -775,14 +775,14 @@ export const demoContent: SiteContent = {
       }
     },
     {
-      "_id": "page-legal",
+      "id": "page-legal",
       "slug": "mentions-legales",
       "eyebrow": "Informations du site",
       "title": "Mentions légales",
       "intro": "Calas Conseil — La voie de la qualité relationnelle.",
       "sections": [
         {
-          "_key": "contact",
+          "key": "contact",
           "kind": "text",
           "title": "Nous joindre",
           "text": "Pour toute question concernant ce site : saraserranocabeza@gmail.com ou 06 43 16 83 81.",
@@ -791,28 +791,28 @@ export const demoContent: SiteContent = {
       ]
     },
     {
-      "_id": "page-privacy",
+      "id": "page-privacy",
       "slug": "confidentialite",
       "eyebrow": "Vos données",
       "title": "Confidentialité",
       "intro": "Nous limitons les informations demandées à ce qui est utile pour comprendre votre demande et vous répondre.",
       "sections": [
         {
-          "_key": "form",
+          "key": "form",
           "kind": "text",
           "title": "Les informations du formulaire",
           "text": "Le formulaire recueille votre nom, votre courriel, l’objet de votre demande et votre message. L’entreprise est facultative. Ces informations servent à traiter votre demande. Merci de ne pas transmettre d’informations médicales ni de données concernant un tiers.",
           "presentation": "default"
         },
         {
-          "_key": "droits",
+          "key": "droits",
           "kind": "text",
           "title": "Vos demandes concernant vos données",
           "text": "Vous pouvez écrire à saraserranocabeza@gmail.com pour toute demande d’accès, de rectification ou d’effacement concernant vos informations. Les modalités applicables sont précisées avec le responsable du traitement.",
           "presentation": "default"
         },
         {
-          "_key": "traceurs",
+          "key": "traceurs",
           "kind": "text",
           "title": "Une navigation sobre",
           "text": "Ce site n’utilise pas d’outil publicitaire ni de widget social tiers. Les polices sont hébergées avec le site. Un cookie technique est réservé aux personnes autorisées à prévisualiser les contenus.",
@@ -823,13 +823,13 @@ export const demoContent: SiteContent = {
   ],
   "people": [
     {
-      "_id": "person-sara",
+      "id": "person-sara",
       "name": "Sara Serrano Cabeza",
       "role": "Consultante en relations humaines et stratégie RH",
       "bio": "Mon parcours croise deux mondes : dix ans d’accompagnement des personnes en institution, puis des postes de direction en entreprise, jusqu’à DRH. Je relie compréhension humaine et exigences de résultat.\nAncienne DRH, praticienne en analyse transactionnelle."
     },
     {
-      "_id": "person-agnes",
+      "id": "person-agnes",
       "name": "Agnès Loupias",
       "role": "Psychologue clinicienne"
     }

@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-25T10:52:50.346Z",
+  "origin": "http://127.0.0.1:4336",
+  "platform": "linux",
+  "lighthouse": "13.5.0",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "ci": {
+    "runId": "40186258008",
+    "commit": "37d040ec0f9ca91639773edb26d6aaf4398d9b7c"
+  },
+  "formFactor": "mobile",
+  "throttlingMethod": "simulate",
+  "throttling": {
+    "rttMs": 150,
+    "throughputKbps": 1638.4,
+    "requestLatencyMs": 562.5,
+    "downloadThroughputKbps": 1474.5600000000002,
+    "uploadThroughputKbps": 675,
+    "cpuSlowdownMultiplier": 4
+  },
+  "performance": 96,
+  "accessibility": 100,
+  "bestPractices": 100,
+  "lcpMs": 2570.1422181625803,
+  "cls": 0.00008236906841116219,
+  "tbtMs": 0,
+  "speedIndexMs": 1891.78518180215
+}

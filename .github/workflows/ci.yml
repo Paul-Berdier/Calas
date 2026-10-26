@@ -1,0 +1,98 @@
+name: Calas — validation
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      CI: 'true'
+      ASTRO_TELEMETRY_DISABLED: '1'
+      RUN_CONTACT_INTEGRATION: '1'
+      RUN_BACKUP_INTEGRATION: '1'
+      CALAS_MEDIA_INTEGRATION: 'yes'
+      BACKUP_POSTGRES_CONTAINER: calas-development-postgres-1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '24.19.0'
+      - run: npm install --global pnpm@11.25.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm cms:prepare
+      - name: Build the pinned local S3 fixture from official source
+        run: docker compose build storage
+      - run: docker compose up -d --wait
+      - run: pnpm db:migrate --apply
+      - run: node scripts/media-storage-setup.mjs --local
+      - run: pnpm content:seed --apply --publish-initial
+      - run: pnpm cms:check --services
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test:cms-local
+      - run: pnpm test:domain
+      - run: pnpm test:integration
+      - run: node --test tests/database-role.test.mjs
+      - run: pnpm --filter @calas/web exec tsx --test ../../tests/proxy-origin.test.ts
+      - run: pnpm --filter @calas/web exec tsx --test ../../tests/auth-test-access.test.ts
+      - run: pnpm --filter @calas/web exec tsx --test ../../tests/home-correction.test.ts
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium firefox
+      - run: pnpm test
+      - run: node scripts/pdf-cms-browser-check.mjs
+      - run: node scripts/pdf-cms-ui-check.mjs
+      - run: node scripts/ci-auth-prepare.mjs
+      - run: node scripts/acceptance-standalone.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: reports-and-public-screenshots
+          path: |
+            playwright-report/
+            artifacts/resource-budget.json
+            artifacts/lighthouse-custom-cms-ci.report.html
+            artifacts/custom-cms/*report.json
+            artifacts/custom-cms/dashboard-authenticated.png
+            artifacts/custom-cms/security-stale-*.png
+            artifacts/custom-cms/admin/report.json
+            artifacts/custom-cms/admin/login-report.json
+            artifacts/custom-cms/admin/*.png
+            artifacts/custom-cms/images/*report.json
+            artifacts/custom-cms/images/*.png
+            artifacts/custom-cms/pdf-import/*report.json
+            artifacts/custom-cms/pdf-import/*.png
+            artifacts/custom-cms/editorial-e2e/report.json
+            artifacts/custom-cms/editorial-e2e/*.png
+            artifacts/screenshots/
+            artifacts/logo-coil/report*.json
+          retention-days: 7
+      - if: always()
+        run: docker compose down
+
+  container:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24.19.0'
+      - run: docker build --build-arg SITE_URL=http://localhost:4321 --tag calas-cms:local-check .
+      - run: node scripts/docker-smoke-check.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: container-smoke-report
+          path: artifacts/custom-cms/docker-smoke-report.json
+          retention-days: 7

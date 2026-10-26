@@ -1,6 +1,7 @@
 import {createHmac,randomBytes,timingSafeEqual,createHash} from 'node:crypto';
 import nodemailer from 'nodemailer';
 import {env,isProductionSite} from './environment';
+import {clientAddress as resolveClientAddress} from '../server/client-address';
 
 export const subjects={diagnostic:'Diagnostic',equipes:'Équipes',managers:'Managers',autre:'Autre'} as const;
 export type Subject=keyof typeof subjects;
@@ -65,6 +66,13 @@ export async function submitContact(request:Request,form:FormData,clientAddress:
   const errors=validateFields(fields);
   if(Object.keys(errors).length)return {ok:false,status:422,message:'Quelques informations sont à corriger.',errors};
   if(form.get('website'))return {ok:false,status:422,message:'La demande ne peut pas être traitée.'};
+  if(env('CONTENT_MODE')==='database'){
+    try{
+      const {sharedContactSubmission}=await import('../server/contact-submission');
+      const key=secret();
+      return await sharedContactSubmission({token,secret:key,payloadHash:createHmac('sha256',key).update(JSON.stringify(fields)).digest('hex'),addressHash:createHmac('sha256',key).update(resolveClientAddress(request,clientAddress)).digest('hex'),maximum:Number(env('CONTACT_RATE_LIMIT','5')),deliver:()=>transport(fields)});
+    }catch{return {ok:false,status:503,message:'L’envoi est momentanément indisponible. Votre saisie est conservée.'};}
+  }
   prune();
   const hash=createHash('sha256').update(JSON.stringify(fields)).digest('hex');
   const existing=submissions.get(token);

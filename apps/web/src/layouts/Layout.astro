@@ -11,7 +11,7 @@ import {safeHref} from '../lib/links';
 import type {SiteSettings} from '../lib/cms/types';
 interface Props { title: string; description?: string; settings: SiteSettings; noindex?: boolean }
 const {title,description='Calas Conseil : prévention des risques psychosociaux, qualité du lien, accompagnement des équipes et des managers.',settings,noindex=false}=Astro.props;
-const preview=isPreview(Astro.cookies);
+const preview=await isPreview(Astro);
 const Preview=preview?(await import('../lib/cms/Preview.astro')).default:undefined;
 const production=isProductionSite();
 const hidden=noindex || !production || preview;
@@ -48,7 +48,7 @@ const organization={
     {!production && <div class="environment-note">Version de travail · Relecture avant publication{env('MAIL_TRANSPORT','simulation')==='simulation'?' · Formulaire de test, aucun courriel envoyé':''}</div>}
     <header class="site-header">
       <div class="wrap header-inner">
-        <a class="brand-link" href="/" aria-label="Calas Conseil — Accueil"><Brand /></a>
+        <a class="brand-link" href="/" aria-label="Calas Conseil — Accueil"><Brand withTagline /></a>
         <nav class="desktop-nav" aria-label="Navigation principale">
           {nav.map(([label,href],i)=><a href={href} class:list={{priority:i===0,'nav-contact':i===6}} aria-current={Astro.url.pathname===href?'page':undefined}>{label}</a>)}
         </nav>
