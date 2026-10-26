@@ -26,7 +26,7 @@ function Shell({ children }: { children: ReactNode }) {
     <div className="auth-app">
       <header className="auth-header">
         <a href="/" className="auth-brand">
-          Calas <span>Conseil</span>
+          <img src="/brand/wordmark.svg" width="680" height="86" alt="Calas Conseil" />
         </a>
         <a href="/">Voir le site public ↗</a>
       </header>

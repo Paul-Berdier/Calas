@@ -29,8 +29,11 @@
     serif;
   letter-spacing: -1px;
 }
-.auth-brand span {
-  color: var(--bronze);
+.auth-brand img {
+  display: block;
+  width: clamp(160px, 22vw, 240px);
+  max-width: 100%;
+  height: auto;
 }
 .auth-header a:not(.auth-brand) {
   color: var(--navy);

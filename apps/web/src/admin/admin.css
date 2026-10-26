@@ -98,6 +98,15 @@
   height: 46px;
   object-fit: contain;
 }
+.admin-brand .admin-brand-wordmark {
+  width: 100%;
+  max-width: 168px;
+  height: auto;
+}
+.admin-brand > div {
+  min-width: 0;
+  flex: 1;
+}
 .admin-brand strong {
   font:
     27px/1.1 Georgia,

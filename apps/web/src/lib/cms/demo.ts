@@ -17,7 +17,7 @@ export const demoContent: SiteContent = {
   "home": {
     "eyebrow": "Prévention des risques psychosociaux · Qualité du lien",
     "title": "Prévenir les risques psychosociaux à leur racine : la qualité du lien au cœur de la performance collective",
-    "intro": "Tensions, désengagement, relations tendues, départs : les fragilités d’une organisation se jouent souvent dans les relations de travail. Calas Conseil vous aide à comprendre l’origine des difficultés, puis à agir concrètement sur l’organisation, le management et les dynamiques d’équipe.",
+    "intro": "Stress, tensions, désengagement, départs : ce qui fragilise une entreprise commence souvent dans la relation.\n\nCALAS Conseil vous aide à comprendre l’origine des difficultés, puis à agir concrètement sur l’organisation, le management et les dynamiques d’équipe.",
     "primaryCta": {
       "label": "Faire le point sur vos risques",
       "href": "/diagnostic-rps/"
@@ -72,7 +72,7 @@ export const demoContent: SiteContent = {
     ],
     "diagnostic": {
       "title": "Voir clair avant d’agir.",
-      "text": "Écouter le travail réel. Comprendre ce qui fragilise l’organisation, les relations et les personnes. Faire émerger des priorités d’action concrètes, avec les acteurs de votre entreprise.",
+      "text": "L’évaluation des risques psychosociaux est une obligation. Nous en faisons un vrai outil de pilotage : une lecture précise de ce qui fragilise le travail (l’organisation, les relations, les personnes) et des priorités d’action concrètes.",
       "cta": {
         "label": "Découvrir le diagnostic",
         "href": "/diagnostic-rps/"
@@ -82,15 +82,15 @@ export const demoContent: SiteContent = {
     "reasons": [
       {
         "title": "Un binôme complémentaire",
-        "text": "L’expérience de la direction RH et le regard de la psychologie clinique se rencontrent pour comprendre les réalités de l’entreprise et les dynamiques humaines."
+        "text": "Au croisement de l’entreprise et de l’humain : une ancienne DRH habilitée IPRP, qui connaît les réalités et les contraintes de l’entreprise, et une psychologue clinicienne, qui apporte un éclairage sur les dynamiques humaines et relationnelles."
       },
       {
         "title": "Agir à la source",
-        "text": "Les émotions, les croyances et les mécanismes relationnels influencent les comportements. Nous les examinons avec les conditions et l’organisation du travail, sans réduire les difficultés aux personnes."
+        "text": "Derrière les tensions, des émotions, des croyances et des mécanismes relationnels influencent les comportements. C’est à ce niveau que nous intervenons, pour comprendre ce qui se joue et faire évoluer durablement les situations."
       },
       {
         "title": "Une démarche cohérente",
-        "text": "Du diagnostic à l’action, nous accompagnons les évolutions dans la durée pour les ancrer dans les pratiques quotidiennes, au-delà des formations ponctuelles."
+        "text": "Du diagnostic à l’action : nous mobilisons nos propres outils pour accompagner les transformations dans la durée, au-delà des formations ponctuelles, afin d’ancrer les changements dans les pratiques quotidiennes."
       }
     ],
     "domainsTitle": "Trois entrées.\nUne même attention au lien.",

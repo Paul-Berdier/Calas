@@ -2,7 +2,9 @@
 
 ## Source unique et fichiers
 
-Le nom public est **Calas Conseil**, avec un seul s. La référence JPEG n’est jamais servie par le site. Les lettres sont recomposées en Cormorant Garamond ; la signature utilise EB Garamond.
+Le nom public est **Calas Conseil**, avec un seul s. La référence JPEG n’est jamais servie par le site. Le 26 octobre 2026, le lettrage a été recomposé pour suivre la carte fournie : **CALAS CONSEIL** en capitales fines et contrastées, C initiaux légèrement plus hauts, espacement optique resserré et second mot doré. La base est Cormorant Garamond 300, ajustée dans `scripts/brand-export.mjs` ; cette reproduction ne prétend pas identifier la police originale du JPEG. La signature utilise EB Garamond en capitales espacées.
+
+`wordmark.svg` et `wordmark-dark.svg` contiennent les contours vectoriels communs à l’en-tête, au pied de page, à la connexion et à l’administration. Le navigateur n’a besoin d’aucune police pour afficher le nom : les proportions restent identiques sans JavaScript, en mouvement réduit et lors du chargement des autres polices. Les noms accessibles restent en texte « Calas Conseil ». Le lettrage et la signature sont immobiles ; cette correction ne modifie ni les rubans ni leur animation.
 
 Les cinq rubans proviennent de la silhouette fournie, redessinée en courbes de Bézier. **`assets/brand/geometry.mjs` reste la source unique et n’a pas été modifiée pour la nouvelle animation.** Les vides sont transparents et le noyau est en `(162,373)`. `contours.json` conserve l’étude initiale.
 

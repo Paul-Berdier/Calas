@@ -53,3 +53,26 @@ Concurrence des sauvegardes : version attendue et transaction. Fuite de brouillo
 - Validation finale Railway : [CI 40201737133](https://github.com/Paul-Berdier/Calas/actions/runs/40201737133) entièrement verte sur `0c4e0b97` (`validate`, `container`). Tunnel SSH opérateur fermé après recette. Aucun secret connu détecté dans les fichiers livrés. Le commit documentaire suivant conserve les preuves sans modifier la version applicative déployée.
 - Ajustement demandé ensuite par Paul : connexion identifiant/mot de passe pour son seul compte de recette. Commit `cbe33b8`, exception strictement `staging` avec ID opérateur exact et adresse réservée, gardes email/session/rôle/origine inchangées. Production et autres comptes conservent la MFA. Aucun résultat MFA forgé. Quatre groupes de tests de permissions et routes passent, typecheck/lint réussissent et une revue de sécurité indépendante ne relève pas de point bloquant.
 - Déploiement de cet ajustement `cae77967-94b7-421c-a16b-2e4a5bde37fe` réussi. Un enrollment en attente et une ancienne session du compte ciblé ont été retirés ; anciens codes invalidés, mot de passe et email vérifié conservés. Six groupes de recette distante passent, dont vraie connexion sans MFA, Réflexions et formulaire d’article sans QR, refus anonymes/CSRF/routes MFA, aucune mutation de contenu et déconnexion de la seule session de test. Le fichier d’accès privé contient maintenant les instructions simples. Rapports `password-only-*` dans `artifacts/railway-review/`.
+
+## Corrections éditoriales du 26 octobre 2026
+
+Le PDF de corrections fourni par Paul remplace cinq champs de l’accueil : `intro`, `diagnostic.text` et les trois `reasons[].text`. Ces textes sont repris dans le contenu de recette initial. Aucun titre, statistique, bouton, coordonnée ou contenu d’article n’est remplacé. La mention IPRP provient du texte fourni ; le statut de qualification demeure `pending`, sans justificatif ni numéro ajoutés.
+
+Une base déjà initialisée ne relit pas automatiquement `demo.ts`. La commande datée suivante prépare donc une révision ciblée, sans réimporter le site :
+
+```powershell
+pnpm --filter @calas/web exec tsx ../../scripts/content-correct-home-20261026.ts --dry-run
+# Après examen du rapport, avec l’ID d’un administrateur local actif et vérifié :
+pnpm --filter @calas/web exec tsx ../../scripts/content-correct-home-20261026.ts --apply --actor-id=ID_ADMIN_LOCAL
+# Ajouter --publish-local uniquement pour rendre cette correction visible en recette locale.
+```
+
+Le mode par défaut est une simulation en lecture seule. La commande refuse production, staging, adresses distantes, autres bases et autres ports : seul `calas_development` sur le port local 15432 est accepté avec le site local 4321. Elle compare chaque texte à sa valeur précédente ou à la correction datée, conserve les autres champs, crée une révision via le moteur CMS et respecte la version attendue. `--publish-local` refuse tout autre changement inédit entre brouillon et publication. Réexécuter une correction déjà appliquée ne crée pas de nouvelle révision. Aucun script de démarrage, d’installation ou de compilation n’appelle cette commande ; aucune opération distante n’est incluse.
+
+Les quatre tests `tests/home-correction.test.ts` vérifient la portée locale, les champs préservés, le refus de textes édités depuis et l’idempotence. Une exécution de ces tests ne vaut pas application de la correction en base.
+
+Application locale effectuée le 26 octobre : la simulation a trouvé cinq corrections sur l’accueil en version 1, sans autre brouillon inédit. Après revue du script, l’opération explicite avec un administrateur local actif et vérifié a créé la révision corrigée puis sa publication de recette. La nouvelle simulation constate la version 3 et zéro correction restante. L’historique est conservé. Le site Railway et sa base n’ont pas été modifiés par cette opération.
+
+Le lettrage a été recomposé d’après la carte fournie : capitales fines, deux grands C, espacement resserré et signature en capitales. Les mêmes tracés vectoriels servent au site, à la connexion, à l’administration et aux exports. Il s’agit d’une reproduction typographique de la référence raster, sans identification certaine de sa fonte originale. Le coquillage et son animation conservent leur source et leurs contours. L’introduction respecte les deux paragraphes du PDF ; le logo reste contenu au zoom texte de 200 %.
+
+Vérification locale du 26 octobre : typecheck sans erreur ni avertissement (18 indications de dépréciation préexistantes), lint et build réussis ; quatre tests de correction ciblée, cinq scénarios publics (responsive, zoom, absence de JavaScript, accessibilité et ressources) réussis. Les 48 contrôles du logo passent sous Chromium et Firefox, dont mouvement réduit et absence de JavaScript. Firefox a nécessité une exécution hors sandbox après un arrêt du navigateur dans celle-ci. La page de connexion passe le contrôle de largeur et axe à cinq tailles. Les rapports et captures de cette correction sont dans `artifacts/corrections-20261026/`. Le serveur local 4321 reste disponible en mode base de données ; les serveurs standalone de tests ont été arrêtés après leur recette. Ces vérifications ne constituent pas une validation éditoriale de production.

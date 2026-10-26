@@ -347,7 +347,7 @@ export default function AdminApp({
         >
           <img src="/brand/symbol.png" alt="" />
           <div>
-            <strong>Calas Conseil</strong>
+            <img className="admin-brand-wordmark" src="/brand/wordmark-dark.svg" width="680" height="86" alt="Calas Conseil" />
             <span>Atelier éditorial</span>
           </div>
         </a>

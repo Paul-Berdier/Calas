@@ -24,7 +24,7 @@ Décision à consigner : date, noms des personnes ayant relu, version du code, f
 | --- | --- | --- |
 | Portraits Sara et Agnès | Fichiers authentiques, droits d'usage, cadrages et textes alternatifs | Présentation typographique, aucun faux portrait |
 | Agnès | Biographie et rôle précis dans le diagnostic | Nom et qualité fournis seulement |
-| IPRP Sara | Attestation, numéro, autorité/région et validité | Qualification non affichée ; justificatif privé hors CMS public |
+| IPRP Sara | Attestation, numéro, autorité/région et validité | La mention « ancienne DRH habilitée IPRP », fournie dans les corrections du 26 octobre, est reprise dans le texte de recette. La qualification structurée reste `pending` ; aucun justificatif reçu, aucun numéro ajouté au site |
 | Articles | Textes finaux, auteur, date et droits des images | État vide propre ; démonstration éventuelle réservée aux brouillons |
 | Conférence | Durée définitive | Pas de durée de 1 h 30 annoncée comme acquise |
 | Managers | Durée, rythme, format | Champs éditables, pas d'engagement inventé |
@@ -56,3 +56,9 @@ Décision à consigner : date, noms des personnes ayant relu, version du code, f
 - [ ] Sara et Agnès ont autorisé la mise en production après relecture ; tout achat est approuvé séparément.
 
 Les travaux locaux réversibles peuvent continuer pendant la relecture. Une case non cochée n'est pas un test réussi ; les raccordements externes ne deviennent vérifiés qu'après exécution réelle.
+
+## Corrections reçues le 26 octobre 2026
+
+Le document fourni par Paul, « correction site web 1.pdf », remplace cinq textes d’accueil : introduction, présentation du diagnostic et trois raisons de travailler ensemble. L’introduction conserve ses deux paragraphes. La carte jointe sert de référence au lettrage en capitales ; le nom reste **Calas Conseil**, avec un seul s, et la signature **La voie de la qualité relationnelle** (correction de « la voir » dans l’annotation du PDF).
+
+La mention IPRP est une formulation fournie pour la relecture, et non une attestation d’habilitation. Les données de qualification, les coordonnées, les biographies et le numéro figurant sur la carte ne sont pas modifiés par cette reprise. La validation finale de l’accueil et de Diagnostic reste à consigner.

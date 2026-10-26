@@ -48,7 +48,7 @@ const organization={
     {!production && <div class="environment-note">Version de travail · Relecture avant publication{env('MAIL_TRANSPORT','simulation')==='simulation'?' · Formulaire de test, aucun courriel envoyé':''}</div>}
     <header class="site-header">
       <div class="wrap header-inner">
-        <a class="brand-link" href="/" aria-label="Calas Conseil — Accueil"><Brand /></a>
+        <a class="brand-link" href="/" aria-label="Calas Conseil — Accueil"><Brand withTagline /></a>
         <nav class="desktop-nav" aria-label="Navigation principale">
           {nav.map(([label,href],i)=><a href={href} class:list={{priority:i===0,'nav-contact':i===6}} aria-current={Astro.url.pathname===href?'page':undefined}>{label}</a>)}
         </nav>
