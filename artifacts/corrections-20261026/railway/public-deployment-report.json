@@ -1,0 +1,165 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "commit": "6640b991a74654f32ffbd16acbbf8f68d52516f4",
+  "deploymentId": "e52d5014-83ce-4fb7-a98e-c9f95640ea78",
+  "startedAt": "2026-10-26T12:06:18.715Z",
+  "readOnly": true,
+  "authenticated": false,
+  "checks": [
+    {
+      "kind": "health",
+      "path": "/api/health/",
+      "status": 200,
+      "payloadStatus": "ok"
+    },
+    {
+      "kind": "health",
+      "path": "/api/ready/",
+      "status": 200,
+      "payloadStatus": "ready"
+    },
+    {
+      "kind": "asset",
+      "path": "/brand/wordmark.svg",
+      "status": 200,
+      "sha256": "512b3009fd26d71243caba95ef079921914003e6397e32c95c0c87bca628e410",
+      "matchesLocal": true
+    },
+    {
+      "kind": "asset",
+      "path": "/brand/wordmark-dark.svg",
+      "status": 200,
+      "sha256": "7fa2a26488ca5902c264c29dfac2b3953966205434b8943bc8461456a8aa5df8",
+      "matchesLocal": true
+    },
+    {
+      "kind": "route",
+      "path": "/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/diagnostic-rps/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/equipes/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/managers/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/notre-approche/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/qui-sommes-nous/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/reflexions/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/contact/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/mentions-legales/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/confidentialite/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/admin/login/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "indexation",
+      "robotsDisallowAll": true,
+      "sitemapStatus": 404
+    },
+    {
+      "kind": "browser",
+      "path": "/",
+      "width": 360,
+      "status": 200,
+      "noOverflow": true,
+      "wordmarksLoaded": true,
+      "accessibleBrandAndSignature": true,
+      "noindex": true,
+      "paragraphs": 2
+    },
+    {
+      "kind": "browser",
+      "path": "/diagnostic-rps/",
+      "width": 360,
+      "status": 200,
+      "noOverflow": true,
+      "wordmarksLoaded": true,
+      "accessibleBrandAndSignature": true,
+      "noindex": true,
+      "paragraphs": 0
+    },
+    {
+      "kind": "browser",
+      "path": "/",
+      "width": 1440,
+      "status": 200,
+      "noOverflow": true,
+      "wordmarksLoaded": true,
+      "accessibleBrandAndSignature": true,
+      "noindex": true,
+      "paragraphs": 2
+    },
+    {
+      "kind": "browser",
+      "path": "/diagnostic-rps/",
+      "width": 1440,
+      "status": 200,
+      "noOverflow": true,
+      "wordmarksLoaded": true,
+      "accessibleBrandAndSignature": true,
+      "noindex": true,
+      "paragraphs": 0
+    }
+  ],
+  "browserErrors": [],
+  "passed": true,
+  "completedAt": "2026-10-26T12:06:24.521Z"
+}
