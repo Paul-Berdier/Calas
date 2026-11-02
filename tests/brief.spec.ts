@@ -35,6 +35,7 @@ test('les illustrations chargent et les nouvelles pages restent lisibles',async(
    expect((await page.goto(path))?.status()).toBe(200);await page.evaluate(()=>document.fonts.ready);
    for(const img of await page.locator('main img:visible').all()){await img.scrollIntoViewIfNeeded();await expect(img).toHaveJSProperty('complete',true);expect(await img.evaluate(el=>(el as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);}
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+   if(path==='/situations-sensibles/')expect(await page.locator('#section-cadre .notice-content').evaluate(el=>el.getBoundingClientRect().width)).toBeGreaterThan(width<800?width*.65:300);
    await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`artifacts/brief-20261101/${name}-${width}.png`,fullPage:true});
    if(path==='/'||path==='/situations-sensibles/')expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);
   }
