@@ -33,7 +33,7 @@ const outline=(font,text,x,y,size,fill)=>{
 };
 const svg=(width,height,body,title='Calas Conseil — La voie de la qualité relationnelle.')=>`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${title}"><title>${title}</title>${body}</svg>`;
 const symbol=(x,y,w,h,id,mono=null)=>`<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${viewBox}">${shellMarkup(id,mono)}</svg>`;
-// Source contours preserve the supplied card's glyphs and original spacing.
+// Native glyph contours and the custom C retain the card's proportions.
 const brandSize=100,brandBaseline=82;
 const letterScale=4/3,brandWidth=wordmarkWidth*letterScale,brandHeight=wordmarkHeight*letterScale;
 const wordmark=(dark=false,mono=null)=>`<g transform="scale(${letterScale})">${wordmarkMarkup({dark,mono})}</g>`;
