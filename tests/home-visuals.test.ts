@@ -11,10 +11,10 @@ import { migrateDatabase } from '../apps/web/src/server/db/migrate';
 import { getContent, isMediaPublished, mediaIsReferenced, publishContent, readSiteContent, saveContent, seedDocuments } from '../apps/web/src/server/content/repository';
 
 const home = prepareSeedPlan(demoContent).entries.find(entry => entry.kind === 'home')!;
-test('les neuf visuels de l’accueil sont facultatifs et limités aux images de la médiathèque', () => {
+test('les dix visuels de l’accueil sont facultatifs et limités aux images de la médiathèque', () => {
   assert.equal(parseContent('home', home.content).visuals, undefined);
   const image = { mediaId: randomUUID(), alt: 'Un collectif échange pendant un atelier', width: 1600, height: 900 };
-  const visuals = Object.fromEntries(['threads', 'nautilus', 'roots', 'compass', 'tree', 'kintsugi', 'ripples', 'murmuration', 'closing'].map(name => [name, image]));
+  const visuals = Object.fromEntries(['threads', 'nautilus', 'roots', 'compass', 'tree', 'kintsugi', 'ripples', 'murmuration', 'calmFace', 'closing'].map(name => [name, image]));
   assert.deepEqual(parseContent('home', { ...home.content, visuals }).visuals, visuals);
   for (const invalid of [{ arbitrary: image }, { closing: { ...image, src: 'https://remote.test/photo.jpg' } }, { closing: { ...image, mediaId: 'external-file' } }, { closing: { mediaId: image.mediaId } }]) {
     assert.throws(() => parseContent('home', { ...home.content, visuals: invalid }), ContentError);
@@ -42,7 +42,7 @@ test('les visuels d’accueil conservent les droits privés, la publication expl
     await seedDocuments(prepareSeedPlan(demoContent).entries, { publish: true });
     for (const [id, mime] of [[imageId, 'image/jpeg'], [pdfId, 'application/pdf']]) await getPool().query('INSERT INTO media (id,storage_key,upload_key,original_filename,mime_type,size_bytes,metadata,created_by,width,height) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)', [id, `tests/${id}`, `test:${id}`, 'fixture', mime, 1000, { checksum: 'test-only' }, administrator.id, mime === 'image/jpeg' ? 1200 : null, mime === 'image/jpeg' ? 800 : null]);
     const initial = await getContent(home.id);
-    const withImage = { ...initial.content, visuals: { closing: { mediaId: imageId, alt: 'Visuel de recette' } } };
+    const withImage = { ...initial.content, visuals: { calmFace: { mediaId: imageId, alt: 'Visage apaisé de recette' } } };
     const code = (expected: string) => (error: unknown) => error instanceof ContentError && error.code === expected;
     await assert.rejects(saveContent(home.id, withImage, initial.version, editor), code('PRIVATE_MEDIA'));
     await assert.rejects(saveContent(home.id, { ...initial.content, visuals: { closing: { mediaId: pdfId, alt: 'PDF refusé' } } }, initial.version, administrator), code('INVALID_IMAGE'));
@@ -51,10 +51,10 @@ test('les visuels d’accueil conservent les droits privés, la publication expl
     assert.equal(await isMediaPublished(imageId), false);
     assert.equal(await mediaIsReferenced(imageId), true);
     assert.equal((await readSiteContent()).home.visuals, undefined);
-    assert.equal((await readSiteContent({ preview: true })).home.visuals?.closing?.mediaId, imageId);
+    assert.equal((await readSiteContent({ preview: true })).home.visuals?.calmFace?.mediaId, imageId);
     const published = await publishContent(home.id, draft.version, administrator);
     assert.equal(await isMediaPublished(imageId), true);
-    assert.equal((await readSiteContent()).home.visuals?.closing?.mediaId, imageId);
+    assert.equal((await readSiteContent()).home.visuals?.calmFace?.mediaId, imageId);
     const removed = await saveContent(home.id, initial.content, published.version, administrator);
     assert.equal(await isMediaPublished(imageId), true, 'Un nouveau brouillon ne révoque pas la version publiée.');
     await publishContent(home.id, removed.version, administrator);

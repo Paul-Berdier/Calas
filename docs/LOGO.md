@@ -2,13 +2,17 @@
 
 ## Source unique et fichiers
 
-Le nom public est **Calas Conseil**, avec un seul s. La référence JPEG n’est jamais servie par le site. Le 26 octobre 2026, le lettrage a été recomposé pour suivre la carte fournie : **CALAS CONSEIL** en capitales fines et contrastées, C initiaux légèrement plus hauts, espacement optique resserré et second mot doré. La base est Cormorant Garamond 300, ajustée dans `scripts/brand-export.mjs` ; cette reproduction ne prétend pas identifier la police originale du JPEG. La signature utilise EB Garamond en capitales espacées.
+Le nom public est **Calas Conseil**, avec un seul s. La référence JPEG n’est jamais servie par le site. La correction du **2 novembre 2026** remplace la recomposition en Cormorant Garamond 300 par un **lettrage vectoriel dédié**, redessiné à partir de la carte fournie et de l’extrait du PDF de corrections. `assets/brand/wordmark.mjs` rassemble ses contours : grand C prolongé vers le A, capitales romaines contrastées, empattements fins et CONSEIL compact. Ce dessin suit la référence sans prétendre identifier sa police originale. La signature conserve EB Garamond en capitales espacées. Le premier essai du 26 octobre reste dans l’historique Git.
 
 `wordmark.svg` et `wordmark-dark.svg` contiennent les contours vectoriels communs à l’en-tête, au pied de page, à la connexion et à l’administration. Le navigateur n’a besoin d’aucune police pour afficher le nom : les proportions restent identiques sans JavaScript, en mouvement réduit et lors du chargement des autres polices. Les noms accessibles restent en texte « Calas Conseil ». Le lettrage et la signature sont immobiles ; cette correction ne modifie ni les rubans ni leur animation.
 
 Les cinq rubans proviennent de la silhouette fournie, redessinée en courbes de Bézier. **`assets/brand/geometry.mjs` reste la source unique et n’a pas été modifiée pour la nouvelle animation.** Les vides sont transparents et le noyau est en `(162,373)`. `contours.json` conserve l’étude initiale.
 
-`node scripts/brand-export.mjs` reproduit les variantes SVG et PNG dans `apps/web/public/brand/` : horizontal, empilé, symbole, monochromes, versions pour fond sombre et favicon. Les lettres des exports autonomes sont vectorisées depuis les polices locales. `assets/brand/logo-editable.svg` garde des textes éditables. Les PNG sont exportés à 2× ; le favicon est limité à 64 × 64 px. Le visuel Open Graph mesure 1200 × 630 px.
+`node scripts/brand-export.mjs` reproduit les variantes SVG et PNG dans `apps/web/public/brand/` : horizontal, empilé, symbole, monochromes, versions pour fond sombre et favicon. Le nom utilise les contours de `wordmark.mjs` ; la signature est vectorisée depuis la police locale. `assets/brand/logo-editable.svg` reste éditable par ses nœuds vectoriels, sans dépendre de la présence d’une police pour le nom. Les PNG sont exportés à 2× ; le favicon est limité à 64 × 64 px. Le visuel Open Graph mesure 1200 × 630 px.
+
+## En-tête du 2 novembre
+
+L’en-tête est bleu nuit (`#14213A`), avec le nom ivoire et doré de `wordmark-dark.svg`. Les menus ordinateur et mobile conservent le même fond ; leurs textes et focus restent clairs. Le bouton Contact ivoire garde un texte bleu nuit. Les menus natifs fonctionnent également sans JavaScript. Cette correction concerne le fond et le lettrage : le symbole et son mouvement restent inchangés.
 
 ## Nouvelle direction : s’enrouler vers le noyau
 

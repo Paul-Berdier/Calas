@@ -2,7 +2,7 @@
 
 L’**Atelier éditorial Calas Conseil** est l’administration privée du site. Vous y modifiez les textes et les images, préparez vos articles et choisissez leur publication. Aucun compte Sanity, terminal ou outil de programmation n’est nécessaire.
 
-L’administration se trouve à l’adresse du site suivie de `/admin/`. Une [adresse Railway de préproduction](https://calas-web-test-production.up.railway.app/admin/) existe pour la recette. Les évolutions du cahier des charges du 31 octobre sont pour le moment disponibles **dans la recette locale du 1er novembre**, pas encore sur cette adresse Railway. Les captures ci-dessous montrent la version du 25 octobre : le compte « Recette Calas » et les articles « Recette » sont des tests, sans signature de Sara ou d’Agnès. Les nouveaux champs sont décrits dans le texte de ce guide.
+L’administration se trouve à l’adresse du site suivie de `/admin/`. Les évolutions du cahier des charges du 31 octobre et les photos fournies pour Sara sont disponibles sur l’[adresse Railway de préproduction](https://calas-web-test-production.up.railway.app/admin/) depuis le 2 novembre. Les corrections supplémentaires reçues le 2 novembre sont en préparation locale ; les nouveaux champs décrits ci-dessous apparaîtront sur Railway après leur déploiement. Les captures ci-dessous montrent la version du 25 octobre : le compte « Recette Calas » et les articles « Recette » sont des tests, sans signature de Sara ou d’Agnès.
 
 ## Se connecter la première fois
 
@@ -42,7 +42,11 @@ Le menu rassemble **Pages du site**, **Réflexions**, **Médiathèque**, **Équi
 
 ![L’édition structurée de l’accueil](../artifacts/custom-cms/admin/home-editor-1440.png)
 
-Les trois cartes du chemin possèdent chacune leur petit libellé, leur titre, leur présentation et leur lien. Le passage vers **Situations sensibles** se modifie juste après ces cartes. La page correspondante est également accessible dans **Pages du site** et présente ses cinq formats ainsi que le cadre et les limites d'intervention.
+Les trois cartes du chemin possèdent chacune leur petit libellé, leur titre, leur présentation et leur lien. Le champ **Phrase d’ouverture — gras et italique** contient la première phrase, affichée seule en gras et en italique ; **Suite de la présentation** contient le paragraphe qui suit. Saisissez uniquement le texte, sans astérisques ni balises : la mise en forme est automatique. Ces champs correspondent à `lead` et `text` dans le contenu enregistré.
+
+Dans **Notre conviction**, **Phrase finale en italique** permet de modifier la phrase « Quand on se sent en sécurité, on ose : c’est là que naît l’autonomie. ». Elle est séparée du texte courant et affichée automatiquement en italique. Laisser ce champ vide retire cette phrase ; son nom technique est `closingQuote`.
+
+Le passage vers **Situations sensibles** se modifie juste après les trois cartes du chemin. La page correspondante est également accessible dans **Pages du site** et présente ses cinq formats ainsi que le cadre et les limites d'intervention.
 
 Les liens de contact prévus sont `/contact/?objet=diagnostic`, `/contact/?objet=equipes`, `/contact/?objet=managers`, `/contact/?objet=sensible` ou `/contact/`. L'objet correspondant est présélectionné pour le visiteur. Utilisez une adresse complète commençant par `https://` pour les liens externes.
 
@@ -54,9 +58,11 @@ Dans un champ image, ouvrez la médiathèque et choisissez un fichier existant o
 
 Renseignez le **texte alternatif**, qui décrit le contenu utile aux personnes qui ne voient pas l’image. Ajustez le cadrage et le point d’intérêt, puis vérifiez l’aperçu mobile. Un portrait s’édite dans **Équipe**, sur la fiche de la personne.
 
-Dans **Pages du site → Accueil → Images de l’accueil**, vous pouvez remplacer les fils dorés, le nautile, les racines, la boussole, l'arbre, le kintsugi, les ondes et les oiseaux par des images de la médiathèque. Sans remplacement, le site utilise les illustrations que Sara a proposées. Retirer une image de remplacement rétablit l'illustration initiale. Un champ distinct permet d'ajouter une **Photo de l’invitation finale** : il reste vide tant qu'une photographie adaptée n'a pas été fournie.
+Dans **Pages du site → Accueil → Images de l’accueil**, dix champs sont disponibles : les fils dorés, le nautile, les racines, la boussole, l’arbre, le kintsugi, les ondes, les oiseaux, **Visage apaisé — fin de Notre conviction** (`calmFace`) et **Photo de l’invitation finale**. Les huit premiers remplacent les illustrations proposées par Sara ; retirer leur image de remplacement rétablit l’illustration initiale. Les deux derniers accueillent des photographies facultatives : sans image, leur emplacement photographique n’est pas affiché.
 
-Les portraits de Sara et d'Agnès ne sont pas remplacés par des visages inventés. Pour les photographies d'atelier ou de personnes, vérifiez les droits d'utilisation et l'accord des personnes représentées. La provenance et les emplacements des illustrations sont indiqués dans [les évolutions du 1er novembre](EVOLUTIONS-20261101.md#sélection-des-images).
+Deux photographies de banque d’images ont été sélectionnées pour les corrections du 2 novembre : un visage apaisé pour la fin de Notre conviction et un échange entre collègues pour l’invitation finale. Leurs sources et licences sont consignées dans [MEDIA.md](MEDIA.md#photographies-dillustration--corrections-du-2-novembre-2026). Ce sont des illustrations, pas des portraits du cabinet ni des témoignages de clientes.
+
+Le portrait réel de Sara, fourni le 2 novembre, est déjà utilisé sur l’accueil et dans Qui sommes-nous. Le portrait d’Agnès reste à fournir ; sa présentation typographique est conservée. Aucun visage de banque d’images ne remplace un portrait de Sara ou d’Agnès. Pour les photographies d’atelier ou de personnes, vérifiez les droits d’utilisation et l’accord des personnes représentées. La provenance et les emplacements des illustrations sont indiqués dans [les évolutions du 1er novembre](EVOLUTIONS-20261101.md#sélection-des-images).
 
 Les médias restent privés tant qu’ils ne sont pas utilisés par un contenu publié. Remplacer le fichier d’une image partagée peut modifier ses différentes utilisations : l’opération est réservée à l’administrateur et demande une confirmation explicite. Pour changer seulement une page, sélectionnez une nouvelle image dans cette page. Un fichier lié à un contenu ou à une version conservée ne peut pas être supprimé.
 
@@ -116,7 +122,7 @@ Les **Horaires d’appel confirmés** et le **Délai de réponse annoncé** se r
 
 Le formulaire propose Diagnostic RPS, Atelier et compétences relationnelles, Management, Situation sensible et Autre. L'organisation, la fonction et le téléphone sont facultatifs. Le visiteur doit cocher lui-même son accord pour le traitement de la demande ; cet accord est aussi contrôlé par le serveur. La page de confidentialité présente ces champs.
 
-La seule adresse professionnelle demandée est **sara@calasconseil.fr**. Elle n'est pas encore créée : Paul confirme que le domaine n'est pas acheté et la proposition OVHcloud reste à approuver. Ne remplacez pas le courriel public par cette adresse avant que la boîte fonctionne. Le formulaire de recette affiche toujours un message de simulation et n'envoie aucun email. Les étapes de raccordement sont décrites dans [COURRIEL.md](COURRIEL.md).
+Le nom de domaine désormais envisagé est **calas-conseil.fr**, avec un tiret. Il n’a pas encore été acheté et aucune boîte professionnelle n’est créée. Plusieurs adresses sont possibles, par exemple **sara@calas-conseil.fr** et **agnes@calas-conseil.fr** ; le nombre de boîtes, leurs noms et l’offre restent à confirmer lors de l’achat par Sara. Ne remplacez pas le courriel public avant que la boîte retenue fonctionne. Le formulaire de recette affiche toujours un message de simulation et n’envoie aucun email. Les étapes de raccordement sont décrites dans [COURRIEL.md](COURRIEL.md).
 
 ## Revenir à une version précédente
 
@@ -140,6 +146,6 @@ La liste des sessions nécessite une connexion datant de moins de quinze minutes
 
 À réaliser en préproduction : modifier un paragraphe de l’accueil, vérifier son aperçu mobile ; remplacer une image ; importer un PDF de test clairement identifié ; relire et publier l’article de test ; vérifier dans une fenêtre non connectée que seul le contenu publié est accessible ; restaurer une version en brouillon puis retirer le test.
 
-La mise en ligne publique reste conditionnée à la validation de l’accueil et de Diagnostic par Sara et Agnès, puis à la relecture finale. Les fonctions décrites ont été vérifiées localement ; l’adresse, les emails et les sauvegardes doivent aussi être vérifiés sur l’hébergement définitif.
+Le lancement définitif reste conditionné à la validation de l’accueil et de Diagnostic par Sara et Agnès, puis à la relecture finale. La préproduction publique sert à cette relecture. Les nouvelles corrections du 2 novembre restent en cours de contrôle ; l’adresse définitive, les emails et les sauvegardes devront aussi être vérifiés sur l’hébergement retenu.
 
 Le CMS contient les contenus destinés au site. N’y placez pas de dossiers RH, données médicales, demandes reçues par le formulaire, mots de passe ou documents privés de tiers.

@@ -4,6 +4,18 @@
 
 **État au 2 novembre 2026 :** sur demande explicite de Paul, le nouveau cahier des charges du 31 octobre et ses consignes ont été déployés sur la **préproduction Railway**, après la recette locale. Les 24 documents ciblés sont publiés sur cette adresse de test, avec conservation de l'historique. La matrice [Évolutions du 1er novembre](EVOLUTIONS-20261101.md) distingue ce qui est appliqué, les pièces manquantes et les raccordements encore attendus. Les cases ci-dessous restent des décisions de Sara et Agnès ; le déploiement de recette et ses tests techniques ne les cochent pas à leur place.
 
+## Corrections reçues le 2 novembre — préparation et contrôles en cours
+
+Le document « CORRECTIONS SITE AU 02-11.pdf » demande un fond bleu nuit, une adaptation du lettrage Calas Conseil selon sa référence, trois phrases d’ouverture en gras et italique, la phrase finale de Notre conviction en italique, l’ajout du signe IPRP fourni et les photographies prévues. Les champs éditoriaux `journey.cards[].lead`, `conviction.closingQuote` et `home.visuals.calmFace` sont intégrés au code local et à l’administration. Le guide décrit les dix champs d’images de l’accueil. Deux photographies d’illustration sont sélectionnées ; leurs licences et sources sont consignées dans [MEDIA.md](MEDIA.md#photographies-dillustration--corrections-du-2-novembre-2026).
+
+La recette locale est réussie : typecheck, lint, build, 15 tests ciblés, 3 scénarios navigateur et contrôles publics/admin à 390/1440 px. Les deux documents corrigés et les deux photos sont publiés dans la base locale, avec historique préservé. Le déploiement Railway de ces nouvelles corrections reste en préparation à ce stade. Résultats : `artifacts/corrections-20261102/`.
+
+- [ ] Vérifier les textes corrigés, leur séparation en paragraphes et les mises en forme sur les trois cartes et dans Notre conviction.
+- [ ] Relire le fond bleu nuit, le lettrage et le signe IPRP sur ordinateur et téléphone ; le numéro reste attribué à Sara, sans attestation déclarée vérifiée.
+- [ ] Valider le cadrage du visage apaisé et de l’échange entre collègues, présentés comme photographies d’illustration.
+- [ ] Confirmer que l’administration permet de modifier les nouveaux champs et conserve les brouillons, publications et versions antérieures.
+- [ ] Consigner les résultats de typecheck, lint et des tests adaptés, dont le logo en mouvement réduit et sans JavaScript.
+
 ## Revue 1 — Accueil et Diagnostic
 
 À examiner ensemble sur ordinateur et mobile, à partir des captures de recette et du [site de test Railway](https://calas-web-test-production.up.railway.app/) :
@@ -32,7 +44,7 @@ Décision à consigner : date, noms des personnes ayant relu, version du code, f
 | --- | --- | --- |
 | Portraits Sara et Agnès | Relecture des cadrages ; portrait d'Agnès encore à fournir | Portrait de Sara fourni par Paul le 2 novembre et intégré à l'accueil et à Qui sommes-nous via le CMS ; présentation typographique conservée pour Agnès |
 | Biographies et diplômes | Relecture finale des textes et intitulés par Sara et Agnès | Biographies détaillées reprises du nouveau brief ; aucune biographie inventée |
-| IPRP Sara | Attestation, autorité/région et validité | Numéro **2026.16.004** et formulation « enregistrée auprès de la DREETS » fournis ; numéro affiché et attribué à Sara en recette locale. La qualification structurée reste `pending`, sans preuve marquée vérifiée |
+| IPRP Sara | Attestation, autorité/région et validité | Numéro **2026.16.004** et formulation « enregistrée auprès de la DREETS » fournis ; numéro affiché et attribué à Sara en préproduction. La qualification structurée reste `pending`, sans preuve marquée vérifiée |
 | Articles | Textes intégraux si une lecture sur Calas est souhaitée ; sixième article et composition de série ; droits des images | Cinq cartes éditables avec auteur, date, aperçu et lien original LinkedIn. Aucun texte intégral ni image LinkedIn importé |
 | Conférence | Relecture de la durée approximative fournie | « Environ 1 h 30 » repris du nouveau brief |
 | Managers et ateliers | Paramètres encore ouverts : durée globale, participants, prérequis et modalités détaillées | Rythme mensuel et trois phases repris du brief ; champs éditables |
@@ -41,9 +53,9 @@ Décision à consigner : date, noms des personnes ayant relu, version du code, f
 | Géographie | Implantation et zone d'intervention | Aucune localisation inventée |
 | Identité juridique | Nom légal, forme, SIREN/SIRET si applicable, adresse, directeur de publication | Pas de données factices |
 | Données personnelles | Responsable, destinataires, base légale, conservation, contact droits, sous-traitants | Revue nécessaire avant collecte réelle |
-| Domaine/hébergement | Proposition OVHcloud, propriété Calas Conseil, budget et administrateur | Paul confirme que `calasconseil.fr` n'est pas acheté. Proposition décrite dans COURRIEL.md, accord encore attendu. Aucun achat ni changement DNS |
+| Domaine/hébergement | Achat par Sara du domaine envisagé `calas-conseil.fr`, propriété Calas Conseil, fournisseur, budget et administrateur | Domaine non acheté. Le choix avec tiret remplace la proposition initiale sans tiret ; disponibilité et offre à vérifier avant commande. Aucun achat ni changement DNS |
 | CMS propriétaire | Adresse du premier responsable, accès Sara, PostgreSQL et S3 de production | Préproduction Railway vérifiée avec compte de recette ; comptes nominatifs et exploitation définitive à configurer |
-| Courriel | Création de la seule boîte `sara@calasconseil.fr`, accès au fournisseur, transport et test autorisé | Boîte non créée ; simulation ou boîte locale. Aucun email envoyé à Sara. Voir [COURRIEL.md](COURRIEL.md) |
+| Courriel | Nombre et noms des boîtes, par exemple `sara@calas-conseil.fr` et `agnes@calas-conseil.fr`, accès au fournisseur, transport et test autorisé | Aucune boîte créée ; le besoin n’est plus limité à une seule adresse. Simulation ou boîte locale, aucun email envoyé à Sara. Voir [COURRIEL.md](COURRIEL.md) |
 
 ## Revue 2 — Avant production
 

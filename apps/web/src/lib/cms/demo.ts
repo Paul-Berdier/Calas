@@ -11,7 +11,7 @@ export const demoContent: SiteContent = {
     "email": "saraserranocabeza@gmail.com",
     "qualification": {
       "status": "pending",
-      "label": "IPRP enregistrée auprès de la DREETS",
+      "label": "IPRP enregistrée auprès de la DREETS Nouvelle-Aquitaine",
       "registration": "2026.16.004",
       "personId": "person-sara"
     },
@@ -127,7 +127,8 @@ export const demoContent: SiteContent = {
     "domainsIntro": "Du diagnostic à la transformation managériale.",
     "conviction": {
       "title": "Notre conviction",
-      "text": "Une organisation tient par ses process, et plus encore par la qualité des liens entre les personnes qui la font vivre.\n\nChacun arrive au travail avec ses émotions qui expriment ce qui compte pour lui et font écho à ses valeurs, à ses aspirations et à ses croyances qui influencent sa manière de percevoir les situations et d’entrer en relation avec les autres. Émotions et croyances façonnent ainsi nos comportements et nos interactions.\n\nCes liens reposent sur l’authenticité, qui permet de parler vrai, et un cadre de sécurité, qui permet d’oser. Ils s’apprennent et s’entretiennent, par des rituels de conversation et des temps de régulation. Quand on se sent en sécurité, on ose : c’est là que naît l’autonomie.",
+      "text": "Une organisation tient par ses process, et plus encore par la qualité des liens entre les personnes qui la font vivre.\n\nChacun arrive au travail avec ses émotions qui expriment ce qui compte pour lui et font écho à ses valeurs, à ses aspirations et à ses croyances qui influencent sa manière de percevoir les situations et d’entrer en relation avec les autres. Émotions et croyances façonnent ainsi nos comportements et nos interactions.\n\nCes liens reposent sur l’authenticité, qui permet de parler vrai, et un cadre de sécurité, qui permet d’oser. Ils s’apprennent et s’entretiennent, par des rituels de conversation et des temps de régulation.",
+      "closingQuote": "Quand on se sent en sécurité, on ose : c’est là que naît l’autonomie.",
       "cta": {
         "label": "Découvrir notre approche",
         "href": "/notre-approche/"
@@ -184,7 +185,8 @@ export const demoContent: SiteContent = {
           "key": "diagnostic",
           "eyebrow": "Le socle",
           "title": "Diagnostiquer et sécuriser",
-          "text": "Voir ce qui se joue avant d’agir. Un diagnostic des risques psychosociaux, utile à votre document unique (DUERP), pour lire les risques et les ressources de votre organisation avec justesse et décider sur une base claire.",
+          "lead": "Voir ce qui se joue avant d’agir.",
+          "text": "Un diagnostic des risques psychosociaux, utile à votre document unique (DUERP), pour lire les risques et les ressources de votre organisation avec justesse et décider sur une base claire.",
           "cta": {
             "label": "Découvrir le diagnostic",
             "href": "/diagnostic-rps/"
@@ -194,7 +196,8 @@ export const demoContent: SiteContent = {
           "key": "equipes",
           "eyebrow": "L’action au quotidien",
           "title": "Outiller et réguler",
-          "text": "Développer ses compétences relationnelles. Des processus d’apprentissage, conférences et ateliers, sur les émotions et les croyances pour mieux se comprendre, ajuster son comportement au sein du collectif et agir en conscience dans la relation.",
+          "lead": "Développer des compétences relationnelles.",
+          "text": "Des processus d’apprentissage, conférences et ateliers, sur les émotions et les croyances pour mieux se comprendre, ajuster son comportement au sein du collectif et agir en conscience dans la relation.",
           "cta": {
             "label": "Développer les compétences relationnelles",
             "href": "/equipes/"
@@ -204,7 +207,8 @@ export const demoContent: SiteContent = {
           "key": "managers",
           "eyebrow": "L’ancrage dans la durée",
           "title": "Transformer et pérenniser",
-          "text": "Faire du manager un professionnel du lien. Un parcours sur la posture, pour que chaque manager devienne un point d’appui pour son équipe.",
+          "lead": "Faire du manager un professionnel du lien.",
+          "text": "Un parcours sur la posture, pour que chaque manager devienne un point d’appui pour son équipe.",
           "cta": {
             "label": "Accompagner les managers",
             "href": "/managers/"

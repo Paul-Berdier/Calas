@@ -129,14 +129,14 @@ export const homeSchema = z.object({
   eyebrow: required(180), title: required(350), intro: required(2500), primaryCta: ctaSchema, secondaryCta: ctaSchema,
   visuals: z.object({
     threads: imageSchema.optional(), nautilus: imageSchema.optional(), roots: imageSchema.optional(), compass: imageSchema.optional(), tree: imageSchema.optional(),
-    kintsugi: imageSchema.optional(), ripples: imageSchema.optional(), murmuration: imageSchema.optional(), closing: imageSchema.optional(),
+    kintsugi: imageSchema.optional(), ripples: imageSchema.optional(), murmuration: imageSchema.optional(), calmFace: imageSchema.optional(), closing: imageSchema.optional(),
   }).strict().optional(),
   whyNow: z.object({ title: required(250), text: required(2500) }).strict().optional(),
-  journey: z.object({ cards: z.array(z.object({ key: required(100), eyebrow: required(140), title: required(220), text: required(2500), cta: ctaSchema }).strict()).length(3), transition: required(1000), sensitiveText: required(1200), sensitiveCta: ctaSchema }).strict().optional(),
+  journey: z.object({ cards: z.array(z.object({ key: required(100), eyebrow: required(140), title: required(220), lead: optionalText(350), text: required(2500), cta: ctaSchema }).strict()).length(3), transition: required(1000), sensitiveText: required(1200), sensitiveCta: ctaSchema }).strict().optional(),
   statistics: z.array(statisticSchema).max(6).default([]), statisticIds: z.array(uuid).max(6).optional(), statisticsTitle: optionalText(250), statisticsTransition: optionalText(1000),
   diagnostic: z.object({ title: required(250), text: required(2500), cta: ctaSchema, image: imageSchema.optional() }).strict(),
   reasons: z.array(item).length(3, 'L’accueil doit conserver ses trois raisons.'), reasonsTitle: optionalText(250), domainsTitle: optionalText(250), domainsIntro: optionalText(1200),
-  conviction: z.object({ title: required(250), text: required(2500), cta: ctaSchema }).strict(), closingTitle: optionalText(250), closingCta: ctaSchema.optional(), seo: seoSchema.optional(), editorial: homeEditorial.optional(),
+  conviction: z.object({ title: required(250), text: required(2500), closingQuote: optionalText(500), cta: ctaSchema }).strict(), closingTitle: optionalText(250), closingCta: ctaSchema.optional(), seo: seoSchema.optional(), editorial: homeEditorial.optional(),
 }).strict().superRefine((home, context) => {
   const keys = home.reasons.map(reason => reason.key).filter(Boolean);
   if (new Set(keys).size !== keys.length) context.addIssue({ code: 'custom', path: ['reasons'], message: 'Chaque raison doit avoir une identité distincte.' });

@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 import {shellMarkup,viewBox} from '../assets/brand/geometry.mjs';
 import {coilSvg,coilDuration} from '../assets/brand/coil.mjs';
+import {wordmarkMarkup,wordmarkWidth} from '../assets/brand/wordmark.mjs';
 import sharp from 'sharp';
 import opentype from 'opentype.js';
 
@@ -15,7 +16,6 @@ await mkdir(output,{recursive:true});
 const fontFile=(pkg,name)=>resolve(dirname(fromWeb.resolve(`@fontsource/${pkg}/package.json`)),'files',name);
 const font=async(path)=>{const data=await readFile(path);return opentype.parse(data.buffer.slice(data.byteOffset,data.byteOffset+data.byteLength));};
 const titleFont=await font(fontFile('cormorant-garamond','cormorant-garamond-latin-500-normal.woff'));
-const brandFont=await font(fontFile('cormorant-garamond','cormorant-garamond-latin-300-normal.woff'));
 const textFont=await font(fontFile('eb-garamond','eb-garamond-latin-400-normal.woff'));
 const outline=(font,text,x,y,size,fill)=>{
  const path=font.getPath(text,x,y,size);
@@ -33,22 +33,11 @@ const outline=(font,text,x,y,size,fill)=>{
 };
 const svg=(width,height,body,title='Calas Conseil — La voie de la qualité relationnelle.')=>`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${title}"><title>${title}</title>${body}</svg>`;
 const symbol=(x,y,w,h,id,mono=null)=>`<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${viewBox}">${shellMarkup(id,mono)}</svg>`;
-// The supplied card uses fine capitals, an enlarged first C and a compact
-// CONSEIL. Keep these optical proportions identical in every exported lockup.
+// Dedicated letter outlines follow the supplied card; no guessed font is used.
+// Keep the former export dimensions so all existing lockups retain their size.
 const brandSize=100,brandBaseline=82,brandHeight=86;
-const word=(text,initialScale=1)=>{
- let x=0;const glyphs=[];
- for(const [index,letter]of [...text].entries()){
-  const size=brandSize*(index===0?initialScale:1);
-  glyphs.push({letter,x,size});
-  x+=brandFont.getAdvanceWidth(letter,size)-3.2;
- }
- return {glyphs,width:x+3.2};
-};
-const calas=word('CALAS',1.17),conseil=word('CONSEIL',1.17),conseilScale=.89,wordGap=17;
-const brandWidth=Number((calas.width+wordGap+conseil.width*conseilScale).toFixed(2));
-const wordPaths=(word,fill)=>word.glyphs.map(g=>outline(brandFont,g.letter,g.x,brandBaseline,g.size,fill)).join('');
-const wordmark=(dark=false,mono=null)=>wordPaths(calas,mono??(dark?'#F7F2EA':'#14213A'))+`<g transform="translate(${calas.width+wordGap} 0) scale(${conseilScale} 1)">${wordPaths(conseil,mono??(dark?'#D5B37E':'#94672F'))}</g>`;
+const letterScale=4/3,brandWidth=wordmarkWidth*letterScale;
+const wordmark=(dark=false,mono=null)=>`<g transform="scale(${letterScale})">${wordmarkMarkup({dark,mono})}</g>`;
 function lettering(x,y,size,dark=false,mono=null){const scale=size/brandSize;return `<g transform="translate(${x} ${y-brandBaseline*scale}) scale(${scale})">${wordmark(dark,mono)}</g>`;}
 const taglineText='LA VOIE DE LA QUALITÉ RELATIONNELLE';
 const taglineTracking=2.1;
@@ -81,9 +70,8 @@ for(const[name,content]of Object.entries(assets)){
  if(name==='favicon')raster.resize({width:64,height:64,fit:'contain',background:{r:0,g:0,b:0,alpha:0}});
  await raster.png().toFile(resolve(output,`${name}.png`));
 }
-// Editable typography source; production exports above carry vector outlines.
-const editableWord=(word,x,scale,fill)=>`<g transform="translate(${x} ${99-brandBaseline*nameSize/brandSize}) scale(${scale*nameSize/brandSize} ${nameSize/brandSize})">${word.glyphs.map(g=>`<text x="${g.x}" y="${brandBaseline}" font-family="Cormorant Garamond" font-weight="300" font-size="${g.size}" fill="${fill}">${g.letter}</text>`).join('')}</g>`;
-const editable=svg(660,180,symbol(0,0,170,180,'editable')+editableWord(calas,184,1,'#14213A')+editableWord(conseil,184+(calas.width+wordGap)*nameSize/brandSize,conseilScale,'#94672F')+`<text x="${184+(nameWidth-taglineWidth)/2}" y="130" font-family="EB Garamond" font-size="${taglineSize}" letter-spacing="${taglineTracking}" fill="#94672F">${taglineText}</text>`);
+// The source is editable as vector nodes; all lockups use the same outlines.
+const editable=svg(660,180,symbol(0,0,170,180,'editable')+lettering(184,99,nameSize)+tagline(184+(nameWidth-taglineWidth)/2,130,taglineSize));
 await writeFile(resolve(source,'logo-editable.svg'),editable);
 for(const[stage,time]of [['start',.12],['middle',1.1],['end',coilDuration]]){
  const content=coilSvg(time,{background:'none'});

@@ -8,8 +8,13 @@ test('le nouveau chemin et le numéro IPRP sont visibles sans JavaScript',async(
  await page.goto('http://127.0.0.1:4322/');
  await expect(page.locator('main>section')).toHaveCount(7);
  await expect(page.locator('.journey-card')).toHaveCount(3);
+ await expect(page.locator('.journey-lead strong em')).toHaveText(['Voir ce qui se joue avant d’agir.','Développer des compétences relationnelles.','Faire du manager un professionnel du lien.']);
+ await expect(page.locator('.conviction-quote em')).toHaveText('Quand on se sent en sécurité, on ose : c’est là que naît l’autonomie.');
  await expect(page.locator('.stat')).toHaveCount(6);
  await expect(page.locator('.registration')).toContainText('2026.16.004');
+ await expect(page.locator('.registration')).toContainText('Sara Serrano Cabeza');
+ await expect(page.locator('.registration')).toContainText('DREETS Nouvelle-Aquitaine');
+ await expect(page.locator('.registration')).not.toContainText('Agnès');
  await page.locator('.sensitive-link').click();
  await expect(page.locator('h1')).toHaveText('Quand la relation se tend, agir vite et juste');
  await expect(page.locator('#section-cadre')).toContainText('jamais sur les confidences individuelles');

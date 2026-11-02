@@ -48,13 +48,13 @@ export interface SiteSettings {
   contactHours?: string;
   responseTime?: string;
 }
-export type HomeVisualName = 'threads' | 'nautilus' | 'roots' | 'compass' | 'tree' | 'kintsugi' | 'ripples' | 'murmuration' | 'closing';
+export type HomeVisualName = 'threads' | 'nautilus' | 'roots' | 'compass' | 'tree' | 'kintsugi' | 'ripples' | 'murmuration' | 'calmFace' | 'closing';
 export interface Home {
   eyebrow: string; title: string; intro: string; primaryCta: Cta; secondaryCta: Cta;
   visuals?: Partial<Record<HomeVisualName, ContentImage>>;
   whyNow?: { title: string; text: string };
   journey?: {
-    cards: Array<{ key: string; eyebrow: string; title: string; text: string; cta: Cta }>;
+    cards: Array<{ key: string; eyebrow: string; title: string; lead?: string; text: string; cta: Cta }>;
     transition: string; sensitiveText: string; sensitiveCta: Cta;
   };
   statistics: Statistic[]; statisticsTitle?: string; statisticsTransition?: string;
@@ -62,7 +62,7 @@ export interface Home {
   reasons: Array<{ key?: string; title: string; text: string }>;
   reasonsTitle?: string;
   domainsTitle?: string; domainsIntro?: string;
-  conviction: { title: string; text: string; cta: Cta };
+  conviction: { title: string; text: string; closingQuote?: string; cta: Cta };
   closingTitle?: string; closingCta?: Cta; seo?: Seo;
   editorial?: {
     heroAudience?: string; heroDisciplines?: string[]; heroArtTop?: string; heroArtBottom?: string; heroArtCaption?: string; exploreLabel?: string;

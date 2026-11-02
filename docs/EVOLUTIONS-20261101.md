@@ -20,7 +20,7 @@ Le cahier des charges **CAHIER DES CHARGES 311026.pdf**, le document **Symboles_
 | Articles locaux | Édition et import PDF/OCR existants conservés ; données structurées `Article` réservées aux articles natifs | Relire toute extraction PDF ; autoriser séparément le téléchargement de l'original |
 | Images et identité | Huit illustrations proposées par Sara, optimisées en WebP ; remplacements CMS dans `home.visuals` ; logo vectoriel et animation existants conservés | Portraits, visage apaisé et photographie d'échange réel à fournir avec leurs droits |
 | Navigation et contact | Menu Nos offres, accès aux quatre offres, contact mobile ; organisation, fonction et téléphone facultatifs ; accord explicite non précoché et validé par le serveur | Confirmer horaires, délai et coordonnées définitives avant affichage |
-| Domaine et unique boîte mail | Préparation documentée pour **sara@calasconseil.fr** ; comparaison d'offres dans [COURRIEL.md](COURRIEL.md). Paul confirme que le domaine n'est pas acheté | Proposition OVHcloud à approuver, commande et accès nécessaires. Boîte non créée ; aucun achat ou changement DNS |
+| Domaine et boîtes mail | La discussion suivante retient désormais **calas-conseil.fr** comme nom envisagé et la possibilité de plusieurs adresses, notamment Sara et Agnès ; historique et étapes dans [COURRIEL.md](COURRIEL.md) | Domaine non acheté, boîtes non créées. Nombre d’adresses et offre à confirmer avant achat par Sara ; aucun changement DNS |
 | SEO | Pages SSR, métadonnées éditables, liens internes et données structurées adaptées ; relais LinkedIn sans balisage d'article original ni indexation locale | Domaine et zone d'intervention à confirmer ; recette canonicals/sitemap/robots sur la cible définitive |
 | Administration et conservation | Reprise locale puis Railway explicite des contenus ; révisions préservées, brouillons privés, publication distincte, images privées avant publication | Accès nominatif de Sara et prise en main sur l'hébergement définitif |
 | Sauvegardes et mesures | Sauvegarde/restauration manuelles existantes testées ; aucune mesure d'audience ajoutée pendant cette intervention | Planifier sauvegarde quotidienne, copie hors site, rétention et suivi ; choisir puis raccorder les mesures de visites et demandes prévues au brief |
@@ -36,7 +36,7 @@ Les cinq articles LinkedIn restent des publications externes de Sara. Les cartes
 
 ## Sélection des images
 
-Le PDF de Sara propose des esquisses cohérentes, or-bronze sur crème, et autorise leur reprise comme illustrations. Ces **huit visuels fournis** ont été retenus pour conserver cette cohérence et respecter les emplacements indiqués. Les originaux extraits sont conservés dans `assets/editorial/symbols/` ; leurs versions d'affichage sont dans `apps/web/public/images/symbols/`, en WebP de 900 × 520 pixels. Aucune photo générique ni aucun visage inventé n'a été ajouté.
+Le PDF de Sara propose des esquisses cohérentes, or-bronze sur crème, et autorise leur reprise comme illustrations. Ces **huit visuels fournis** ont été retenus pour conserver cette cohérence et respecter les emplacements indiqués. Les originaux extraits sont conservés dans `assets/editorial/symbols/` ; leurs versions d'affichage sont dans `apps/web/public/images/symbols/`, en WebP de 900 × 520 pixels. Lors de cette reprise du 1er novembre, aucune photo générique ni aucun visage inventé n’avait été ajouté. Les compléments photographiques reçus puis sélectionnés le 2 novembre sont distingués ci-dessous et dans [MEDIA.md](MEDIA.md).
 
 | Original PNG → image WebP | Placement retenu | Raison donnée dans le document |
 | --- | --- | --- |
@@ -51,7 +51,7 @@ Le PDF de Sara propose des esquisses cohérentes, or-bronze sur crème, et autor
 
 Les images décoratives par défaut ont un texte alternatif vide et ne répètent pas les titres aux lecteurs d'écran. Les images de remplacement utilisent les textes alternatifs et cadrages du CMS. Dans **Accueil → Images de l'accueil**, chaque symbole peut être remplacé ; retirer le remplacement rétablit le visuel fourni. Une photographie peut aussi être ajoutée à l'invitation finale. Les portraits s'éditent dans **Équipe**. Aucune image n'est ajoutée au bloc des chiffres.
 
-Le document demande également des visages réels : Sara et Agnès, un visage apaisé et des collègues en échange. Ces photographies n'ont pas été fournies dans les pièces reçues. Les emplacements concernés restent sans photographie ; une séance d'atelier avec accord des personnes peut fournir les images à retenir. Les huit illustrations ne sont donc pas présentées comme l'exécution complète du volet photographique.
+Le document demande également des visages réels : Sara et Agnès, un visage apaisé et des collègues en échange. Lors de la reprise du 1er novembre, ces photographies n’avaient pas été fournies ; les huit illustrations n’étaient donc pas présentées comme l’exécution complète du volet photographique. Le portrait réel de Sara a depuis été reçu et publié. Les deux photographies d’illustration sont sélectionnées pour les nouvelles corrections du 2 novembre, avec provenance et licences dans [MEDIA.md](MEDIA.md#photographies-dillustration--corrections-du-2-novembre-2026). Le portrait d’Agnès reste à fournir.
 
 ## Reprise et vérification locale
 

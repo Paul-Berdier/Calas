@@ -1,6 +1,6 @@
 # Migration vers le CMS Calas Conseil
 
-**État au 1er novembre 2026 :** les évolutions du cahier des charges du 31 octobre sont intégrées dans le code et publiées dans la recette locale. Aucun déploiement Railway n'a été effectué pour cette évolution. Le journal ci-dessous conserve les opérations antérieures, notamment le dernier déploiement des corrections du 26 octobre. Voir [la matrice du nouveau brief](EVOLUTIONS-20261101.md) pour les éléments appliqués et les pièces encore attendues.
+**État au 2 novembre 2026 :** les évolutions du cahier des charges du 31 octobre et les photos fournies pour Sara sont publiées en recette locale et sur la préproduction Railway. Les nouvelles corrections du document « CORRECTIONS SITE AU 02-11.pdf » sont en préparation locale ; leurs contrôles sont en cours et aucun déploiement de ces nouvelles corrections n’est annoncé ici. Le journal ci-dessous conserve les opérations antérieures. Voir [la matrice du nouveau brief](EVOLUTIONS-20261101.md) et [les décisions de validation](VALIDATION.md).
 
 ## Périmètre et référence
 
@@ -112,3 +112,17 @@ Sur demande explicite de Paul, le code applicatif 6b3394e et les 24 documents du
 ## Médias de Sara — 2 novembre 2026
 
 L'archive de photos transmise par Paul a été intégrée au CMS local puis Railway sans nouvelle migration SQL ni déploiement du code. Cinq médias importés, trois utilisés publiquement : portrait Sara, kintsugi, ondes. Deux réserves restent privées. Trois documents seulement ont reçu de nouvelles révisions publiées : Sara v3 → v5, Accueil v5 → v7 et Situations sensibles v2 → v4. Les anciennes révisions et tous les champs non ciblés ont été comparés et conservés ; aucune donnée de compte modifiée. Voir [MEDIA.md](MEDIA.md#photos-fournies-pour-sara--2-novembre-2026) et artifacts/sara-images-20261102/.
+
+## Corrections du 2 novembre 2026 — préparation locale
+
+Le nouveau document « CORRECTIONS SITE AU 02-11.pdf » porte sur le fond bleu nuit, le lettrage Calas Conseil, les trois phrases d’ouverture du chemin en gras et italique, la phrase finale de Notre conviction en italique, le signe IPRP fourni et les photographies. Cette intervention est distincte de la publication du brief du 31 octobre et des médias de Sara déjà effectuée le 2 novembre.
+
+Le contrat CMS local accepte désormais les champs facultatifs `journey.cards[].lead`, `conviction.closingQuote` et `home.visuals.calmFace`. L’administration propose les champs de texte séparés et les dix visuels de l’accueil. Le rendu Astro applique la mise en forme sans HTML saisi dans ces textes. Les anciens contenus restent compatibles avec l’absence de ces champs ; une base existante ne reprend pas les valeurs de démonstration automatiquement.
+
+Le script ponctuel `scripts/content-correct-editorial-20261102.ts` prépare la correction de contenu séparément du build et du démarrage. La recette locale passe `home` de v7 à v9 et `settings` de v3 à v5 via les API authentifiées. Les deux photos sont importées privées, puis accessibles seulement après publication de leurs références. Les champs non ciblés et les anciennes révisions sont comparés et préservés. Les sources et licences sont documentées dans [MEDIA.md](MEDIA.md#photographies-dillustration--corrections-du-2-novembre-2026).
+
+Typecheck (0 erreur, 0 avertissement, 18 hints existants), lint et build réussis ; 15 tests ciblés et 3 scénarios navigateur réussis ; 6 audits publics et 4 audits admin à 390/1440 px sans violation Axe ni débordement. Le contrôle admin utilise une vraie session avec TOTP sans modifier de contenu. Rapports : `artifacts/corrections-20261102/`. Déploiement distant en préparation.
+
+Contrôles en cours : typecheck, lint, tests adaptés aux champs éditoriaux et références médias, compilation avant recette standalone, rendu ordinateur/mobile, mouvement réduit et absence de JavaScript. Les résultats et le déploiement éventuel de ces nouvelles corrections devront être ajoutés après confirmation, sans reprendre comme preuve les tests du brief précédent.
+
+État des raccordements : Paul envisage désormais `calas-conseil.fr`, avec un tiret, et a demandé des explications pour que Sara l’achète. Le domaine n’est pas acheté et aucune boîte mail n’est créée. Plusieurs adresses, notamment pour Sara et Agnès, sont envisagées ; leur nombre et l’offre restent à arrêter. Cela remplace la proposition initiale d’une seule boîte sur `calasconseil.fr`, conservée dans l’historique ci-dessus. Aucun achat, changement DNS ni email externe n’est effectué par cette correction.

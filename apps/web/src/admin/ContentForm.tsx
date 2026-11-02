@@ -465,7 +465,7 @@ export function ContentForm({
         </Group>
         <Group title="03 · Notre chemin en trois temps" description="Les trois cartes, leur destination et l’accès aux situations sensibles.">
           {text({name:"domainsTitle",label:"Titre de la section",rows:2})}
-          {(value.journey?.cards??[]).map((card:EditorialContent,index:number)=><div className="admin-repeat-item" key={String(card.key??index)}><div className="admin-repeat-heading"><strong>Étape {index+1}</strong></div><div className="admin-fields">{texts([{name:"eyebrow",label:"Petit libellé"},{name:"title",label:"Titre",rows:2},{name:"text",label:"Présentation",rows:6}],["journey","cards",index])}{cta(["journey","cards",index,"cta"],"Lien de l’étape")}</div></div>)}
+          {(value.journey?.cards??[]).map((card:EditorialContent,index:number)=><div className="admin-repeat-item" key={String(card.key??index)}><div className="admin-repeat-heading"><strong>Étape {index+1}</strong></div><div className="admin-fields">{texts([{name:"eyebrow",label:"Petit libellé"},{name:"title",label:"Titre",rows:2},{name:"lead",label:"Phrase d’ouverture — gras et italique",rows:2,max:350},{name:"text",label:"Suite de la présentation",rows:6}],["journey","cards",index])}{cta(["journey","cards",index,"cta"],"Lien de l’étape")}</div></div>)}
           {texts([{name:"transition",label:"Phrase après les cartes",rows:2},{name:"sensitiveText",label:"Présentation des situations sensibles",rows:3}],["journey"])}
           {cta(["journey","sensitiveCta"],"Situations sensibles")}
         </Group>
@@ -477,6 +477,7 @@ export function ContentForm({
             [
               { name: "title", label: "Notre conviction — titre", rows: 2 },
               { name: "text", label: "Notre conviction — texte", rows: 10 },
+              { name: "closingQuote", label: "Phrase finale en italique", rows: 2, max: 500 },
             ],
             ["conviction"],
           )}
@@ -556,7 +557,7 @@ export function ContentForm({
           {cta(["closingCta"], "Lien final", true)}
         </Group>
         <Group title="Images de l’accueil" description="Les illustrations de Sara sont utilisées par défaut. Vous pouvez les remplacer par une image de votre médiathèque.">
-          {([['threads','Fils dorés — premier écran'],['nautilus','Nautile — pourquoi maintenant'],['roots','Racines — diagnostic'],['compass','Boussole — compétences relationnelles'],['tree','Arbre — management'],['kintsugi','Kintsugi — situations sensibles'],['ripples','Ondes — émotions'],['murmuration','Oiseaux — autonomie'],['closing','Photo de l’invitation finale']] as const).map(([key,label])=>image(["visuals",key],label))}
+          {([['threads','Fils dorés — premier écran'],['nautilus','Nautile — pourquoi maintenant'],['roots','Racines — diagnostic'],['compass','Boussole — compétences relationnelles'],['tree','Arbre — management'],['kintsugi','Kintsugi — situations sensibles'],['ripples','Ondes — émotions'],['murmuration','Oiseaux — autonomie'],['calmFace','Visage apaisé — fin de Notre conviction'],['closing','Photo de l’invitation finale']] as const).map(([key,label])=>image(["visuals",key],label))}
         </Group>
         <Group
           title="Repères et textes secondaires"

@@ -1,12 +1,12 @@
 # Courriel Calas Conseil
 
-## Adresse demandée
+## Domaine et adresses envisagés — état au 2 novembre 2026
 
-Paul a demandé le 1er novembre 2026 une seule boîte professionnelle : **sara@calasconseil.fr**. Cette demande concerne une boîte capable de recevoir et d'envoyer des messages, pas seulement un lien affiché sur le site.
+Paul envisage désormais le domaine **calas-conseil.fr**, avec un tiret, et a demandé les explications nécessaires pour que Sara l’achète. Il souhaite pouvoir disposer de plusieurs adresses, par exemple **sara@calas-conseil.fr** et **agnes@calas-conseil.fr**. Le nombre de boîtes, leurs noms, le fournisseur et l’offre restent à confirmer. Il s’agit de boîtes capables de recevoir et d’envoyer des messages, pas seulement de liens affichés sur le site.
 
-La boîte n'est pas encore créée. Aucun abonnement, achat de domaine, changement DNS ou envoi de message n'a été effectué.
+Le domaine n’est pas acheté et aucune boîte professionnelle n’est créée. Aucun abonnement, achat de domaine, changement DNS ou envoi de message n’a été effectué. La demande initiale du 1er novembre portait sur une seule boîte `sara@calasconseil.fr` ; les vérifications et la comparaison d’offres ci-dessous conservent cet historique et ne constituent pas une vérification de disponibilité du nouveau nom avec tiret.
 
-## État vérifié le 1er novembre 2026
+## Historique — état vérifié le 1er novembre 2026
 
 - Aucun fournisseur de domaine ou de messagerie n'est renseigné dans les documents du projet. Le domaine `calasconseil.fr` y figure comme domaine souhaité.
 - La résolution DNS locale et une requête indépendante à Google Public DNS renvoient `NXDOMAIN` pour `calasconseil.fr` : aucun serveur NS, MX ou enregistrement TXT n'est retourné. La requête `_dmarc.calasconseil.fr` retourne également `NXDOMAIN`.
@@ -16,14 +16,14 @@ La boîte n'est pas encore créée. Aucun abonnement, achat de domaine, changeme
 
 ## Informations et accès nécessaires
 
-1. Confirmer si Calas Conseil possède déjà le domaine et, si oui, ouvrir le compte de son fournisseur. Aucune transmission de mot de passe dans le chat n'est nécessaire.
-2. Si le domaine n'est pas détenu, choisir une offre au nom de Calas Conseil avec une seule boîte `sara`. Présenter le prix du domaine et de la boîte, leur renouvellement et le titulaire avant tout achat.
-3. Utiliser l'accès au fournisseur pour créer la boîte et régler ses enregistrements MX, SPF, DKIM et DMARC avec les valeurs propres à l'offre retenue. Ne pas inventer des valeurs DNS génériques.
-4. Remettre l'accès de manière privée. Ne pas créer automatiquement des boîtes `contact`, `agnes` ou `noreply` ; une adresse unique a été demandée.
+1. Vérifier la disponibilité de `calas-conseil.fr` au moment de la commande et créer le compte fournisseur au nom du titulaire retenu par Calas Conseil. Aucune transmission de mot de passe dans le chat n’est nécessaire.
+2. Confirmer le nombre d’adresses et distinguer les boîtes indépendantes des alias : un alias distribue vers une boîte existante, tandis qu’une boîte indépendante possède ses propres messages et accès. Présenter le prix total du domaine et des boîtes, leur renouvellement et le titulaire avant tout achat.
+3. Après achat par Sara et accès au fournisseur, créer les boîtes retenues et régler MX, SPF, DKIM et DMARC avec les valeurs propres à l’offre. Ne pas inventer des valeurs DNS génériques.
+4. Remettre les accès de manière privée. Les exemples `sara` et `agnes` ne prouvent ni leur création ni une validation du nombre final ; ne pas ajouter d’abonnement ou d’adresse non retenus.
 
-## Option concrète à valider : domaine OVHcloud et boîte incluse
+## Historique — comparaison du 1er novembre pour une seule boîte
 
-**Proposition : réserver `calasconseil.fr` pour un an chez OVHcloud, puis utiliser l'unique boîte Starter incluse pour `sara@calasconseil.fr`.** Les pages officielles consultées le 1er novembre 2026 annoncent les montants suivants, avec TVA française de 20 % :
+**La proposition initiale était de réserver `calasconseil.fr` pour un an chez OVHcloud, puis d’utiliser la boîte Starter incluse pour `sara@calasconseil.fr`.** Les pages officielles consultées le 1er novembre 2026 annonçaient les montants suivants, avec TVA française de 20 %. Cette estimation historique couvre une seule boîte ; elle doit être refaite pour le domaine avec tiret et le nombre de boîtes retenu.
 
 | Élément | Première année | Renouvellement annuel au tarif affiché |
 | --- | --- | --- |
@@ -35,7 +35,7 @@ Ces prix proviennent de la [fiche officielle du domaine `.fr`](https://www.ovhcl
 
 Il suffit de commander le domaine avec son service mail inclus. L'abonnement Zimbra Starter vendu séparément à 0,30 € HT/mois n'est pas nécessaire pour cette première boîte incluse. Le site Astro reste hébergé sur Railway : aucun pack web payant OVHcloud n'est nécessaire pour créer cette adresse.
 
-Lors de la commande, vérifier le panier pour **un seul domaine, une seule année et une seule boîte incluse**, puis confirmer le titulaire, les coordonnées de facturation et le montant final. La promotion pluriannuelle affichée sur la page `.fr` n'est pas utilisée dans ce calcul. La disponibilité et les tarifs devront être revérifiés au moment de l'achat. Rien n'a été commandé.
+Le calcul initial portait sur **un domaine, une année et une boîte incluse**. Le futur panier doit refléter le domaine avec tiret et le nombre de boîtes finalement choisi, avec le titulaire, les coordonnées de facturation et le montant final confirmés. La promotion pluriannuelle affichée sur la page `.fr` n’est pas utilisée dans ce calcul historique. La disponibilité et les tarifs devront être revérifiés au moment de l’achat. Rien n’a été commandé.
 
 Point à confirmer avant validation du panier : une [autre page OVHcloud sur l'hébergement gratuit](https://www.ovhcloud.com/fr/domains/free-web-hosting/) mentionne encore une boîte de 5 Go. Les pages Domaines et Eco annoncent 15 Go ; l'offre effectivement provisionnée et son quota doivent donc être contrôlés dans le récapitulatif, sans présenter cette capacité comme déjà acquise.
 
@@ -45,12 +45,12 @@ Une fois le domaine réservé, ouvrir **Web Cloud → Zimbra Mail**, vérifier l
 
 L'offre [Email Basic 1](https://www.ionos.fr/solutions-bureau/adresse-email.html) affiche **1,50 € HT / 1,80 € TTC par mois**, avec une boîte de 2 Go, webmail et domaine inclus pendant le contrat, résiliable à tout moment. L'équivalent sur douze mois est **18 € HT / 21,60 € TTC** ; aucune remise temporaire n'est affichée pour cette formule. Le maintien du domaine inclus dépend du maintien du contrat et de son emplacement de domaine ; les [règles officielles des domaines inclus](https://www.ionos.fr/assistance/domaines/tarifs-et-factures/domaines-inclus-reponses-aux-questions-frequemment-posees/) détaillent ce fonctionnement et les extensions admissibles.
 
-Cette alternative répond également au besoin, mais l'offre OVHcloud avec boîte incluse est plus économique au tarif annuel vérifié. Aucun second abonnement de messagerie ne doit être ajouté au projet sans nécessité et validation.
+Cette alternative avait également été examinée pour une seule boîte ; au tarif annuel vérifié le 1er novembre, la proposition OVHcloud avec boîte incluse était plus économique pour ce périmètre. Le coût de plusieurs boîtes reste à comparer. Aucun abonnement de messagerie ne doit être ajouté au projet sans nécessité et validation.
 
 ## Raccordement au site après création
 
 - L'adresse publique du site doit correspondre à la boîte réellement créée. Un texte ou lien `mailto:` ne prouve pas que la réception fonctionne.
-- Le formulaire pourra utiliser `SMTP_TO=sara@calasconseil.fr`. L'expéditeur SMTP doit être autorisé par le fournisseur ; l'adresse du visiteur est placée dans `Reply-To`, jamais utilisée comme expéditeur du domaine.
+- Si cette boîte est retenue et créée, le formulaire pourra utiliser `SMTP_TO=sara@calas-conseil.fr`. Le destinataire réel reste à confirmer. L’expéditeur SMTP doit être autorisé par le fournisseur ; l’adresse du visiteur est placée dans `Reply-To`, jamais utilisée comme expéditeur du domaine.
 - Les secrets SMTP restent dans les variables privées du serveur. L'activation du transport réel et le test de réception nécessitent l'autorisation de recette prévue dans `AGENTS.md` ; aucun email de test n'est envoyé à Sara par défaut.
 - Vérifier réception, réponse et authentification du domaine lors d'un test autorisé, puis documenter le fournisseur, l'accès, la conservation des messages et la récupération du compte.
 

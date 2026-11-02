@@ -3,5 +3,23 @@ import type {Person,SiteSettings} from '../lib/cms/types';
 interface Props {settings:SiteSettings; person?:Person; compact?:boolean}
 const {settings,person,compact=false}=Astro.props;
 const registration=person&&settings.qualification.personId===person.id?settings.qualification.registration:undefined;
+// The 2 November 2026 correction PDF supplies this registration and authority for
+// Sara. It is an editorial declaration, not the supporting certificate: pending
+// remains pending, and no arbitrary unverified qualification label is exposed.
+const isSaraDeclaration=registration==='2026.16.004'&&person?.name.trim().toLocaleLowerCase('fr-FR')==='sara serrano cabeza';
 ---
-{registration&&person&&<aside class:list={['registration',{'registration-compact':compact}]} aria-label={`Enregistrement IPRP de ${person.name}`}><span class="registration-mark" aria-hidden="true">↗</span><div><p>{person.name}</p><p><strong>Numéro d’enregistrement d’IPRP : {registration}</strong></p></div></aside>}
+{registration&&person&&<aside class:list={['registration',{'registration-compact':compact}]} aria-label={`Enregistrement IPRP de ${person.name}`}>
+  <p class="registration-heading"><svg viewBox="0 0 32 36" width="25" height="28" fill="none" aria-hidden="true"><path d="M16 2 28 7v11c0 7-7 12-12 15C11 30 4 25 4 18V7L16 2Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="m11 17 3.5 4L22 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>IPRP enregistrée</span></p>
+  <p class="registration-person">{person.name}</p>
+  <p class="registration-title">Intervenante en prévention<br class="registration-break"/> des risques professionnels</p>
+  {isSaraDeclaration&&<p class="registration-authority">Enregistrement auprès de la<br/> DREETS Nouvelle-Aquitaine</p>}
+  <p class="registration-number"><span class="sr-only">Numéro d’enregistrement d’IPRP : </span><span aria-hidden="true">N° </span><strong>{registration}</strong></p>
+</aside>}
+<style>
+  .registration{display:flex;flex-direction:column;align-items:center;gap:0;max-width:540px;margin-top:32px;padding:26px 24px 24px;border:1px solid #d0ded9;background:#f5faf7;color:#142e35;text-align:center;font:13px/1.5 var(--ui);border-radius:3px}
+  .registration p+p{margin-top:10px}.registration-heading{display:flex;align-items:center;justify-content:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.045em;text-transform:uppercase}.registration-heading svg{flex-shrink:0;color:#267a75}
+  .registration .registration-person{font-size:20px;font-family:var(--display);line-height:1.25;margin-top:15px}.registration-title{font-size:13px;font-weight:500}.registration-authority{font-size:12px;color:#45615e}
+  .registration .registration-number{margin-top:16px;padding:5px 13px;background:#dbefdf;color:#205d37;border-radius:20px;font-size:13px}.registration strong{font-weight:600}.registration-break{display:none}
+  .registration-compact{max-width:380px;padding:22px 18px}.registration-compact .registration-person{font-size:19px}.registration-compact .registration-break{display:initial}
+  @media(max-width:599px){.registration{padding-inline:20px}.registration-break{display:initial}}
+</style>
