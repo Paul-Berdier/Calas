@@ -4,7 +4,7 @@ import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 import {shellMarkup,viewBox} from '../assets/brand/geometry.mjs';
 import {coilSvg,coilDuration} from '../assets/brand/coil.mjs';
-import {wordmarkMarkup,wordmarkWidth} from '../assets/brand/wordmark.mjs';
+import {wordmarkMarkup,wordmarkWidth,wordmarkHeight} from '../assets/brand/wordmark.mjs';
 import sharp from 'sharp';
 import opentype from 'opentype.js';
 
@@ -33,10 +33,9 @@ const outline=(font,text,x,y,size,fill)=>{
 };
 const svg=(width,height,body,title='Calas Conseil — La voie de la qualité relationnelle.')=>`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${title}"><title>${title}</title>${body}</svg>`;
 const symbol=(x,y,w,h,id,mono=null)=>`<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${viewBox}">${shellMarkup(id,mono)}</svg>`;
-// Dedicated letter outlines follow the supplied card; no guessed font is used.
-// Keep the former export dimensions so all existing lockups retain their size.
-const brandSize=100,brandBaseline=82,brandHeight=86;
-const letterScale=4/3,brandWidth=wordmarkWidth*letterScale;
+// Source contours preserve the supplied card's glyphs and original spacing.
+const brandSize=100,brandBaseline=82;
+const letterScale=4/3,brandWidth=wordmarkWidth*letterScale,brandHeight=wordmarkHeight*letterScale;
 const wordmark=(dark=false,mono=null)=>`<g transform="scale(${letterScale})">${wordmarkMarkup({dark,mono})}</g>`;
 function lettering(x,y,size,dark=false,mono=null){const scale=size/brandSize;return `<g transform="translate(${x} ${y-brandBaseline*scale}) scale(${scale})">${wordmark(dark,mono)}</g>`;}
 const taglineText='LA VOIE DE LA QUALITÉ RELATIONNELLE';

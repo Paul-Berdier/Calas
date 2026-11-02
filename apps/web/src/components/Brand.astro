@@ -11,7 +11,7 @@ const {variant='horizontal',dark=false,class:className='',withTagline=false}=Ast
 <span class:list={['calas-brand',`calas-brand--${variant}`,{'calas-brand--dark':dark},className]} role="img" aria-label={withTagline?'Calas Conseil — La voie de la qualité relationnelle.':'Calas Conseil'}>
  <span class="calas-brand__symbol"><Shell/></span>
  <span class="calas-brand__lettering" aria-hidden="true">
-  <img class="calas-brand__name" src={dark?'/brand/wordmark-dark.svg':'/brand/wordmark.svg'} width="680" height="86" alt="" />
+  <img class="calas-brand__name" src={(dark?'/brand/wordmark-dark.svg':'/brand/wordmark.svg')+'?v=card-contours-20261102'} width="680" height="91" alt="" />
   {withTagline && <span class="calas-brand__tagline">La voie de la qualité relationnelle.</span>}
  </span>
 </span>
@@ -20,12 +20,12 @@ const {variant='horizontal',dark=false,class:className='',withTagline=false}=Ast
  .calas-brand__symbol{display:block;flex:0 0 auto;width:3.2rem}
  .calas-brand__lettering{display:flex;flex-direction:column;align-items:center;min-width:0;gap:.35rem;text-align:center}
  .calas-brand__name{display:block;width:13rem;height:auto;max-width:100%}
- .calas-brand__tagline{font-family:'EB Garamond',Georgia,serif;font-size:.58rem;line-height:1.35;letter-spacing:.08em;text-transform:uppercase;color:#805724}
+ .calas-brand__tagline{font-family:'EB Garamond',Georgia,serif;font-size:.58rem;line-height:1.35;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;color:#805724}
  .calas-brand--stacked{flex-direction:column;gap:.8rem;text-align:center}
  .calas-brand--stacked .calas-brand__symbol{width:7.5rem}
  .calas-brand--stacked .calas-brand__name{width:22rem}
  .calas-brand--stacked .calas-brand__tagline{font-size:.85rem;letter-spacing:.12em}
  .calas-brand--dark{color:#F7F2EA}
  .calas-brand--dark .calas-brand__tagline{color:#D5B37E}
- @media(max-width:599px){.calas-brand__symbol{width:2.5rem}.calas-brand__name{width:11rem}.calas-brand__tagline{font-size:.5rem;letter-spacing:.05em}.calas-brand--stacked .calas-brand__name{width:min(22rem,78vw)}}
+ @media(max-width:599px){.calas-brand__symbol{width:2.5rem}.calas-brand__name{width:11rem}.calas-brand__tagline{font-size:.5rem;letter-spacing:.12em}.calas-brand--stacked .calas-brand__name{width:min(22rem,78vw)}}
 </style>

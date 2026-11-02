@@ -1,6 +1,6 @@
 # Migration vers le CMS Calas Conseil
 
-**État au 2 novembre 2026 :** le cahier des charges du 31 octobre, les photos fournies pour Sara et les corrections du document « CORRECTIONS SITE AU 02-11.pdf » sont appliqués en recette locale et sur la préproduction Railway. Le portrait d’Agnès reste attendu, comme confirmé par Paul. Le journal ci-dessous conserve les opérations antérieures. Voir [la matrice du nouveau brief](EVOLUTIONS-20261101.md) et [les décisions de validation](VALIDATION.md).
+**État au 2 novembre 2026 :** le cahier des charges du 31 octobre, les photos fournies pour Sara et une première livraison des corrections du document « CORRECTIONS SITE AU 02-11.pdf » sont appliqués en recette locale et sur la préproduction Railway. Paul a ensuite refusé la photo de la femme rousse et demandé une reprise du lettrage : la photo est retirée, la nouvelle typographie est en cours de vérification. Le portrait d’Agnès reste attendu. Le journal ci-dessous conserve les opérations antérieures. Voir [la matrice du nouveau brief](EVOLUTIONS-20261101.md) et [les décisions de validation](VALIDATION.md).
 
 ## Périmètre et référence
 
@@ -127,6 +127,12 @@ Après déploiement du commit `153439e`, l’opérateur API a appliqué les mêm
 
 La revue visuelle a ensuite conduit à limiter la photo finale à 960 pixels avec son ratio 3/2 pour garder les deux visages complets (`f270ee3`). Ce changement CSS ne nécessite aucune nouvelle publication de contenu. Son build, lint et les six vues locales sont vérifiés ; la clôture de la livraison est consignée dans [DEPLOYMENT.md](DEPLOYMENT.md).
 
-Contrôles en cours : typecheck, lint, tests adaptés aux champs éditoriaux et références médias, compilation avant recette standalone, rendu ordinateur/mobile, mouvement réduit et absence de JavaScript. Les résultats et le déploiement éventuel de ces nouvelles corrections devront être ajoutés après confirmation, sans reprendre comme preuve les tests du brief précédent.
+Les contrôles ci-dessus concernent la première livraison. La reprise du lettrage demandée ensuite par Paul nécessite sa propre vérification ; aucun résultat ou accord sur cette nouvelle typographie n’est déduit des tests précédents.
 
 État des raccordements : Paul envisage désormais `calas-conseil.fr`, avec un tiret, et a demandé des explications pour que Sara l’achète. Le domaine n’est pas acheté et aucune boîte mail n’est créée. Plusieurs adresses, notamment pour Sara et Agnès, sont envisagées ; leur nombre et l’offre restent à arrêter. Cela remplace la proposition initiale d’une seule boîte sur `calasconseil.fr`, conservée dans l’historique ci-dessus. Aucun achat, changement DNS ni email externe n’est effectué par cette correction.
+
+## Retrait de la photographie refusée — 2 novembre 2026
+
+Sur demande explicite de Paul, une opération API ponctuelle retire uniquement `home.visuals.calmFace` de l’accueil publié, en local et sur Railway. L’accueil passe de v9 à v11 après enregistrement puis publication. Un instantané privé précède l’opération ; les versions attendues, l’identifiant du média et l’absence de brouillon sont contrôlés. Les autres champs de l’accueil, les autres pages et toutes les anciennes révisions sont comparés et restent identiques.
+
+Le média n’est pas supprimé : il reste privé et référencé par l’historique. Son accès anonyme renvoie désormais 404 ; la photo d’échange finale renvoie toujours 200. Le HTML public ne contient plus la photo ni son conteneur, donc aucun espace photographique vide. Les deux sessions opérateur sont déconnectées et le serveur local 4336 est arrêté. Rapports : `artifacts/revision-brand-20261102/photo-removal/local.json` et `railway.json`. Aucun autre portrait ni remplacement n’est ajouté. Le contrat CMS conserve dix emplacements éditables, dont `calmFace` facultatif et actuellement vide.
