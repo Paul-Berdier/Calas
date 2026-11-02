@@ -12,7 +12,7 @@ Astro rend le texte et les liens avant JavaScript. Le CSS public et GSAP restent
 
 `content_documents` porte identité, statut, version attendue et deux pointeurs : brouillon courant et dernière révision publiée. `content_revisions` contient des instantanés immuables, avec tables métier pages/articles/personnes/catégories/statistiques/paramètres et relations explicites. Clés étrangères et gardes SQL empêchent un pointeur vers la révision d’un autre document. Les publications valident les références ; des transactions et versions attendues renvoient 409 en cas de conflit.
 
-Une restauration crée une nouvelle révision. Une archive retire la publication sans effacer l’historique. Les personnes et paramètres sont eux aussi versionnés. Le seed importe 17 ressources initiales sans articles inventés ; il préserve toute ressource existante. Le lecteur public utilise un instantané cohérent et seulement les pointeurs publiés. Il ne partage pas de cache en mémoire : une publication est visible à la requête suivante. Une panne donne 503, jamais les données de démonstration.
+Une restauration crée une nouvelle révision. Une archive retire la publication sans effacer l’historique. Les personnes et paramètres sont eux aussi versionnés. Depuis le cahier des charges du 31 octobre, le seed comporte 26 ressources, dont cinq liens vers les articles LinkedIn fournis par Sara ; aucun article intégral n’est inventé. Il préserve toute ressource existante. Le lecteur public utilise un instantané cohérent et seulement les pointeurs publiés. Il ne partage pas de cache en mémoire : une publication est visible à la requête suivante. Une panne donne 503, jamais les données de démonstration.
 
 ## Accès et frontières
 

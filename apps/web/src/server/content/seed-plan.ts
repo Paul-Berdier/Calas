@@ -67,7 +67,7 @@ export function prepareSeedPlan(source: SiteContent): SeedPlan {
     if (article.author && !authorId) throw new Error(`Auteure inconnue pour l’article ${article.slug}.`);
     add('article', stableContentId('article', article.slug), {
       title: article.title, slug: article.slug, excerpt: article.excerpt, body: convertBody(article.body, `Article ${article.slug}`), authorId, categoryId, date: article.date,
-      image: article.image, sourcePdf: article.sourcePdf, seo: article.seo, allowPdfDownload: false,
+      image: article.image, sourcePdf: article.sourcePdf, seo: article.seo, externalUrl: article.externalUrl, allowPdfDownload: false,
     });
   }
   validateSeedPlan(entries);

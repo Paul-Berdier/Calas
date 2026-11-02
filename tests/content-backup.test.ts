@@ -108,7 +108,7 @@ test('restauration réelle PostgreSQL et S3 dans deux destinations isolées', { 
       assert.equal(restored.objectCount, manifest.objectCount);
       assert.deepEqual(await target.get(key), new Uint8Array(bytes));
       assert.equal((await getContent(article.id)).content.title, 'Brouillon conservé dans la sauvegarde');
-      assert.equal((await readSiteContent()).articles[0]!.title, 'Article sauvegardé');
+      assert.equal((await readSiteContent()).articles.find(item => item.id === article.id)!.title, 'Article sauvegardé');
       assert.equal((await listRevisions(article.id)).length, revisionCount);
       assert.equal(await isMediaPublished(mediaId, { download: true }), true);
       const user = await getPool().query<{ role: string }>('SELECT role FROM auth_user WHERE id = $1', [actor.id]);

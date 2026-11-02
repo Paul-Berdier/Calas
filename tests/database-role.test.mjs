@@ -48,7 +48,7 @@ test('application role can run the CMS seed but cannot modify its schema or migr
     application = new Client({connectionString:appUrl.href});
     await application.connect();
     assert.equal(command('content-seed-custom.ts',['--apply','--publish-initial'],appUrl.href).status,0,'seed with restricted role');
-    assert.equal((await application.query('SELECT COUNT(*)::int AS count FROM content_documents WHERE published_revision_id IS NOT NULL')).rows[0].count,17);
+    assert.equal((await application.query('SELECT COUNT(*)::int AS count FROM content_documents WHERE published_revision_id IS NOT NULL')).rows[0].count,26);
     const flags = (await application.query('SELECT rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls FROM pg_roles WHERE rolname=current_user')).rows[0];
     assert.ok(Object.values(flags).every(value=>value===false));
     for (const sql of ['CREATE TABLE public.forbidden(id int)','ALTER TABLE content_documents ADD COLUMN forbidden int','TRUNCATE content_documents','SELECT * FROM drizzle.__drizzle_migrations']) {

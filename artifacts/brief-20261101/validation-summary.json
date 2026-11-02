@@ -1,0 +1,27 @@
+{
+  "date": "2026-11-01",
+  "environment": "local",
+  "deployedToRailway": false,
+  "gitPushed": false,
+  "checks": {
+    "typecheck": "0 errors / 0 warnings / 18 existing hints",
+    "lint": "passed",
+    "build": "passed",
+    "cmsLocal": 49,
+    "databaseStorageBackup": 26,
+    "publicBrowserScenarios": 37,
+    "adminAxeAudits": 6,
+    "briefUnits": 8,
+    "briefDatabase": 1,
+    "homeVisuals": 2,
+    "contactUnits": 8,
+    "brandCoilStates": 1515
+  },
+  "screenshots": "artifacts/brief-20261101/responsive",
+  "remaining": [
+    "Domain purchase and creation of sara@calasconseil.fr await approval and provider account",
+    "Authentic photos and call hours not supplied",
+    "Complete original article texts and sixth series article not supplied",
+    "Production launch and operations await editorial/legal/infrastructure validation"
+  ]
+}

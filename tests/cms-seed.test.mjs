@@ -7,11 +7,11 @@ import { demoContent } from '../apps/web/src/lib/cms/demo.ts';
 const built = await build({ entryPoints: [fileURLToPath(new URL('../apps/web/src/server/content/seed-plan.ts', import.meta.url))], bundle: true, write: false, platform: 'node', format: 'esm', logLevel: 'silent' });
 const { prepareSeedPlan, validateSeedPlan, stableContentId } = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
 
-test('le contenu initial conserve les neuf pages et les objets éditables sans faux article', () => {
+test('le contenu initial contient dix pages et les cinq publications LinkedIn fournies', () => {
   const { entries, warnings } = prepareSeedPlan(demoContent);
-  assert.equal(entries.length, 17);
-  assert.equal(entries.filter(entry => entry.kind === 'page').length, 9);
-  assert.equal(entries.filter(entry => entry.kind === 'article').length, 0);
+  assert.equal(entries.length, 26);
+  assert.equal(entries.filter(entry => entry.kind === 'page').length, 10);
+  assert.equal(entries.filter(entry => entry.kind === 'article').length, 5);
   const diagnostic = entries.find(entry => entry.content.slug === 'diagnostic-rps');
   const method = diagnostic.content.sections.find(section => section.presentation === 'method');
   assert.equal(method.items.length, 5);

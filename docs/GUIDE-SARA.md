@@ -2,7 +2,7 @@
 
 L’**Atelier éditorial Calas Conseil** est l’administration privée du site. Vous y modifiez les textes et les images, préparez vos articles et choisissez leur publication. Aucun compte Sanity, terminal ou outil de programmation n’est nécessaire.
 
-L’administration se trouve à l’adresse du site suivie de `/admin/`. L’adresse définitive sera fournie après installation de la préproduction. Les captures montrent la recette locale du 25 octobre 2026 : le compte « Recette Calas » et les articles « Recette » sont des tests, sans signature de Sara ou d’Agnès.
+L’administration se trouve à l’adresse du site suivie de `/admin/`. Une [adresse Railway de préproduction](https://calas-web-test-production.up.railway.app/admin/) existe pour la recette. Les évolutions du cahier des charges du 31 octobre sont pour le moment disponibles **dans la recette locale du 1er novembre**, pas encore sur cette adresse Railway. Les captures ci-dessous montrent la version du 25 octobre : le compte « Recette Calas » et les articles « Recette » sont des tests, sans signature de Sara ou d’Agnès. Les nouveaux champs sont décrits dans le texte de ce guide.
 
 ## Se connecter la première fois
 
@@ -15,6 +15,8 @@ L’administration se trouve à l’adresse du site suivie de `/admin/`. L’adr
 7. Cliquez sur **Accéder à mes contenus**.
 
 Lors des connexions suivantes, le site demande votre mot de passe puis le code temporaire de votre application. Ne partagez jamais le QR code, le mot de passe ou les codes de secours.
+
+Le compte de recette réservé à Paul bénéficie d'une exception avec identifiant et mot de passe, uniquement sur la préproduction. Cela ne remplace pas la création de votre accès personnel et ne modifie pas la protection prévue pour les autres comptes.
 
 ![L’écran de connexion](../artifacts/custom-cms/admin/login-1440.png)
 
@@ -31,7 +33,7 @@ Le menu rassemble **Pages du site**, **Réflexions**, **Médiathèque**, **Équi
 ## Modifier une page
 
 1. Ouvrez **Pages du site**, puis **Accueil**, **Diagnostic RPS** ou la page concernée.
-2. Dépliez la section à modifier et ajustez ses textes. L’accueil conserve ses six blocs et Diagnostic ses étapes : la composition reste protégée.
+2. Dépliez la section à modifier et ajustez ses textes. L’accueil suit désormais sept blocs : premier écran, Pourquoi maintenant, chemin en trois temps, conviction, binôme, chiffres et invitation finale. Diagnostic conserve ses cinq étapes.
 3. Attendez **Brouillon enregistré**. La sauvegarde automatique intervient après une courte pause de saisie ; vous pouvez aussi utiliser **Enregistrer le brouillon**, ou `Ctrl+S` / `Cmd+S`.
 4. Cliquez sur **Prévisualiser**. Vérifiez le résultat aux largeurs Ordinateur, Tablette et Mobile.
 5. Faites relire, puis cliquez sur **Publier** lorsque le texte est approuvé. Confirmez l’action ; la réussite n’est annoncée qu’après enregistrement par le serveur.
@@ -40,7 +42,9 @@ Le menu rassemble **Pages du site**, **Réflexions**, **Médiathèque**, **Équi
 
 ![L’édition structurée de l’accueil](../artifacts/custom-cms/admin/home-editor-1440.png)
 
-Les liens de contact prévus sont `/contact/?objet=diagnostic`, `/contact/?objet=equipes`, `/contact/?objet=managers` ou `/contact/`. Utilisez une adresse complète commençant par `https://` pour les liens externes.
+Les trois cartes du chemin possèdent chacune leur petit libellé, leur titre, leur présentation et leur lien. Le passage vers **Situations sensibles** se modifie juste après ces cartes. La page correspondante est également accessible dans **Pages du site** et présente ses cinq formats ainsi que le cadre et les limites d'intervention.
+
+Les liens de contact prévus sont `/contact/?objet=diagnostic`, `/contact/?objet=equipes`, `/contact/?objet=managers`, `/contact/?objet=sensible` ou `/contact/`. L'objet correspondant est présélectionné pour le visiteur. Utilisez une adresse complète commençant par `https://` pour les liens externes.
 
 Si l’enregistrement échoue, votre saisie reste à l’écran : corrigez les champs indiqués ou réessayez. Sans confirmation, la modification n’est pas enregistrée. Si une autre personne a modifié le même document, comparez les versions puis rechargez celle du serveur ; recopiez auparavant les passages à conserver. L’outil n’écrase pas automatiquement le travail de votre collègue.
 
@@ -49,6 +53,10 @@ Si l’enregistrement échoue, votre saisie reste à l’écran : corrigez les c
 Dans un champ image, ouvrez la médiathèque et choisissez un fichier existant ou ajoutez une photographie authentique dont vous détenez les droits. Formats acceptés : JPEG, PNG et WebP, jusqu’à 12 Mo par image.
 
 Renseignez le **texte alternatif**, qui décrit le contenu utile aux personnes qui ne voient pas l’image. Ajustez le cadrage et le point d’intérêt, puis vérifiez l’aperçu mobile. Un portrait s’édite dans **Équipe**, sur la fiche de la personne.
+
+Dans **Pages du site → Accueil → Images de l’accueil**, vous pouvez remplacer les fils dorés, le nautile, les racines, la boussole, l'arbre, le kintsugi, les ondes et les oiseaux par des images de la médiathèque. Sans remplacement, le site utilise les illustrations que Sara a proposées. Retirer une image de remplacement rétablit l'illustration initiale. Un champ distinct permet d'ajouter une **Photo de l’invitation finale** : il reste vide tant qu'une photographie adaptée n'a pas été fournie.
+
+Les portraits de Sara et d'Agnès ne sont pas remplacés par des visages inventés. Pour les photographies d'atelier ou de personnes, vérifiez les droits d'utilisation et l'accord des personnes représentées. La provenance et les emplacements des illustrations sont indiqués dans [les évolutions du 1er novembre](EVOLUTIONS-20261101.md#sélection-des-images).
 
 Les médias restent privés tant qu’ils ne sont pas utilisés par un contenu publié. Remplacer le fichier d’une image partagée peut modifier ses différentes utilisations : l’opération est réservée à l’administrateur et demande une confirmation explicite. Pour changer seulement une page, sélectionnez une nouvelle image dans cette page. Un fichier lié à un contenu ou à une version conservée ne peut pas être supprimé.
 
@@ -73,7 +81,7 @@ En cas de coupure lors de la création, utilisez **Réessayer la création** sur
 
 ## Écrire directement un article
 
-1. Dans **Réflexions**, cliquez sur **Nouvelle réflexion**.
+1. Dans **Réflexions**, cliquez sur **Écrire un article** ; le raccourci du tableau de bord s'appelle **Nouvelle réflexion**.
 2. Renseignez le titre, le résumé et l’adresse lisible proposée à partir du titre. L’adresse d’un article déjà publié est protégée pour préserver les liens.
 3. Choisissez l’auteure réelle, une catégorie et la date, nécessaires à la publication. Si une catégorie ou une personne manque, enregistrez d’abord l’article, puis créez et publiez cette fiche avant de revenir.
 4. Rédigez dans **Texte de l’article**. La barre propose gras, italique, titres 2 et 3, listes, citation, liens, image, séparation et annulation. Le titre principal vient du champ Titre de l’article.
@@ -84,11 +92,31 @@ En cas de coupure lors de la création, utilisez **Réessayer la création** sur
 
 La mise en forme collée depuis un traitement de texte est nettoyée. Relisez les titres et les listes. Aucun article, témoignage, client, portrait ou résultat ne doit être inventé pour remplir le site.
 
+## Présenter un article déjà publié sur LinkedIn
+
+Les cinq liens transmis par Sara sont présentés comme des cartes modifiables : titre, date d'origine, auteure et court aperçu. Le bouton **Lire sur LinkedIn** ouvre le texte original. Les articles complets et leurs images n'ont pas été recopiés depuis LinkedIn.
+
+Pour modifier une de ces cartes, ouvrez-la dans **Réflexions**. Le groupe **Article publié sur LinkedIn** contient son adresse d'origine, qui doit commencer par `https://` et correspondre à un article LinkedIn. Le titre, le résumé, la catégorie, l'auteure et la date restent modifiables dans les champs habituels.
+
+Pour proposer ensuite une lecture complète sur Calas Conseil, ajoutez le texte validé dans **Rédaction**, ou préparez un article à partir de votre PDF original. Retirez le lien LinkedIn pour que le texte saisi soit affiché sur le site ; vérifiez l'aperçu puis publiez. Tant que le lien reste renseigné, le texte saisi est conservé mais les visiteurs sont dirigés vers l'article original. Un article local vide ne peut pas être publié.
+
+La catégorie permet de classer les articles. Les cinq liens reçus ne sont pas automatiquement présentés comme la série complète de six articles annoncée dans le brief. Voir [les publications reçues](ARTICLES-LINKEDIN.md).
+
 ## Vérifier les chiffres et les informations communes
 
-Dans **Chiffres et sources**, chaque indicateur possède sa valeur, son libellé, sa source, son lien, son millésime et ses précisions de périmètre. Vérifiez la source avant de cocher sa validation puis de publier. L’accueil permet de choisir les quatre chiffres affichés. Consultez [SOURCES.md](SOURCES.md) pour les formulations retenues.
+Dans **Chiffres et sources**, chaque indicateur possède sa valeur, son libellé, sa source, son lien, son millésime et ses précisions de périmètre. Vérifiez la source avant de cocher sa validation puis de publier. L’accueil permet de choisir **six chiffres** et leur ordre. Les indicateurs sont répartis entre « Ce que vivent les équipes » et « Les conséquences pour les organisations ». Consultez [SOURCES.md](SOURCES.md) pour les formulations retenues et l'actualisation WTW 2026.
 
-Les administrateurs modifient les coordonnées dans **Paramètres du site**. La marque et la signature sont protégées. LinkedIn reste vide tant que son adresse n’est pas confirmée. Le statut IPRP ne doit être activé qu’après contrôle réel de l’attestation ; les justificatifs privés restent conservés séparément.
+Les administrateurs modifient les coordonnées dans **Paramètres du site**. La marque et la signature sont protégées. Le lien vers le profil LinkedIn reste vide tant que son adresse exacte n'est pas confirmée ; cela n'empêche pas les cartes d'articles LinkedIn de fonctionner.
+
+Le numéro IPRP **2026.16.004**, transmis par Paul, est affiché avec le nom de Sara. Dans **Qualification IPRP**, l'état reste **Justificatif à contrôler — numéro déclaré affiché**. Ne choisissez **Justificatif contrôlé** qu'après examen réel de l'attestation et de sa validité. Les justificatifs privés restent conservés séparément ; le numéro ne doit pas être attribué à Agnès.
+
+## Coordonnées et formulaire
+
+Les **Horaires d’appel confirmés** et le **Délai de réponse annoncé** se règlent dans **Paramètres du site**. Laissez ces champs vides tant qu'ils ne sont pas décidés. Le téléphone de Calas Conseil n'est pas un service d'urgence.
+
+Le formulaire propose Diagnostic RPS, Atelier et compétences relationnelles, Management, Situation sensible et Autre. L'organisation, la fonction et le téléphone sont facultatifs. Le visiteur doit cocher lui-même son accord pour le traitement de la demande ; cet accord est aussi contrôlé par le serveur. La page de confidentialité présente ces champs.
+
+La seule adresse professionnelle demandée est **sara@calasconseil.fr**. Elle n'est pas encore créée : Paul confirme que le domaine n'est pas acheté et la proposition OVHcloud reste à approuver. Ne remplacez pas le courriel public par cette adresse avant que la boîte fonctionne. Le formulaire de recette affiche toujours un message de simulation et n'envoie aucun email. Les étapes de raccordement sont décrites dans [COURRIEL.md](COURRIEL.md).
 
 ## Revenir à une version précédente
 

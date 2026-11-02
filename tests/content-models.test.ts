@@ -6,13 +6,14 @@ import { prepareSeedPlan, stableContentId } from '../apps/web/src/server/content
 import { convertPortableText } from '../apps/web/src/server/content/legacy-rich-text';
 
 const id = stableContentId('media', 'fixture');
-test('le plan initial conserve dix pages, deux personnes et quatre chiffres sans faux article', () => {
+test('le plan initial contient les onze pages, deux personnes, six chiffres et cinq liens fournis par Sara', () => {
   const first = prepareSeedPlan(demoContent);
-  assert.equal(first.entries.length, 17);
+  assert.equal(first.entries.length, 26);
   assert.deepEqual(first, prepareSeedPlan(demoContent));
-  assert.equal(first.entries.filter(entry => ['home', 'page'].includes(entry.kind)).length, 10);
-  assert.equal(first.entries.filter(entry => entry.kind === 'article').length, 0);
-  assert.equal(new Set(first.entries.map(entry => entry.id)).size, 17);
+  assert.equal(first.entries.filter(entry => ['home', 'page'].includes(entry.kind)).length, 11);
+  assert.equal(first.entries.filter(entry => entry.kind === 'article').length, 5);
+  assert.equal(first.entries.filter(entry => entry.kind === 'statistic').length, 6);
+  assert.equal(new Set(first.entries.map(entry => entry.id)).size, 26);
   assert.deepEqual(first.warnings, []);
   const diagnostic = first.entries.find(entry => entry.content.slug === 'diagnostic-rps')!;
   assert.equal((diagnostic.content.sections as Array<{ presentation?: string; items?: unknown[] }>).find(section => section.presentation === 'method')!.items!.length, 5);

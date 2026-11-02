@@ -1,0 +1,7 @@
+---
+import type {Person,SiteSettings} from '../lib/cms/types';
+interface Props {settings:SiteSettings; person?:Person; compact?:boolean}
+const {settings,person,compact=false}=Astro.props;
+const registration=person&&settings.qualification.personId===person.id?settings.qualification.registration:undefined;
+---
+{registration&&person&&<aside class:list={['registration',{'registration-compact':compact}]} aria-label={`Enregistrement IPRP de ${person.name}`}><span class="registration-mark" aria-hidden="true">↗</span><div><p>{person.name}</p><p><strong>Numéro d’enregistrement d’IPRP : {registration}</strong></p></div></aside>}

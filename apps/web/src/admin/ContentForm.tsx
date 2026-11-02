@@ -286,57 +286,6 @@ export function ContentForm({
       </Field>
     );
   }
-  function strings(path: ContentPath, label: string) {
-    const list: string[] = readPath(value, path) ?? [];
-    return (
-      <div>
-        <span className="admin-hint">{label}</span>
-        {list.map((item, index) => (
-          <div className="admin-actions" key={index} style={{ marginTop: 8 }}>
-            <Field label={`${label} ${index + 1}`} className="flex-1">
-              {(id) => (
-                <input
-                  id={id}
-                  className="admin-input"
-                  value={item}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    update([...path, index], event.target.value)
-                  }
-                />
-              )}
-            </Field>
-            <Button
-              variant="ghost"
-              size="icon"
-              disabled={disabled}
-              aria-label={`Retirer ${label.toLowerCase()} ${index + 1}`}
-              onClick={() =>
-                update(
-                  path,
-                  list.filter((_, at) => at !== index),
-                )
-              }
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
-        ))}
-        {list.length < 6 && (
-          <Button
-            className="admin-repeat-add"
-            variant="secondary"
-            size="sm"
-            disabled={disabled}
-            onClick={() => update(path, [...list, ""])}
-          >
-            <Plus size={14} />
-            Ajouter un repère
-          </Button>
-        )}
-      </div>
-    );
-  }
   function items(path: ContentPath, label: string, fixedCount?: number) {
     const list: EditorialContent[] = readPath(value, path) ?? [];
     return (
@@ -511,8 +460,41 @@ export function ContentForm({
           {cta(["primaryCta"], "Lien prioritaire")}
           {cta(["secondaryCta"], "Second lien")}
         </Group>
+        <Group title="02 · Pourquoi maintenant" description="Le contexte et les besoins auxquels répond Calas Conseil.">
+          {texts([{name:"title",label:"Titre",rows:2},{name:"text",label:"Texte",rows:8}],["whyNow"])}
+        </Group>
+        <Group title="03 · Notre chemin en trois temps" description="Les trois cartes, leur destination et l’accès aux situations sensibles.">
+          {text({name:"domainsTitle",label:"Titre de la section",rows:2})}
+          {(value.journey?.cards??[]).map((card:EditorialContent,index:number)=><div className="admin-repeat-item" key={String(card.key??index)}><div className="admin-repeat-heading"><strong>Étape {index+1}</strong></div><div className="admin-fields">{texts([{name:"eyebrow",label:"Petit libellé"},{name:"title",label:"Titre",rows:2},{name:"text",label:"Présentation",rows:6}],["journey","cards",index])}{cta(["journey","cards",index,"cta"],"Lien de l’étape")}</div></div>)}
+          {texts([{name:"transition",label:"Phrase après les cartes",rows:2},{name:"sensitiveText",label:"Présentation des situations sensibles",rows:3}],["journey"])}
+          {cta(["journey","sensitiveCta"],"Situations sensibles")}
+        </Group>
         <Group
-          title="02 · Chiffres et sources"
+          title="04 · Notre conviction"
+          description="La pensée du cabinet et le lien vers notre approche."
+        >
+          {texts(
+            [
+              { name: "title", label: "Notre conviction — titre", rows: 2 },
+              { name: "text", label: "Notre conviction — texte", rows: 10 },
+            ],
+            ["conviction"],
+          )}
+          {cta(["conviction", "cta"])}
+        </Group>
+        <Group
+          title="05 · Pourquoi choisir Calas Conseil"
+          description="Le binôme, ses outils et son accompagnement. Les portraits se modifient dans Personnes."
+        >
+          {text({
+            name: "reasonsTitle",
+            label: "Titre de la section",
+            rows: 2,
+          })}
+          {items(["reasons"], "Raison", 3)}
+        </Group>
+        <Group
+          title="06 · Chiffres et sources"
           description="Le contexte qui donne du sens à la prévention."
         >
           {texts([
@@ -527,7 +509,7 @@ export function ContentForm({
             Les valeurs, les sources et leur vérification se règlent dans la
             rubrique dédiée.
           </p>
-          {[0, 1, 2, 3].map((index) => {
+          {[0, 1, 2, 3, 4, 5].map((index) => {
             const ids: string[] =
               value.statisticIds ??
               (value.statistics ?? []).map((item: EditorialContent) => item.id);
@@ -569,65 +551,18 @@ export function ContentForm({
             Modifier les chiffres et leurs sources
           </Button>
         </Group>
-        <Group
-          title="03 · Diagnostic prioritaire"
-          description="L’accompagnement central de Calas Conseil."
-        >
-          {texts(
-            [
-              { name: "title", label: "Titre", rows: 2 },
-              { name: "text", label: "Présentation du diagnostic", rows: 6 },
-            ],
-            ["diagnostic"],
-          )}
-          {cta(["diagnostic", "cta"])}
-          {image(["diagnostic", "image"], "Image du diagnostic")}
-        </Group>
-        <Group
-          title="04 · Pourquoi travailler ensemble"
-          description="Les trois raisons restent présentes dans la composition."
-        >
-          {text({
-            name: "reasonsTitle",
-            label: "Titre de la section",
-            rows: 2,
-          })}
-          {items(["reasons"], "Raison", 3)}
-        </Group>
-        <Group
-          title="05 · Accompagnements"
-          description="Les offres renvoient à leurs pages dédiées."
-        >
-          {texts([
-            { name: "domainsTitle", label: "Titre", rows: 2 },
-            { name: "domainsIntro", label: "Introduction", rows: 3 },
-          ])}
-          <p className="admin-hint">
-            Le résumé de chaque offre se modifie dans sa propre page.
-          </p>
-        </Group>
-        <Group
-          title="06 · Conviction et invitation"
-          description="La dernière impression laissée au visiteur."
-        >
-          {texts(
-            [
-              { name: "title", label: "Notre conviction — titre", rows: 2 },
-              { name: "text", label: "Notre conviction — texte", rows: 5 },
-            ],
-            ["conviction"],
-          )}
-          {cta(["conviction", "cta"])}
+        <Group title="07 · Invitation finale">
           {text({ name: "closingTitle", label: "Invitation finale", rows: 2 })}
           {cta(["closingCta"], "Lien final", true)}
+        </Group>
+        <Group title="Images de l’accueil" description="Les illustrations de Sara sont utilisées par défaut. Vous pouvez les remplacer par une image de votre médiathèque.">
+          {([['threads','Fils dorés — premier écran'],['nautilus','Nautile — pourquoi maintenant'],['roots','Racines — diagnostic'],['compass','Boussole — compétences relationnelles'],['tree','Arbre — management'],['kintsugi','Kintsugi — situations sensibles'],['ripples','Ondes — émotions'],['murmuration','Oiseaux — autonomie'],['closing','Photo de l’invitation finale']] as const).map(([key,label])=>image(["visuals",key],label))}
         </Group>
         <Group
           title="Repères et textes secondaires"
           description="Légendes, surtitres et petits textes autour des illustrations."
         >
-          {texts(homeEditorial, ["editorial"])}
-          {strings(["editorial", "heroDisciplines"], "Discipline")}
-          {strings(["editorial", "diagnosticArtLegend"], "Légende diagnostic")}
+          {texts(homeEditorial.filter(field=>["heroAudience","statisticsDescription","statisticsNote"].includes(field.name)), ["editorial"])}
           {cta(["editorial", "reasonsLink"], "Rencontre avec l’équipe", true)}
         </Group>
         {seo}
@@ -721,7 +656,7 @@ export function ContentForm({
             </Group>
           ),
         )}
-        {["diagnostic-rps", "equipes", "managers"].includes(value.slug) && (
+        {["diagnostic-rps", "equipes", "managers", "situations-sensibles"].includes(value.slug) && (
           <Group
             title="Présentation de l’offre"
             description="Résumé sur l’accueil et modalités confirmées."
@@ -828,8 +763,17 @@ export function ContentForm({
           </Field>
         </Group>
         <Group
+          title="Article publié sur LinkedIn"
+          description="Renseignez le lien original pour proposer sa lecture sur LinkedIn. Laissez ce champ vide pour publier le texte sur Calas Conseil."
+          open={Boolean(value.externalUrl)}
+        >
+          <Field label="Lien de l’article LinkedIn" hint="Une adresse HTTPS d’article LinkedIn, contenant /pulse/. Le titre, le résumé, l’auteure et la date restent modifiables ici.">
+            {(id) => <input id={id} className="admin-input" type="url" maxLength={2048} disabled={disabled} value={String(value.externalUrl ?? "")} placeholder="https://www.linkedin.com/pulse/…" onChange={(event) => update(["externalUrl"], event.target.value || undefined)} />}
+          </Field>
+        </Group>
+        <Group
           title="Rédaction"
-          description="Le contenu est mis en forme avec la typographie du site dans l’aperçu."
+          description={value.externalUrl ? "La carte ouvre l’article original sur LinkedIn. Le texte ci-dessous reste conservé et sera affiché sur le site si vous retirez le lien." : "Le contenu est mis en forme avec la typographie du site dans l’aperçu."}
           open
         >
           {rich(["body"], "Texte de l’article")}
@@ -987,6 +931,7 @@ export function ContentForm({
           "La source et son interprétation ont été vérifiées",
           "La publication ne rend visible le chiffre que si cette vérification est cochée.",
         )}
+        <Field label="Groupe sur l’accueil">{id=><select id={id} className="admin-select" value={value.group??"people"} disabled={disabled} onChange={event=>update(["group"],event.target.value)}><option value="people">Ce que vivent les équipes</option><option value="cost">Les conséquences pour les organisations</option></select>}</Field>
       </Group>
     );
   if (kind === "category")
@@ -1046,6 +991,8 @@ export function ContentForm({
             max: 400,
           },
           { name: "contactText", label: "Introduction du contact", rows: 4 },
+          { name: "contactHours", label: "Horaires d’appel confirmés", hint: "Laissez vide tant que les horaires ne sont pas arrêtés." },
+          { name: "responseTime", label: "Délai de réponse annoncé", hint: "Uniquement un délai que vous pouvez effectivement tenir." },
         ])}
       </Group>
       <Group
@@ -1063,7 +1010,7 @@ export function ContentForm({
                 update(["qualification", "status"], event.target.value)
               }
             >
-              <option value="pending">Non vérifiée — ne pas afficher</option>
+              <option value="pending">Justificatif à contrôler — numéro déclaré affiché</option>
               <option value="verified">Justificatif contrôlé</option>
             </select>
           )}
@@ -1095,7 +1042,7 @@ export function ContentForm({
             { name: "label", label: "Libellé public vérifié", max: 180 },
             {
               name: "registration",
-              label: "Référence, région et validité confirmées",
+              label: "Numéro d’enregistrement communiqué",
               max: 220,
             },
             {

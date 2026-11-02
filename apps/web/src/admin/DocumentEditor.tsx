@@ -910,6 +910,7 @@ const fieldLabels: Record<string, string> = {
   href: "Destination du lien",
   body: "Corps de l’article",
   excerpt: "Résumé",
+  externalUrl: "Lien de l’article LinkedIn",
   name: "Nom",
   role: "Fonction",
   bio: "Biographie",

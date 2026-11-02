@@ -825,7 +825,7 @@
 }
 .admin-input[readonly] {
   background: #f2f2ed;
-  color: #69717c;
+  color: var(--a-muted);
 }
 .admin-textarea {
   resize: vertical;

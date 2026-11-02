@@ -3,9 +3,9 @@ import nodemailer from 'nodemailer';
 import {env,isProductionSite} from './environment';
 import {clientAddress as resolveClientAddress} from '../server/client-address';
 
-export const subjects={diagnostic:'Diagnostic',equipes:'Équipes',managers:'Managers',autre:'Autre'} as const;
+export const subjects={diagnostic:'Diagnostic RPS',equipes:'Atelier et compétences relationnelles',managers:'Management',sensible:'Situation sensible',autre:'Autre'} as const;
 export type Subject=keyof typeof subjects;
-export interface ContactFields {name:string;company:string;email:string;subject:string;message:string}
+export interface ContactFields {name:string;company:string;jobTitle:string;email:string;phone:string;subject:string;message:string;consent:string}
 export interface ContactResult {ok:boolean;status:number;message:string;errors?:Partial<Record<keyof ContactFields,string>>;simulation?:boolean}
 const localKey=randomBytes(32).toString('hex');
 const ttl=60*60*1000;
@@ -17,7 +17,7 @@ export function createFormToken(){const value=`${Date.now()}.${randomBytes(18).t
 function validToken(token:string){
   try{const parts=token.split('.');if(parts.length!==3||token.length>180)return false;const time=Number(parts[0]);if(!Number.isFinite(time)||time>Date.now()+1000||Date.now()-time>ttl)return false;const expected=Buffer.from(sign(`${parts[0]}.${parts[1]}`));const supplied=Buffer.from(parts[2]||'');return expected.length===supplied.length&&timingSafeEqual(expected,supplied);}catch{return false;}
 }
-export const emptyFields:ContactFields={name:'',company:'',email:'',subject:'autre',message:''};
+export const emptyFields:ContactFields={name:'',company:'',jobTitle:'',email:'',phone:'',subject:'autre',message:'',consent:''};
 export async function readBoundedForm(request:Request):Promise<FormData>{
   if(!request.headers.get('content-type')?.startsWith('application/x-www-form-urlencoded'))throw new Error('Unsupported content type');
   if(Number(request.headers.get('content-length')||0)>65536)throw new RangeError('Body too large');
@@ -27,15 +27,18 @@ export async function readBoundedForm(request:Request):Promise<FormData>{
 }
 export function readFields(form:FormData):ContactFields{
   const get=(name:string,max:number)=>{const value=form.get(name);return typeof value==='string'?value.trim().slice(0,max+1):'';};
-  return {name:get('name',100),company:get('company',160),email:get('email',254),subject:get('subject',30),message:get('message',5000)};
+  return {name:get('name',100),company:get('company',160),jobTitle:get('jobTitle',120),email:get('email',254),phone:get('phone',40),subject:get('subject',30),message:get('message',5000),consent:get('consent',3)};
 }
 export function validateFields(fields:ContactFields){
   const errors:Partial<Record<keyof ContactFields,string>>={};
   if(fields.name.length<2||fields.name.length>100||/[\r\n]/.test(fields.name))errors.name='Indiquez votre nom (2 à 100 caractères).';
   if(fields.company.length>160||/[\r\n]/.test(fields.company))errors.company='Limitez le nom de l’entreprise à 160 caractères.';
+  if(fields.jobTitle.length>120||/[\r\n]/.test(fields.jobTitle))errors.jobTitle='Limitez votre fonction à 120 caractères, sur une seule ligne.';
   if(fields.email.length>254||!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(fields.email))errors.email='Indiquez une adresse courriel valide.';
+  if(fields.phone&&(fields.phone.length>40||!/^\+?[0-9 ().-]+$/.test(fields.phone)||fields.phone.replace(/\D/g,'').length<6||fields.phone.replace(/\D/g,'').length>15))errors.phone='Indiquez un numéro de téléphone valide ou laissez ce champ vide.';
   if(!Object.hasOwn(subjects,fields.subject))errors.subject='Choisissez un objet dans la liste.';
   if(fields.message.length<10||fields.message.length>5000)errors.message='Votre message doit contenir entre 10 et 5 000 caractères.';
+  if(fields.consent!=='yes')errors.consent='Votre accord est nécessaire pour traiter les informations de cette demande.';
   return errors;
 }
 function prune(){const now=Date.now();for(const [key,value]of rates)if(value.expires<now)rates.delete(key);for(const [key,value]of submissions)if(value.expires<now)submissions.delete(key);}
@@ -51,7 +54,7 @@ async function transport(fields:ContactFields):Promise<ContactResult>{
   if(!env('SMTP_HOST')||!env('SMTP_FROM')||!recipient||!env('SMTP_USER')||!env('SMTP_PASS'))return {ok:false,status:503,message:'L’envoi est momentanément indisponible. Contactez-nous directement par téléphone ou courriel.'};
   const mailer=nodemailer.createTransport({host:env('SMTP_HOST'),port:Number(env('SMTP_PORT','587')),secure:env('SMTP_SECURE')==='true',requireTLS:env('SMTP_SECURE')!=='true',auth:{user:env('SMTP_USER'),pass:env('SMTP_PASS')},connectionTimeout:8000,greetingTimeout:8000,socketTimeout:10000,logger:false,debug:false});
   try{
-    const result=await mailer.sendMail({from:env('SMTP_FROM'),to:recipient,replyTo:{name:fields.name,address:fields.email},subject:`Calas Conseil — ${subjects[fields.subject as Subject]}`,text:`Nom : ${fields.name}\nEntreprise : ${fields.company||'Non renseignée'}\nCourriel : ${fields.email}\nObjet : ${subjects[fields.subject as Subject]}\n\n${fields.message}`,disableFileAccess:true,disableUrlAccess:true});
+    const result=await mailer.sendMail({from:env('SMTP_FROM'),to:recipient,replyTo:{name:fields.name,address:fields.email},subject:`Calas Conseil — ${subjects[fields.subject as Subject]}`,text:`Nom : ${fields.name}\nOrganisation : ${fields.company||'Non renseignée'}\nFonction : ${fields.jobTitle||'Non renseignée'}\nCourriel : ${fields.email}\nTéléphone : ${fields.phone||'Non renseigné'}\nObjet : ${subjects[fields.subject as Subject]}\nAccord pour le traitement de la demande : oui\n\n${fields.message}`,disableFileAccess:true,disableUrlAccess:true});
     if(!result.accepted?.length)throw new Error('Not accepted');
     return {ok:true,status:200,message:'Votre demande a bien été envoyée. Merci pour votre confiance ; nous reviendrons vers vous.'};
   }catch{return {ok:false,status:503,message:'Le serveur de courriel n’a pas confirmé l’envoi. Votre saisie est conservée. Réessayez dans un instant ou contactez-nous directement.'};}finally{mailer.close();}

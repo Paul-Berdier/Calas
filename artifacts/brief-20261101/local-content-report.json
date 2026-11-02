@@ -1,0 +1,531 @@
+{
+  "environment": "local development only",
+  "operation": "cahier-311026",
+  "documents": [
+    {
+      "kind": "person",
+      "slug": "",
+      "title": "Sara Serrano Cabeza",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "person",
+      "slug": "",
+      "title": "Agnès Loupias",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "statistic",
+      "slug": "",
+      "title": "39 %",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "statistic",
+      "slug": "",
+      "title": "1 sur 2",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "statistic",
+      "slug": "",
+      "title": "8 %",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "created"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "statistic",
+      "slug": "",
+      "title": "4,95 %",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "created"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "statistic",
+      "slug": "",
+      "title": "38 jours",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "created"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "statistic",
+      "slug": "",
+      "title": "9 %",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "created"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "settings",
+      "slug": "",
+      "title": "Paramètres du site",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "home",
+      "slug": "",
+      "title": "Accueil",
+      "version": 5,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        },
+        {
+          "version": 4,
+          "action": "saved"
+        },
+        {
+          "version": 5,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "page",
+      "slug": "contact",
+      "title": "Et si nous prenions\nle temps d’en parler ?",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "page",
+      "slug": "diagnostic-rps",
+      "title": "Voir clair avant d’agir",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "page",
+      "slug": "equipes",
+      "title": "Développer ses compétences relationnelles",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "page",
+      "slug": "managers",
+      "title": "Faire du manager un professionnel du lien",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "page",
+      "slug": "situations-sensibles",
+      "title": "Quand la relation se tend, agir vite et juste",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "page",
+      "slug": "notre-approche",
+      "title": "Le lien ne se décrète pas.\nIl se construit dans l’altérité.",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "page",
+      "slug": "qui-sommes-nous",
+      "title": "Deux parcours.\nUn même regard sur le lien.",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "page",
+      "slug": "confidentialite",
+      "title": "Confidentialité",
+      "version": 3,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "imported"
+        },
+        {
+          "version": 2,
+          "action": "saved"
+        },
+        {
+          "version": 3,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "category",
+      "slug": "management-qualite-du-lien",
+      "title": "Management et qualité du lien",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "created"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "article",
+      "slug": "manager-xxie-siecle",
+      "title": "Manager au XXIe siècle, c’est comprendre ce qui fait sens pour un être humain",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "created"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "article",
+      "slug": "chacun-sa-version-de-la-realite",
+      "title": "Personne ne voit la réalité. Chacun voit sa version de la réalité.",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "created"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "article",
+      "slug": "cinq-drivers-management-sous-pression",
+      "title": "Les 5 drivers qui façonnent votre management sous pression",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "created"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "article",
+      "slug": "motiver-engager-sens",
+      "title": "Il y a une différence entre motiver et engager, et cette différence s’appelle le sens.",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "created"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    },
+    {
+      "kind": "article",
+      "slug": "le-lien-qui-libere-le-lien-qui-enferme",
+      "title": "Le lien qui libère, le lien qui enferme.",
+      "version": 2,
+      "status": "published",
+      "remainingChanges": 0,
+      "hasUnpublishedChanges": false,
+      "history": [
+        {
+          "version": 1,
+          "action": "created"
+        },
+        {
+          "version": 2,
+          "action": "published"
+        }
+      ]
+    }
+  ],
+  "verified": {
+    "statistics": 6,
+    "articles": 5,
+    "registration": "2026.16.004",
+    "qualificationStatus": "pending",
+    "newPagePublished": true,
+    "allPublished": true,
+    "idempotent": true
+  }
+}

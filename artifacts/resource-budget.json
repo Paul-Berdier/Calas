@@ -1,20 +1,25 @@
 {
-  "javascriptGzipBytes": 32544,
-  "totalDecodedBytes": 247326,
+  "javascriptGzipBytes": 32613,
+  "totalDecodedBytes": 374354,
   "resources": [
     {
       "url": "http://127.0.0.1:4322/",
-      "bytes": 35551,
+      "bytes": 31156,
       "type": "document"
     },
     {
-      "url": "http://127.0.0.1:4322/_astro/Layout.X27EFFRg.css",
-      "bytes": 16170,
+      "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-400-normal.B-1hWBU7.woff2",
+      "bytes": 22876,
+      "type": "font"
+    },
+    {
+      "url": "http://127.0.0.1:4322/_astro/Layout.Bc3Np10s.css",
+      "bytes": 18453,
       "type": "stylesheet"
     },
     {
-      "url": "http://127.0.0.1:4322/_astro/index.BDyjYs4K.css",
-      "bytes": 13662,
+      "url": "http://127.0.0.1:4322/_astro/index.UpuLnVaw.css",
+      "bytes": 10462,
       "type": "stylesheet"
     },
     {
@@ -23,14 +28,9 @@
       "type": "image"
     },
     {
-      "url": "http://127.0.0.1:4322/brand/wordmark-dark.svg",
-      "bytes": 14328,
+      "url": "http://127.0.0.1:4322/images/symbols/threads.webp",
+      "bytes": 19942,
       "type": "image"
-    },
-    {
-      "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-400-normal.B-1hWBU7.woff2",
-      "bytes": 22876,
-      "type": "font"
     },
     {
       "url": "http://127.0.0.1:4322/_astro/eb-garamond-latin-400-normal.BCNrxLz_.woff2",
@@ -38,19 +38,59 @@
       "type": "font"
     },
     {
+      "url": "http://127.0.0.1:4322/brand/wordmark-dark.svg",
+      "bytes": 14328,
+      "type": "image"
+    },
+    {
       "url": "http://127.0.0.1:4322/_astro/cormorant-garamond-latin-400-italic.Dc_OZ8oc.woff2",
       "bytes": 23660,
       "type": "font"
     },
     {
-      "url": "http://127.0.0.1:4322/_astro/Layout.astro_astro_type_script_index_0_lang.BkteO47d.js",
-      "bytes": 81266,
+      "url": "http://127.0.0.1:4322/_astro/Layout.astro_astro_type_script_index_0_lang.3GORc6es.js",
+      "bytes": 81618,
       "type": "script"
     },
     {
       "url": "http://127.0.0.1:4322/_astro/preload-helper.DHhhL8Zf.js",
       "bytes": 1665,
       "type": "script"
+    },
+    {
+      "url": "http://127.0.0.1:4322/images/symbols/nautilus.webp",
+      "bytes": 12642,
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4322/images/symbols/roots.webp",
+      "bytes": 17464,
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4322/images/symbols/compass.webp",
+      "bytes": 13952,
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4322/images/symbols/tree.webp",
+      "bytes": 19692,
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4322/images/symbols/kintsugi.webp",
+      "bytes": 10690,
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4322/images/symbols/ripples.webp",
+      "bytes": 13676,
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4322/images/symbols/murmuration.webp",
+      "bytes": 23930,
+      "type": "image"
     }
   ]
 }

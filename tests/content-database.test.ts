@@ -31,14 +31,31 @@ test('persistance PostgreSQL réelle, publication et isolation des révisions', 
     const plan = prepareSeedPlan(demoContent);
     await suite.test('initialisation idempotente sans remplacement des contenus', async () => {
       const first = await seedDocuments(plan.entries, { publish: true });
-      assert.equal(first.filter(entry => entry.result === 'created').length, 17);
+      assert.equal(first.filter(entry => entry.result === 'created').length, 26);
       const second = await seedDocuments(plan.entries, { publish: true });
-      assert.equal(second.filter(entry => entry.result === 'skipped').length, 17);
+      assert.equal(second.filter(entry => entry.result === 'skipped').length, 26);
       const publicContent = await readSiteContent();
-      assert.equal(publicContent.pages.length, 9);
-      assert.equal(publicContent.home.statistics.length, 4);
-      assert.equal(publicContent.articles.length, 0);
+      assert.equal(publicContent.pages.length, 10);
+      assert.equal(publicContent.home.statistics.length, 6);
+      assert.equal(publicContent.articles.length, 5);
+      assert(publicContent.articles.every(article => article.externalUrl?.startsWith('https://www.linkedin.com/pulse/')));
+      assert(publicContent.articles.every(article => article.body.content.length === 0));
       assert.equal(publicContent.home.title, demoContent.home.title);
+    });
+    await suite.test('le numéro IPRP déclaré reste pending et exige une titulaire publiée', async () => {
+      const qualification = (await readSiteContent()).settings.qualification;
+      assert.equal(qualification.status, 'pending');
+      assert.equal(qualification.registration, '2026.16.004');
+      assert(qualification.personId);
+      assert.equal(qualification.label, undefined);
+      const settings = plan.entries.find(entry => entry.kind === 'settings')!;
+      const original = await getContent(settings.id);
+      const saved = await saveContent(settings.id, { ...original.content, qualification: { status: 'pending', registration: '2026.16.004' } }, original.version, admin);
+      const published = await publishContent(settings.id, saved.version, admin);
+      assert.deepEqual((await readSiteContent()).settings.qualification, { status: 'pending' });
+      const restored = await saveContent(settings.id, original.content, published.version, admin);
+      await publishContent(settings.id, restored.version, admin);
+      assert.equal((await readSiteContent()).settings.qualification.registration, '2026.16.004');
     });
     const home = plan.entries.find(entry => entry.kind === 'home')!;
     await suite.test('enregistrer ne modifie pas le public et la publication est atomique', async () => {
@@ -105,10 +122,11 @@ test('persistance PostgreSQL réelle, publication et isolation des révisions', 
       const same = await createContent('article', articleInput, admin, { id: article.id });
       assert.equal(same.id, article.id);
       await assert.rejects(createContent('article', { ...articleInput, title: 'Autre' }, admin, { id: article.id }), errorCode('IDEMPOTENCY_CONFLICT'));
-      assert.equal((await listContent('articles')).length, 1);
+      assert.equal((await listContent('articles')).length, 6);
     });
     await suite.test('le PDF et l’article brouillons sont privés et la relecture bloque la publication', async () => {
-      assert.equal((await readSiteContent()).articles.length, 0);
+      assert.equal((await readSiteContent()).articles.length, 5);
+      assert.equal((await readSiteContent()).articles.some(item => item.id === article.id), false);
       assert.equal(await isMediaPublished(pdfId, { download: true }), false);
       assert.equal(await mediaIsReferenced(pdfId), true);
       await assert.rejects(publishContent(article.id, article.version, admin), errorCode('PUBLICATION_INCOMPLETE'));
@@ -118,19 +136,20 @@ test('persistance PostgreSQL réelle, publication et isolation des révisions', 
     await suite.test('publication du PDF autorisé, édition isolée et révocation à la dépublication', async () => {
       article = await saveContent(article.id, { ...article.content, pdfImport: { pageCount: 1, ocrPages: 0, reviewed: true } }, article.version, admin);
       article = await publishContent(article.id, article.version, admin);
-      assert.equal((await readSiteContent()).articles[0]!.title, 'Article de recette');
+      assert.equal((await readSiteContent()).articles.find(item => item.id === article.id)!.title, 'Article de recette');
       assert.equal(await isMediaPublished(pdfId, { download: true }), true);
       article = await saveContent(article.id, { ...article.content, title: 'Article modifié non publié' }, article.version, admin);
-      assert.equal((await readSiteContent()).articles[0]!.title, 'Article de recette');
+      assert.equal((await readSiteContent()).articles.find(item => item.id === article.id)!.title, 'Article de recette');
       article = await changePublication(article.id, article.version, admin, 'unpublish');
-      assert.equal((await readSiteContent()).articles.length, 0);
+      assert.equal((await readSiteContent()).articles.length, 5);
+      assert.equal((await readSiteContent()).articles.some(item => item.id === article.id), false);
       assert.equal(await isMediaPublished(pdfId, { download: true }), false);
     });
     await suite.test('un PDF non autorisé reste privé même après publication de l’article', async () => {
       article = await saveContent(article.id, { ...article.content, allowPdfDownload: false }, article.version, admin);
       article = await publishContent(article.id, article.version, admin);
       assert.equal(await isMediaPublished(pdfId), false);
-      assert.equal((await readSiteContent()).articles[0]!.sourcePdf, undefined);
+      assert.equal((await readSiteContent()).articles.find(item => item.id === article.id)!.sourcePdf, undefined);
     });
     await suite.test('les liens utilisés, slugs uniques et médias historiques sont protégés', async () => {
       const person = await getContent(author.id);
@@ -144,8 +163,8 @@ test('persistance PostgreSQL réelle, publication et isolation des révisions', 
     });
     await suite.test('les métriques du tableau de bord correspondent aux contenus persistés', async () => {
       const result = await dashboard();
-      assert.equal(result.counts.pages, 10);
-      assert.equal(result.counts.articlesPublished, 1);
+      assert.equal(result.counts.pages, 11);
+      assert.equal(result.counts.articlesPublished, 6);
       assert.equal(result.counts.media, 1);
       assert(result.recent.length > 0);
       assert(result.recentPublications.length > 0);

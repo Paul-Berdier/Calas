@@ -15,7 +15,7 @@ export interface ContentFile {
 }
 export interface Statistic {
   id: string; value: string; label: string; source: string; sourceUrl: string;
-  year: string; note: string; verified: boolean;
+  year: string; note: string; verified: boolean; group?: 'people' | 'cost';
 }
 export interface Person { id: string; name: string; role: string; bio?: string; portrait?: ContentImage }
 export interface Section {
@@ -38,16 +38,25 @@ export interface Page {
 export interface Article {
   id: string; slug: string; title: string; date: string; excerpt: string;
   body: RichDocument; author?: Person; category?: { title: string; slug?: string };
-  image?: ContentImage; sourcePdf?: ContentFile; seo?: Seo;
+  image?: ContentImage; sourcePdf?: ContentFile; seo?: Seo; externalUrl?: string;
 }
 export interface SiteSettings {
   brand: string; tagline: string; phone: string; email: string; linkedin?: string;
   qualification: { status: 'pending' | 'verified'; label?: string; registration?: string; personId?: string };
   footerText?: string;
   contactText?: string;
+  contactHours?: string;
+  responseTime?: string;
 }
+export type HomeVisualName = 'threads' | 'nautilus' | 'roots' | 'compass' | 'tree' | 'kintsugi' | 'ripples' | 'murmuration' | 'closing';
 export interface Home {
   eyebrow: string; title: string; intro: string; primaryCta: Cta; secondaryCta: Cta;
+  visuals?: Partial<Record<HomeVisualName, ContentImage>>;
+  whyNow?: { title: string; text: string };
+  journey?: {
+    cards: Array<{ key: string; eyebrow: string; title: string; text: string; cta: Cta }>;
+    transition: string; sensitiveText: string; sensitiveCta: Cta;
+  };
   statistics: Statistic[]; statisticsTitle?: string; statisticsTransition?: string;
   diagnostic: { title: string; text: string; cta: Cta; image?: ContentImage };
   reasons: Array<{ key?: string; title: string; text: string }>;

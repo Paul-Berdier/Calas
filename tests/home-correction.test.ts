@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { demoContent } from '../apps/web/src/lib/cms/demo';
+import { previousBrief as demoContent } from '../scripts/content-correct-brief-20261101';
 import { homeSchema } from '../apps/web/src/server/content/models';
 import { prepareSeedPlan } from '../apps/web/src/server/content/seed-plan';
 import { assertLocalTarget, corrected, hasOnlyCorrectionChanges, planCorrection, previous } from '../scripts/content-correct-home-20261026';
@@ -51,7 +51,7 @@ test('une modification concurrente ou éditoriale d’un champ ciblé est refus�
   assert.deepEqual(home, original);
 });
 
-test('la correction déjà présente est idempotente et les textes de démo concordent', () => {
+test('la correction déjà présente est idempotente et le snapshot du 26 octobre concorde', () => {
   const first = planCorrection(oldHome());
   const repeated = planCorrection(first.content);
   assert.equal(repeated.changes.length, 0);

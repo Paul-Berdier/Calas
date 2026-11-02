@@ -10,6 +10,7 @@ playwright-report/
 .cache/
 *.log
 backups/
+/tmp/
 artifacts/lighthouse*.json
 apps/web/public/_preview/
 apps/studio/public/ocr/

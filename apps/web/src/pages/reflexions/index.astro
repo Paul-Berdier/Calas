@@ -7,6 +7,7 @@ import SectionMedia from '../../components/SectionMedia.astro';
 import EditorialLines from '../../components/EditorialLines.astro';
 import {getSiteContent} from '../../lib/cms/client';
 import {safeHref} from '../../lib/links';
+import {isLinkedInArticleUrl} from '../../lib/article-links';
 import '../../styles/contact-editorial.css';
 const {settings,articles,pages}=await getSiteContent(Astro);
 const content=pages.find(page=>page.slug==='reflexions');
@@ -24,9 +25,9 @@ const seriesCta=journal.seriesCta??{label:'Découvrir notre conviction',href:'/n
 
   {articles.length ? <section class="journal-publications wrap" aria-label="Les réflexions publiées">
     {articles.map((article,index)=><article class:list={['journal-entry',{'journal-entry-featured':index===0}]}>
-      <a class="journal-entry-link" href={`/reflexions/${article.slug}/`}>
+      <a class="journal-entry-link" href={isLinkedInArticleUrl(article.externalUrl)?article.externalUrl:`/reflexions/${article.slug}/`} rel={isLinkedInArticleUrl(article.externalUrl)?'external noopener noreferrer':undefined}>
         {article.image&&<div class="journal-entry-image"><CmsImage image={article.image} width={index===0?1000:700} height={index===0?650:455} sizes="(max-width: 430px) 90vw, 45vw"/></div>}
-        <div class="journal-entry-content"><p class="journal-meta"><time datetime={article.date}>{article.date?new Intl.DateTimeFormat('fr-FR',{dateStyle:'long'}).format(new Date(article.date)):'Brouillon'}</time>{article.category&&<span>{article.category.title}</span>}</p><h2>{article.title}</h2><p class="journal-entry-excerpt">{article.excerpt}</p><div class="journal-entry-footer"><span>Par {article.author?.name||'Auteur à renseigner'}</span><span>Lire la réflexion <span aria-hidden="true">↗</span></span></div></div>
+        <div class="journal-entry-content"><p class="journal-meta"><time datetime={article.date}>{article.date?new Intl.DateTimeFormat('fr-FR',{dateStyle:'long'}).format(new Date(article.date)):'Brouillon'}</time>{article.category&&<span>{article.category.title}</span>}</p><h2>{article.title}</h2><p class="journal-entry-excerpt">{article.excerpt}</p><div class="journal-entry-footer"><span>Par {article.author?.name||'Auteur à renseigner'}</span><span>{isLinkedInArticleUrl(article.externalUrl)?'Lire sur LinkedIn':'Lire la réflexion'} <span aria-hidden="true">↗</span></span></div></div>
       </a>
     </article>)}
   </section> : <section class="journal-coming wrap" aria-labelledby="first-series-title">

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isLinkedInArticleUrl } from '../../lib/article-links';
 
 export const CONTENT_KINDS = ['home', 'page', 'article', 'person', 'statistic', 'category', 'settings'] as const;
 export type ContentKind = typeof CONTENT_KINDS[number];
@@ -99,7 +100,7 @@ export const sectionSchema = z.object({
 const pageEditorial = z.object({ artTop: optionalText(180), artBottom: optionalText(180), methodLinkLabel: optionalText(120), invitationEyebrow: optionalText(140), invitationTitle: optionalText(220) }).strict();
 const journalEditorial = z.object({ baseline: optionalText(300), topics: optionalText(300), seriesEyebrow: optionalText(140), seriesStatus: optionalText(140), seriesTitle: optionalText(220), seriesText: optionalText(2000), seriesCta: ctaSchema.optional(), exploreEyebrow: optionalText(140), exploreTitle: optionalText(220) }).strict();
 const contactEditorial = z.object({ formEyebrow: optionalText(140), formTitle: optionalText(220), directHeading: optionalText(220), context: optionalText(2000), linkedinLabel: optionalText(140) }).strict();
-export const PAGE_SLUGS = ['diagnostic-rps', 'equipes', 'managers', 'notre-approche', 'qui-sommes-nous', 'reflexions', 'contact', 'mentions-legales', 'confidentialite'] as const;
+export const PAGE_SLUGS = ['diagnostic-rps', 'equipes', 'managers', 'situations-sensibles', 'notre-approche', 'qui-sommes-nous', 'reflexions', 'contact', 'mentions-legales', 'confidentialite'] as const;
 export const pageSchema = z.object({
   id: optionalId, slug: z.enum(PAGE_SLUGS), title: required(250), eyebrow: optionalText(140), intro: required(4000),
   sections: z.array(sectionSchema).max(16), cta: ctaSchema.optional(), image: imageSchema.optional(), seo: seoSchema.optional(),
@@ -110,13 +111,13 @@ export const pageSchema = z.object({
   if (page.slug === 'diagnostic-rps' && !page.sections.some(section => section.presentation === 'method' && section.items?.length === 5)) context.addIssue({ code: 'custom', path: ['sections'], message: 'Le Diagnostic doit conserver sa méthode en cinq étapes.' });
   if (page.slug === 'diagnostic-rps' && ['signaux', 'etapes', 'regards', 'livrables', 'confiance', 'questions', 'prevention'].some(key => !page.sections.some(section => section.key === key))) context.addIssue({ code: 'custom', path: ['sections'], message: 'Les sections essentielles du Diagnostic sont protégées ; leurs textes restent modifiables.' });
 });
-export const statisticSchema = z.object({ id: optionalId, value: required(80), label: required(800), source: required(300), sourceUrl: httpsUrl, year: required(150), note: required(2000), verified: z.boolean(), observationPeriod: optionalText(150), publicationYear: z.number().int().min(1900).max(2200).optional(), order: z.number().int().min(0).max(1000).optional() }).strict();
+export const statisticSchema = z.object({ id: optionalId, value: required(80), label: required(800), source: required(300), sourceUrl: httpsUrl, year: required(150), note: required(2000), verified: z.boolean(), group: z.enum(['people', 'cost']).optional(), observationPeriod: optionalText(150), publicationYear: z.number().int().min(1900).max(2200).optional(), order: z.number().int().min(0).max(1000).optional() }).strict();
 export const personSchema = z.object({ id: optionalId, name: required(150), role: required(600), bio: optionalText(8000), portrait: imageSchema.optional(), order: z.number().int().min(0).max(1000).optional() }).strict();
 export const categorySchema = z.object({ id: optionalId, title: required(100), slug: slugSchema, description: optionalText(1000) }).strict();
 export const settingsSchema = z.object({
   brand: z.literal('Calas Conseil'), tagline: z.literal('La voie de la qualité relationnelle.'), phone: z.string().regex(/^[+\d\s().-]{10,25}$/), email: z.string().email().max(254), linkedin: z.union([z.literal(''), httpsUrl.refine(value => /^https:\/\/(www\.)?linkedin\.com\//.test(value))]).optional(),
   qualification: z.object({ status: z.enum(['pending', 'verified']), label: optionalText(220), registration: optionalText(300), personId: optionalId, validUntil: z.string().date().optional() }).strict().refine(value => value.status !== 'verified' || Boolean(value.personId && value.label), 'Sélectionnez la titulaire et un libellé vérifié.'),
-  footerText: optionalText(700), contactText: optionalText(1200),
+  footerText: optionalText(700), contactText: optionalText(1200), contactHours: optionalText(300), responseTime: optionalText(300),
 }).strict();
 const homeEditorial = z.object({
   heroAudience: optionalText(300), heroDisciplines: z.array(short(100)).max(8).optional(), heroArtTop: optionalText(180), heroArtBottom: optionalText(180), heroArtCaption: optionalText(300), exploreLabel: optionalText(120),
@@ -126,7 +127,13 @@ const homeEditorial = z.object({
 }).strict();
 export const homeSchema = z.object({
   eyebrow: required(180), title: required(350), intro: required(2500), primaryCta: ctaSchema, secondaryCta: ctaSchema,
-  statistics: z.array(statisticSchema).max(4).default([]), statisticIds: z.array(uuid).max(4).optional(), statisticsTitle: optionalText(250), statisticsTransition: optionalText(1000),
+  visuals: z.object({
+    threads: imageSchema.optional(), nautilus: imageSchema.optional(), roots: imageSchema.optional(), compass: imageSchema.optional(), tree: imageSchema.optional(),
+    kintsugi: imageSchema.optional(), ripples: imageSchema.optional(), murmuration: imageSchema.optional(), closing: imageSchema.optional(),
+  }).strict().optional(),
+  whyNow: z.object({ title: required(250), text: required(2500) }).strict().optional(),
+  journey: z.object({ cards: z.array(z.object({ key: required(100), eyebrow: required(140), title: required(220), text: required(2500), cta: ctaSchema }).strict()).length(3), transition: required(1000), sensitiveText: required(1200), sensitiveCta: ctaSchema }).strict().optional(),
+  statistics: z.array(statisticSchema).max(6).default([]), statisticIds: z.array(uuid).max(6).optional(), statisticsTitle: optionalText(250), statisticsTransition: optionalText(1000),
   diagnostic: z.object({ title: required(250), text: required(2500), cta: ctaSchema, image: imageSchema.optional() }).strict(),
   reasons: z.array(item).length(3, 'L’accueil doit conserver ses trois raisons.'), reasonsTitle: optionalText(250), domainsTitle: optionalText(250), domainsIntro: optionalText(1200),
   conviction: z.object({ title: required(250), text: required(2500), cta: ctaSchema }).strict(), closingTitle: optionalText(250), closingCta: ctaSchema.optional(), seo: seoSchema.optional(), editorial: homeEditorial.optional(),
@@ -137,6 +144,7 @@ export const homeSchema = z.object({
 });
 export const articleSchema = z.object({
   title: required(250), slug: slugSchema, excerpt: short(700), body: richDocumentSchema,
+  externalUrl: httpsUrl.refine(isLinkedInArticleUrl, 'Utilisez l’adresse HTTPS de l’article LinkedIn.').optional(),
   authorId: optionalId, categoryId: optionalId, date: z.string().datetime({ offset: true }).optional(), image: imageSchema.optional(), sourcePdf: fileSchema.optional(),
   allowPdfDownload: z.boolean().default(false), pdfImport: z.object({ pageCount: z.number().int().min(1).max(40), ocrPages: z.number().int().min(0).max(40), reviewed: z.boolean() }).strict().optional(), seo: seoSchema.optional(),
 }).strict();
@@ -170,7 +178,7 @@ export function assertPublishable(kind: ContentKind, content: Record<string, unk
     if (!article.categoryId) fields.categoryId = 'Choisissez une catégorie.';
     if (!article.date || new Date(article.date).getTime() > Date.now()) fields.date = 'Indiquez une date de publication qui ne soit pas dans le futur.';
     if (!article.excerpt.trim()) fields.excerpt = 'Ajoutez un résumé.';
-    if (!hasRichContent(article.body)) fields.body = 'L’article ne contient pas encore de texte.';
+    if (!article.externalUrl && !hasRichContent(article.body)) fields.body = 'L’article ne contient pas encore de texte.';
     if ((article.pdfImport || article.sourcePdf) && !article.pdfImport?.reviewed) fields.pdfImport = 'Confirmez la relecture du document importé.';
     if (Object.keys(fields).length) throw new ContentError(422, 'PUBLICATION_INCOMPLETE', 'Complétez la relecture avant publication.', fields);
   }

@@ -315,8 +315,16 @@ export async function readSiteContent(options: { preview?: boolean } = {}): Prom
     home.statistics = (home.statisticIds as string[] || []).map(id => byId.get(id)).filter(row => row?.document.kind === 'statistic' && (options.preview || row.revision.content.verified === true)).map(row => contentOf(row!));
     delete home.statisticIds;
     const settings = contentOf(settingsRow);
-    const qualification = settings.qualification as { status: string; personId?: string; validUntil?: string };
-    if (qualification.status !== 'verified' || !qualification.personId || !byId.has(qualification.personId) || (qualification.validUntil && qualification.validUntil < new Date().toISOString().slice(0, 10))) settings.qualification = { status: 'pending' };
+    const qualification = settings.qualification as { status: string; registration?: string; personId?: string; validUntil?: string };
+    const holder = qualification.personId ? byId.get(qualification.personId) : undefined;
+    const hasHolder = holder?.document.kind === 'person' && (options.preview || holder.document.status === 'published');
+    const expired = qualification.validUntil && qualification.validUntil < new Date().toISOString().slice(0, 10);
+    if (!hasHolder || expired) settings.qualification = { status: 'pending' };
+    // The registration supplied by the owner is publishable as a declaration. It never
+    // turns a pending qualification into verified or exposes an unverified badge label.
+    else if (qualification.status !== 'verified') settings.qualification = qualification.registration
+      ? { status: 'pending', registration: qualification.registration, personId: qualification.personId }
+      : { status: 'pending' };
     const publicArticles = rows.filter(row => row.document.kind === 'article').map(row => {
       const content = contentOf(row);
       const author = byId.get(String(content.authorId));
