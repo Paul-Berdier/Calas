@@ -1,0 +1,59 @@
+{
+  "base": "https://calas-web-test-production.up.railway.app",
+  "checkedAt": "2026-11-02T20:56:28.371Z",
+  "readOnly": true,
+  "assets": [
+    {
+      "name": "wordmark",
+      "status": 200,
+      "sha256": "4989f919e038f5b0db6b3489050c3c7f9c44f977d71ae4851f3ebcbebc100c7b",
+      "identical": true
+    },
+    {
+      "name": "wordmark-dark",
+      "status": 200,
+      "sha256": "bd5b0c4b97ec55a3ec4f556c22c947de588e573a13387a0af1f79d99957515bc",
+      "identical": true
+    }
+  ],
+  "views": [
+    {
+      "width": 390,
+      "headerColor": "navy",
+      "versionedWordmark": true,
+      "nameWidth": 176,
+      "nameHeight": 23.453125,
+      "removedPhotoAbsent": true,
+      "emptyFrameAbsent": true,
+      "closingPhotoPresent": true,
+      "imagesDecoded": true,
+      "noOverflow": true,
+      "headerAxeViolations": 0,
+      "openMenuAxeViolations": 0
+    },
+    {
+      "width": 1440,
+      "headerColor": "navy",
+      "versionedWordmark": true,
+      "nameWidth": 208,
+      "nameHeight": 27.71875,
+      "removedPhotoAbsent": true,
+      "emptyFrameAbsent": true,
+      "closingPhotoPresent": true,
+      "imagesDecoded": true,
+      "noOverflow": true,
+      "headerAxeViolations": 0,
+      "openMenuAxeViolations": 0
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "noJavaScript": {
+    "width": 390,
+    "mobileMenu": true,
+    "diagnosticNavigation": true,
+    "diagnosticStatus": 200,
+    "diagnosticTitle": "Voir clair avant d’agir"
+  },
+  "completedAt": "2026-11-02T20:56:40.632Z"
+}

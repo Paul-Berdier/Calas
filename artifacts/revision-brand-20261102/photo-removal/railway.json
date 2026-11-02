@@ -1,0 +1,21 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "mode": "apply",
+  "startedAt": "2026-11-02T20:41:18.415Z",
+  "contentMutated": true,
+  "documentsPublished": 1,
+  "mediaDeleted": false,
+  "emailsSent": false,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "versionBefore": 9,
+  "versionPublished": 11,
+  "onlyCalmFaceRemoved": true,
+  "otherHomeFieldsUnchanged": true,
+  "otherPagesUnchanged": true,
+  "previousRevisionsUnchanged": true,
+  "rejectedPhotoAnonymousStatus": 404,
+  "closingPhotoAnonymousStatus": 200,
+  "noPhotoOrEmptyFrame": true,
+  "completedAt": "2026-11-02T20:41:19.965Z"
+}

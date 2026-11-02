@@ -1,0 +1,102 @@
+{
+  "base": "http://localhost:4321",
+  "date": "2026-11-02T21:19:16.328Z",
+  "reports": [
+    {
+      "width": 360,
+      "javascript": true,
+      "reducedMotion": true,
+      "header": "navy",
+      "wordmark": "smoothed card curves, versioned dark SVG decoded",
+      "menu": "native keyboard works",
+      "overflow": false,
+      "focus": "gold",
+      "axe": "0 violations",
+      "shell": "source contours unchanged"
+    },
+    {
+      "width": 360,
+      "javascript": false,
+      "reducedMotion": true,
+      "header": "navy",
+      "wordmark": "smoothed card curves, versioned dark SVG decoded",
+      "menu": "native keyboard works",
+      "overflow": false,
+      "focus": "gold",
+      "axe": "not run without JS",
+      "shell": "source contours unchanged"
+    },
+    {
+      "width": 390,
+      "javascript": true,
+      "reducedMotion": true,
+      "header": "navy",
+      "wordmark": "smoothed card curves, versioned dark SVG decoded",
+      "menu": "native keyboard works",
+      "overflow": false,
+      "focus": "gold",
+      "axe": "0 violations",
+      "shell": "source contours unchanged"
+    },
+    {
+      "width": 390,
+      "javascript": false,
+      "reducedMotion": true,
+      "header": "navy",
+      "wordmark": "smoothed card curves, versioned dark SVG decoded",
+      "menu": "native keyboard works",
+      "overflow": false,
+      "focus": "gold",
+      "axe": "not run without JS",
+      "shell": "source contours unchanged"
+    },
+    {
+      "width": 768,
+      "javascript": true,
+      "reducedMotion": true,
+      "header": "navy",
+      "wordmark": "smoothed card curves, versioned dark SVG decoded",
+      "menu": "native keyboard works",
+      "overflow": false,
+      "focus": "gold",
+      "axe": "0 violations",
+      "shell": "source contours unchanged"
+    },
+    {
+      "width": 768,
+      "javascript": false,
+      "reducedMotion": true,
+      "header": "navy",
+      "wordmark": "smoothed card curves, versioned dark SVG decoded",
+      "menu": "native keyboard works",
+      "overflow": false,
+      "focus": "gold",
+      "axe": "not run without JS",
+      "shell": "source contours unchanged"
+    },
+    {
+      "width": 1440,
+      "javascript": true,
+      "reducedMotion": true,
+      "header": "navy",
+      "wordmark": "smoothed card curves, versioned dark SVG decoded",
+      "menu": "native keyboard works",
+      "overflow": false,
+      "focus": "gold",
+      "axe": "0 violations",
+      "shell": "source contours unchanged"
+    },
+    {
+      "width": 1440,
+      "javascript": false,
+      "reducedMotion": true,
+      "header": "navy",
+      "wordmark": "smoothed card curves, versioned dark SVG decoded",
+      "menu": "native keyboard works",
+      "overflow": false,
+      "focus": "gold",
+      "axe": "not run without JS",
+      "shell": "source contours unchanged"
+    }
+  ]
+}
