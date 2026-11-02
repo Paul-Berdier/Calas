@@ -4,17 +4,17 @@
 
 **État au 2 novembre 2026 :** sur demande explicite de Paul, le nouveau cahier des charges du 31 octobre et ses consignes ont été déployés sur la **préproduction Railway**, après la recette locale. Les 24 documents ciblés sont publiés sur cette adresse de test, avec conservation de l'historique. La matrice [Évolutions du 1er novembre](EVOLUTIONS-20261101.md) distingue ce qui est appliqué, les pièces manquantes et les raccordements encore attendus. Les cases ci-dessous restent des décisions de Sara et Agnès ; le déploiement de recette et ses tests techniques ne les cochent pas à leur place.
 
-## Corrections reçues le 2 novembre — préparation et contrôles en cours
+## Corrections reçues le 2 novembre — appliquées en préproduction
 
 Le document « CORRECTIONS SITE AU 02-11.pdf » demande un fond bleu nuit, une adaptation du lettrage Calas Conseil selon sa référence, trois phrases d’ouverture en gras et italique, la phrase finale de Notre conviction en italique, l’ajout du signe IPRP fourni et les photographies prévues. Les champs éditoriaux `journey.cards[].lead`, `conviction.closingQuote` et `home.visuals.calmFace` sont intégrés au code local et à l’administration. Le guide décrit les dix champs d’images de l’accueil. Deux photographies d’illustration sont sélectionnées ; leurs licences et sources sont consignées dans [MEDIA.md](MEDIA.md#photographies-dillustration--corrections-du-2-novembre-2026).
 
-La recette locale est réussie : typecheck, lint, build, 15 tests ciblés, 3 scénarios navigateur et contrôles publics/admin à 390/1440 px. Les deux documents corrigés et les deux photos sont publiés dans la base locale, avec historique préservé. Le déploiement Railway de ces nouvelles corrections reste en préparation à ce stade. Résultats : `artifacts/corrections-20261102/`.
+La recette locale est réussie : typecheck, lint, build, 15 tests ciblés, 3 scénarios navigateur et contrôles publics/admin à 390/1440 px. Les deux documents corrigés et les deux photos sont publiés en local et sur Railway, avec historique préservé. Le site distant et son administration passent également les contrôles d’affichage et d’accessibilité. Les 26 contrôles du logo sous Chromium/Firefox et les menus sans JavaScript passent. Résultats : `artifacts/corrections-20261102/`. Ces vérifications techniques ne remplacent pas les décisions éditoriales ci-dessous.
 
 - [ ] Vérifier les textes corrigés, leur séparation en paragraphes et les mises en forme sur les trois cartes et dans Notre conviction.
 - [ ] Relire le fond bleu nuit, le lettrage et le signe IPRP sur ordinateur et téléphone ; le numéro reste attribué à Sara, sans attestation déclarée vérifiée.
 - [ ] Valider le cadrage du visage apaisé et de l’échange entre collègues, présentés comme photographies d’illustration.
-- [ ] Confirmer que l’administration permet de modifier les nouveaux champs et conserve les brouillons, publications et versions antérieures.
-- [ ] Consigner les résultats de typecheck, lint et des tests adaptés, dont le logo en mouvement réduit et sans JavaScript.
+- [x] Confirmer que l’administration permet de modifier les nouveaux champs et conserve les brouillons, publications et versions antérieures : vérifié en local et sur Railway.
+- [x] Consigner les résultats de typecheck, lint et des tests adaptés, dont le logo en mouvement réduit et sans JavaScript.
 
 ## Revue 1 — Accueil et Diagnostic
 

@@ -14,6 +14,8 @@ Les cinq rubans proviennent de la silhouette fournie, redessinée en courbes de 
 
 L’en-tête est bleu nuit (`#14213A`), avec le nom ivoire et doré de `wordmark-dark.svg`. Les menus ordinateur et mobile conservent le même fond ; leurs textes et focus restent clairs. Le bouton Contact ivoire garde un texte bleu nuit. Les menus natifs fonctionnent également sans JavaScript. Cette correction concerne le fond et le lettrage : le symbole et son mouvement restent inchangés.
 
+La recette du 2 novembre vérifie l’en-tête à **360, 390, 768 et 1440 px**, avec et sans JavaScript et en mouvement réduit : menus au clavier, focus doré, nom SVG complet et absence de débordement. Axe ne relève aucune violation dans l’en-tête avec le menu ouvert. Les [captures et mesures](../artifacts/corrections-20261102/header/header-qa.json) proviennent du serveur de développement local. Sur le build standalone en mode database/test, [Chromium et Firefox réussissent les 13 contrôles de mouvement chacun](../artifacts/corrections-20261102/motion/logo-browser-report.json) ; le [chargement différé](../artifacts/corrections-20261102/motion/loading-report.json) est également vérifié à 390 et 1440 px. Le serveur de recette dédié a été arrêté après ces vérifications.
+
 ## Nouvelle direction : s’enrouler vers le noyau
 
 Le brief de migration remplace le déroulement depuis le centre par **un enroulement extérieur vers intérieur**. Le bloc SVG, les lettres, la navigation et les CTA restent immobiles et accessibles. Le symbole se forme une seule fois en **2,2 secondes**, sans parallaxe ni boucle.

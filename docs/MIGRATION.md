@@ -1,6 +1,6 @@
 # Migration vers le CMS Calas Conseil
 
-**État au 2 novembre 2026 :** les évolutions du cahier des charges du 31 octobre et les photos fournies pour Sara sont publiées en recette locale et sur la préproduction Railway. Les nouvelles corrections du document « CORRECTIONS SITE AU 02-11.pdf » sont en préparation locale ; leurs contrôles sont en cours et aucun déploiement de ces nouvelles corrections n’est annoncé ici. Le journal ci-dessous conserve les opérations antérieures. Voir [la matrice du nouveau brief](EVOLUTIONS-20261101.md) et [les décisions de validation](VALIDATION.md).
+**État au 2 novembre 2026 :** le cahier des charges du 31 octobre, les photos fournies pour Sara et les corrections du document « CORRECTIONS SITE AU 02-11.pdf » sont appliqués en recette locale et sur la préproduction Railway. Le portrait d’Agnès reste attendu, comme confirmé par Paul. Le journal ci-dessous conserve les opérations antérieures. Voir [la matrice du nouveau brief](EVOLUTIONS-20261101.md) et [les décisions de validation](VALIDATION.md).
 
 ## Périmètre et référence
 
@@ -113,7 +113,7 @@ Sur demande explicite de Paul, le code applicatif 6b3394e et les 24 documents du
 
 L'archive de photos transmise par Paul a été intégrée au CMS local puis Railway sans nouvelle migration SQL ni déploiement du code. Cinq médias importés, trois utilisés publiquement : portrait Sara, kintsugi, ondes. Deux réserves restent privées. Trois documents seulement ont reçu de nouvelles révisions publiées : Sara v3 → v5, Accueil v5 → v7 et Situations sensibles v2 → v4. Les anciennes révisions et tous les champs non ciblés ont été comparés et conservés ; aucune donnée de compte modifiée. Voir [MEDIA.md](MEDIA.md#photos-fournies-pour-sara--2-novembre-2026) et artifacts/sara-images-20261102/.
 
-## Corrections du 2 novembre 2026 — préparation locale
+## Corrections du 2 novembre 2026 — application locale et Railway
 
 Le nouveau document « CORRECTIONS SITE AU 02-11.pdf » porte sur le fond bleu nuit, le lettrage Calas Conseil, les trois phrases d’ouverture du chemin en gras et italique, la phrase finale de Notre conviction en italique, le signe IPRP fourni et les photographies. Cette intervention est distincte de la publication du brief du 31 octobre et des médias de Sara déjà effectuée le 2 novembre.
 
@@ -121,7 +121,11 @@ Le contrat CMS local accepte désormais les champs facultatifs `journey.cards[].
 
 Le script ponctuel `scripts/content-correct-editorial-20261102.ts` prépare la correction de contenu séparément du build et du démarrage. La recette locale passe `home` de v7 à v9 et `settings` de v3 à v5 via les API authentifiées. Les deux photos sont importées privées, puis accessibles seulement après publication de leurs références. Les champs non ciblés et les anciennes révisions sont comparés et préservés. Les sources et licences sont documentées dans [MEDIA.md](MEDIA.md#photographies-dillustration--corrections-du-2-novembre-2026).
 
-Typecheck (0 erreur, 0 avertissement, 18 hints existants), lint et build réussis ; 15 tests ciblés et 3 scénarios navigateur réussis ; 6 audits publics et 4 audits admin à 390/1440 px sans violation Axe ni débordement. Le contrôle admin utilise une vraie session avec TOTP sans modifier de contenu. Rapports : `artifacts/corrections-20261102/`. Déploiement distant en préparation.
+Typecheck (0 erreur, 0 avertissement, 18 hints existants), lint et build réussis ; 15 tests ciblés et 3 scénarios navigateur réussis ; 6 audits publics et 4 audits admin à 390/1440 px sans violation Axe ni débordement. Le contrôle admin local utilise une vraie session avec TOTP sans modifier de contenu. Les 26 contrôles du mouvement passent sous Chromium/Firefox, ainsi que le chargement différé à 390/1440 px ; le header est contrôlé à 360/390/768/1440 px avec et sans JavaScript. Rapports : `artifacts/corrections-20261102/`.
+
+Après déploiement du commit `153439e`, l’opérateur API a appliqué les mêmes corrections sur Railway : accueil v7 → v9, paramètres v3 → v5, deux médias privés avant publication, champs hors périmètre et anciennes révisions identiques. Le portrait de Sara, le kintsugi et les ondes sont préservés. La recette distante passe six audits publics et quatre audits admin à 390/1440 px, sans erreur JavaScript, débordement ni violation Axe. Le compte de recette conserve son exception ciblée ; la session opérateur est déconnectée. Le badge attribue le numéro à Sara et conserve le statut `pending`. Aucun email externe n’est envoyé.
+
+La revue visuelle a ensuite conduit à limiter la photo finale à 960 pixels avec son ratio 3/2 pour garder les deux visages complets (`f270ee3`). Ce changement CSS ne nécessite aucune nouvelle publication de contenu. Son build, lint et les six vues locales sont vérifiés ; la clôture de la livraison est consignée dans [DEPLOYMENT.md](DEPLOYMENT.md).
 
 Contrôles en cours : typecheck, lint, tests adaptés aux champs éditoriaux et références médias, compilation avant recette standalone, rendu ordinateur/mobile, mouvement réduit et absence de JavaScript. Les résultats et le déploiement éventuel de ces nouvelles corrections devront être ajoutés après confirmation, sans reprendre comme preuve les tests du brief précédent.
 
