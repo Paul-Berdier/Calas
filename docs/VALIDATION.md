@@ -2,11 +2,11 @@
 
 État de départ : développement local. Le 25 octobre 2026, Paul a ensuite autorisé une préproduction publique dans le projet Railway Calas, avec PostgreSQL, stockage privé et compte de recette sans email externe. [Cette adresse](https://calas-web-test-production.up.railway.app/) permet la relecture ; ce n’est pas une validation de production. Le brief exige la validation de l'accueil et de Diagnostic par Sara et Agnès, puis une relecture générale avant lancement définitif. Ce document est une liste de décision ; les résultats réellement exécutés sont consignés séparément dans le compte rendu de tests.
 
-**État au 1er novembre 2026 :** le nouveau cahier des charges du 31 octobre et les consignes transmises par Paul ont été intégrés et publiés dans la **recette locale**. Cette évolution n'a pas été déployée sur Railway pendant cette intervention. La matrice [Évolutions du 1er novembre](EVOLUTIONS-20261101.md) distingue ce qui est appliqué, les pièces manquantes et les raccordements encore attendus. Les cases ci-dessous restent des décisions de Sara et Agnès ; des tests techniques réussis ne les cochent pas à leur place.
+**État au 2 novembre 2026 :** sur demande explicite de Paul, le nouveau cahier des charges du 31 octobre et ses consignes ont été déployés sur la **préproduction Railway**, après la recette locale. Les 24 documents ciblés sont publiés sur cette adresse de test, avec conservation de l'historique. La matrice [Évolutions du 1er novembre](EVOLUTIONS-20261101.md) distingue ce qui est appliqué, les pièces manquantes et les raccordements encore attendus. Les cases ci-dessous restent des décisions de Sara et Agnès ; le déploiement de recette et ses tests techniques ne les cochent pas à leur place.
 
 ## Revue 1 — Accueil et Diagnostic
 
-À examiner ensemble sur ordinateur et mobile, à partir des captures de recette et du site local :
+À examiner ensemble sur ordinateur et mobile, à partir des captures de recette et du [site de test Railway](https://calas-web-test-production.up.railway.app/) :
 
 - [ ] Le nom comporte un seul s ; la signature, les proportions du coquillage et la dorure sont approuvées.
 - [ ] Le nouveau titre « Construire la performance durable par la qualité du lien » et les sept blocs sont approuvés : premier écran, Pourquoi maintenant, chemin en trois temps, conviction, binôme, chiffres, invitation finale.

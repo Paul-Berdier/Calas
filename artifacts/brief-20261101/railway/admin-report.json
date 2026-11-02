@@ -1,0 +1,50 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "checkedAt": "2026-11-02T17:24:06.228Z",
+  "contentMutated": false,
+  "emailsSent": false,
+  "realPasswordLogin": true,
+  "checks": [
+    {
+      "name": "home-new-fields",
+      "width": 390,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "home-new-fields",
+      "width": 1440,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "settings-new-fields",
+      "width": 390,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "settings-new-fields",
+      "width": 1440,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "article-link",
+      "width": 390,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "article-link",
+      "width": 1440,
+      "noOverflow": true,
+      "violations": []
+    }
+  ],
+  "runtimeErrors": 0,
+  "unexpectedWrites": 0,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "completedAt": "2026-11-02T17:24:20.942Z"
+}

@@ -1,10 +1,10 @@
 # Évolutions du 1er novembre 2026
 
-Le cahier des charges **CAHIER DES CHARGES 311026.pdf**, le document **Symboles_et_images_Calas_Conseil (1).pdf** et les consignes transmises par Paul ont été appliqués au site et à son CMS dans la recette locale. Cette intervention n'a pas déployé ces évolutions sur Railway. La validation de l'accueil et de Diagnostic par Sara et Agnès, puis la relecture générale, restent attendues avant production.
+Le cahier des charges **CAHIER DES CHARGES 311026.pdf**, le document **Symboles_et_images_Calas_Conseil (1).pdf** et les consignes transmises par Paul ont été appliqués au site et à son CMS dans la recette locale le 1er novembre. **Le 2 novembre, sur instruction de Paul, la nouvelle application et les 24 documents ciblés ont été déployés sur la [préproduction Railway](https://calas-web-test-production.up.railway.app/).** La validation de l'accueil et de Diagnostic par Sara et Agnès, puis la relecture générale, restent attendues avant production. Détails dans [DEPLOYMENT.md](DEPLOYMENT.md#nouveau-cahier-des-charges--2-novembre-2026).
 
 ## Matrice du brief
 
-| Demande | Réalisation locale | À compléter ou valider |
+| Demande | Réalisation disponible en recette | À compléter ou valider |
 | --- | --- | --- |
 | Positionnement et premier écran | « Construire la performance durable par la qualité du lien » ; le diagnostic RPS devient une porte d'entrée dans le parcours global | Approbation du message par Sara et Agnès |
 | Accueil en sept blocs | Premier écran, Pourquoi maintenant, chemin en trois temps, conviction, binôme, chiffres, invitation finale ; champs éditables dans le CMS | Relecture sur ordinateur et mobile |
@@ -22,9 +22,9 @@ Le cahier des charges **CAHIER DES CHARGES 311026.pdf**, le document **Symboles_
 | Navigation et contact | Menu Nos offres, accès aux quatre offres, contact mobile ; organisation, fonction et téléphone facultatifs ; accord explicite non précoché et validé par le serveur | Confirmer horaires, délai et coordonnées définitives avant affichage |
 | Domaine et unique boîte mail | Préparation documentée pour **sara@calasconseil.fr** ; comparaison d'offres dans [COURRIEL.md](COURRIEL.md). Paul confirme que le domaine n'est pas acheté | Proposition OVHcloud à approuver, commande et accès nécessaires. Boîte non créée ; aucun achat ou changement DNS |
 | SEO | Pages SSR, métadonnées éditables, liens internes et données structurées adaptées ; relais LinkedIn sans balisage d'article original ni indexation locale | Domaine et zone d'intervention à confirmer ; recette canonicals/sitemap/robots sur la cible définitive |
-| Administration et conservation | Reprise locale explicite des contenus ; révisions préservées, brouillons privés, publication distincte, images privées avant publication | Accès nominatif de Sara et prise en main sur l'hébergement définitif |
+| Administration et conservation | Reprise locale puis Railway explicite des contenus ; révisions préservées, brouillons privés, publication distincte, images privées avant publication | Accès nominatif de Sara et prise en main sur l'hébergement définitif |
 | Sauvegardes et mesures | Sauvegarde/restauration manuelles existantes testées ; aucune mesure d'audience ajoutée pendant cette intervention | Planifier sauvegarde quotidienne, copie hors site, rétention et suivi ; choisir puis raccorder les mesures de visites et demandes prévues au brief |
-| Mise en ligne définitive | Recette locale disponible ; adresse Railway existante inchangée pour cette évolution | Revue Sara/Agnès, mentions légales, domaine/courriel, exploitation, puis déploiement et recette de la cible |
+| Mise en ligne définitive | Nouvelle version disponible en local et sur l'adresse Railway de test depuis le 2 novembre | Revue Sara/Agnès, mentions légales, domaine/courriel, exploitation, puis lancement et recette de la cible définitive |
 
 ## Chiffres et articles : choix de reprise
 
@@ -72,3 +72,8 @@ La revue de l’administration a ensuite validé six audits axe à 390 et 1 440 
 Les résultats historiques d'octobre restent consignés séparément. Aucun résultat local ne vaut validation des textes par Sara et Agnès, activation des emails, déploiement Railway de cette évolution ou recette de production. Les prochaines décisions sont consignées dans [VALIDATION.md](VALIDATION.md), et les gestes d'édition dans [GUIDE-SARA.md](GUIDE-SARA.md).
 
 Synthèse de cette recette : [rapport](../artifacts/brief-20261101/validation-summary.json). Les captures complètes responsive sont dans `artifacts/brief-20261101/responsive/` ; un dossier distinct a évité les verrous temporaires Windows sur les anciennes images de référence.
+
+
+## Vérification Railway du 2 novembre
+
+La version finale 77493b1 est déployée après correction d'un encadré trop étroit sur mobile. Les 24 documents ciblés sont publiés, l'historique et les autres documents sont conservés, et la vérification idempotente constate zéro correction restante. La recette distante réussit 30 contrôles publics, huit rendus et huit audits d'accessibilité, plus six audits de l'administration avec connexion réelle. Aucun email, achat de domaine ou changement d'identifiant n'a eu lieu. Détails dans [DEPLOYMENT.md](DEPLOYMENT.md#nouveau-cahier-des-charges--2-novembre-2026).

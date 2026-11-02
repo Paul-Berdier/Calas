@@ -1,0 +1,50 @@
+{
+  "date": "2026-11-02",
+  "siteEnvironment": "staging",
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "projectId": "e030d2f5-36b9-4fad-817d-7a146a3c3c31",
+  "serviceId": "4811b664-6212-4cdf-a1b5-3f998d317367",
+  "environmentId": "cc59f611-8119-46f6-8f8d-d7c5d0d909a2",
+  "commit": "77493b1f11262a4f3b4ff964e90049d2d0827740",
+  "deploymentId": "275bc283-f460-42c8-86dd-29d83fffc037",
+  "deploymentStatus": "SUCCESS",
+  "deployedAt": "2026-11-02T17:30:17.949Z",
+  "databaseSchemaChanged": false,
+  "mailConfigurationChanged": false,
+  "domainPurchased": false,
+  "applicationChecks": {
+    "readyStatus": 200,
+    "editorialImageStatus": 200
+  },
+  "initialDeployment": {
+    "commit": "6b3394e7cadbc4b8f46e87f96079af2bfcf375af",
+    "deploymentId": "8db651a4-484d-4fab-94fd-d32e5bfb8ec6",
+    "deployedAt": "2026-11-02T17:21:31.818Z"
+  },
+  "editorialDocumentsPublished": 24,
+  "editorialHistoryPreserved": true,
+  "adminChecksPassed": 6,
+  "adminSessionSignedOut": true,
+  "privateTunnelClosed": true,
+  "publicChecks": {
+    "checks": 30,
+    "pageRenders": 8,
+    "axeAudits": 8,
+    "browserErrors": 0,
+    "httpErrors": 0,
+    "horizontalOverflow": false,
+    "mobileNoticeWidth": true
+  },
+  "verificationComplete": true,
+  "ci": {
+    "runId": 41491362633,
+    "url": "https://github.com/Paul-Berdier/Calas/actions/runs/41491362633",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": {
+      "container": "success",
+      "validate": "success"
+    }
+  },
+  "pendingRailwayWork": false
+}
