@@ -1,0 +1,22 @@
+{
+  "origin": "http://localhost:4336",
+  "mode": "apply",
+  "startedAt": "2026-11-02T20:41:11.025Z",
+  "contentMutated": true,
+  "documentsPublished": 1,
+  "mediaDeleted": false,
+  "emailsSent": false,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "versionBefore": 9,
+  "versionPublished": 11,
+  "onlyCalmFaceRemoved": true,
+  "otherHomeFieldsUnchanged": true,
+  "otherPagesUnchanged": true,
+  "previousRevisionsUnchanged": true,
+  "rejectedPhotoAnonymousStatus": 404,
+  "closingPhotoAnonymousStatus": 200,
+  "noPhotoOrEmptyFrame": true,
+  "localServerStopped": true,
+  "completedAt": "2026-11-02T20:41:15.791Z"
+}

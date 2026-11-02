@@ -1,0 +1,10 @@
+import {createRequire} from 'node:module';
+import {fileURLToPath} from 'node:url';
+import {resolve} from 'node:path';
+import {readdirSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const require=createRequire(resolve(root,'apps/web/package.json'));
+const files=readdirSync(resolve(root,'tests')).filter(file=>/\.(test|unit)\.mjs$/.test(file)).map(file=>resolve(root,'tests',file));
+const result=spawnSync(process.execPath,[require.resolve('tsx/cli'),'--test',resolve(root,'scripts/cms-config.test.mjs'),...files],{cwd:root,stdio:'inherit',shell:false,windowsHide:true});
+if(result.error)throw result.error;process.exitCode=result.status??1;

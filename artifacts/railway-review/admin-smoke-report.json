@@ -1,0 +1,53 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "executedAt": "2026-10-25T14:26:12.208Z",
+  "transport": "HTTPS Railway + private PostgreSQL through SSH + private S3; email captured by local Mailpit only",
+  "mockedResponses": false,
+  "checks": [
+    {
+      "name": "Compte technique éditeur neuf ; connexion avant vérification et API anonyme refusées",
+      "passed": true
+    },
+    {
+      "name": "Lien réel de vérification HTTPS consommé ; email uniquement capturé localement",
+      "passed": true
+    },
+    {
+      "name": "Session mot de passe seule refusée ; TOTP activé et nouvelle connexion MFA réussie ; éditeur interdit des utilisateurs ; écriture cross-origin refusée ; cookies Secure/HttpOnly",
+      "passed": true
+    },
+    {
+      "name": "Interface administration distante rendue avec une vraie session MFA",
+      "passed": true
+    },
+    {
+      "name": "Catégorie privée créée, modifiée, relue et archivée ; historique conservé ; aucune publication synthétique",
+      "passed": true
+    },
+    {
+      "name": "Image et PDF téléversés sur S3 privé ; anonyme 404, session MFA 200 ; variante image et PDF valide",
+      "passed": true
+    },
+    {
+      "name": "Deux médias sans référence supprimés de PostgreSQL et S3 ; leurs URLs révoquées",
+      "passed": true
+    },
+    {
+      "name": "Seul le compte technique suspendu ; toutes ses sessions révoquées et accès refusé",
+      "passed": true
+    }
+  ],
+  "cleanup": {
+    "categoryArchived": true,
+    "mediaDeleted": true,
+    "technicalAccountDisabled": true,
+    "technicalSessionsRevoked": true
+  },
+  "limits": [
+    "Bounded editor/API/media acceptance; no external SMTP or cabinet user validation."
+  ],
+  "passed": true,
+  "completedAt": "2026-10-25T14:26:20.409Z",
+  "deploymentId": "757213ce-9369-4bcb-abf4-8ef80d20cb3e",
+  "testedCommit": "0c4e0b97"
+}

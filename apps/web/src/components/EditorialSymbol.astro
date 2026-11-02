@@ -1,0 +1,12 @@
+---
+import CmsImage from './CmsImage.astro';
+import type {ContentImage} from '../lib/cms/types';
+interface Props {
+  name: 'threads' | 'nautilus' | 'roots' | 'compass' | 'tree' | 'kintsugi' | 'ripples' | 'murmuration';
+  class?: string;
+  eager?: boolean;
+  image?: ContentImage;
+}
+const {name,class:className='',eager=false,image}=Astro.props;
+---
+{image?<CmsImage image={image} class={`editorial-symbol editorial-symbol-custom ${className}`} width={960} height={555} sizes="(max-width:599px) 90vw, 45vw" loading={eager?'eager':'lazy'}/>:<img class:list={['editorial-symbol',className]} src={`/images/symbols/${name}.webp`} width="900" height="520" alt="" aria-hidden="true" loading={eager?'eager':'lazy'} decoding="async" />}

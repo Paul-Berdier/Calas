@@ -5,11 +5,11 @@ import {readFile} from 'node:fs/promises';
 
 // Compile only the pure formatting/limits helper in memory. No PDF, model,
 // browser, account, server or network resource is needed for these tests.
-const sources=await Promise.all(['pdf-import.types.ts','pdf-import-format.ts'].map(file=>readFile(new URL(`../apps/studio/lib/${file}`,import.meta.url),'utf8')));
+const sources=await Promise.all(['pdf-import.types.ts','pdf-import-format.ts'].map(file=>readFile(new URL(`../apps/web/src/features/pdf-import/${file}`,import.meta.url),'utf8')));
 const source=sources.map(text=>text.replace(/^import .*;\r?\n/gm,'')).join('\n');
 const built=await transform(source,{loader:'ts',format:'esm'});
 const helpers=await import(`data:text/javascript;base64,${Buffer.from(built.code).toString('base64')}`);
-const {validatePdfFile,validatePageCount,validateCharacterCount,cleanText,titleFromFilename,excerptFromText,ocrTextToParagraphs,textItemsToParagraphs,paragraphsToBlocks,shouldRecognizePage}=helpers;
+const {validatePdfFile,validatePageCount,validateCharacterCount,cleanText,titleFromFilename,excerptFromText,ocrTextToParagraphs,textItemsToParagraphs,paragraphsToDocument,shouldRecognizePage}=helpers;
 const item=(str,x,y,height=12,width=str.length*6,hasEOL=true)=>({str,transform:[height,0,0,height,x,y],height,width,hasEOL});
 
 test('limits reject an entire oversized document rather than truncating it',()=>{
@@ -47,12 +47,12 @@ test('PDF fragments form lines, headings and paragraphs in source order',()=>{
     {text:'Début de la colonne suivante.',style:'normal'},
   ]);
 });
-test('OCR paragraphs become editable Portable Text without invented marks or attribution',()=>{
+test('OCR paragraphs become editable Tiptap JSON without invented marks or attribution',()=>{
   const paragraphs=ocrTextToParagraphs('Premier paragraphe\nsur deux lignes.\n\nDeuxième paragraphe.');
-  const blocks=paragraphsToBlocks(paragraphs);
-  assert.deepEqual(blocks.map(block=>block.children[0].text),['Premier paragraphe sur deux lignes.','Deuxième paragraphe.']);
-  assert.equal(new Set(blocks.map(block=>block._key)).size,2);
-  assert(blocks.every(block=>block._type==='block'&&block.style==='normal'&&block.markDefs.length===0));
+  const document=paragraphsToDocument(paragraphs);
+  assert.equal(document.type,'doc');
+  assert.deepEqual(document.content.map(block=>block.content[0].text),['Premier paragraphe sur deux lignes.','Deuxième paragraphe.']);
+  assert(document.content.every(block=>block.type==='paragraph'&&block.content[0].type==='text'&&!block.content[0].marks));
   assert.equal(cleanText('Texte\u0000 visible\u00ad.\r\nSuite'),'Texte visible.\nSuite');
 });
 test('automatic OCR catches scans and small native headers; full OCR also covers rich-text hybrid pages',()=>{

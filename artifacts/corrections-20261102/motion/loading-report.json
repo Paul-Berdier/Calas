@@ -1,0 +1,18 @@
+{
+  "base": "http://127.0.0.1:4337",
+  "at": "2026-11-02T20:21:05.263Z",
+  "cases": [
+    {
+      "width": 390,
+      "initialScrollTriggerRequests": 0,
+      "lazyMethodLoads": true,
+      "errors": []
+    },
+    {
+      "width": 1440,
+      "initialScrollTriggerRequests": 0,
+      "lazyMethodLoads": true,
+      "errors": []
+    }
+  ]
+}

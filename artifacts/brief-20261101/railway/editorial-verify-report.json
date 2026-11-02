@@ -1,0 +1,361 @@
+{
+  "mode": "verify",
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "startedAt": "2026-11-02T17:24:07.131Z",
+  "contentMutated": false,
+  "passed": true,
+  "documents": [
+    {
+      "id": "7653c186-4529-85e5-9113-425be17fc942",
+      "kind": "person",
+      "version": 3,
+      "publishedRevisionId": "bf6b2b7a-758d-4be4-a5ad-8748f5294060",
+      "changedFields": []
+    },
+    {
+      "id": "6f857d0f-5b3a-81c4-9548-4c018b6b4619",
+      "kind": "person",
+      "version": 3,
+      "publishedRevisionId": "db219c91-565c-4741-a351-56262bd63c5b",
+      "changedFields": []
+    },
+    {
+      "id": "66d0d9ad-3bae-8e69-bc0a-0e10166375e4",
+      "kind": "statistic",
+      "version": 3,
+      "publishedRevisionId": "329cd0d1-1617-417b-b28a-f0807e238531",
+      "changedFields": []
+    },
+    {
+      "id": "e7d1c619-3bbf-8ac9-809c-a7beb33fe510",
+      "kind": "statistic",
+      "version": 3,
+      "publishedRevisionId": "d28417a2-c405-4bd8-a14b-f8b060e644b0",
+      "changedFields": []
+    },
+    {
+      "id": "d3155773-8be5-884e-a150-2b5f93758aa1",
+      "kind": "statistic",
+      "version": 2,
+      "publishedRevisionId": "7c745b51-d521-4876-a7cf-fa2d0c07726c",
+      "changedFields": []
+    },
+    {
+      "id": "2aa8951d-f01d-81c5-8f8a-68abdb1b58c6",
+      "kind": "statistic",
+      "version": 2,
+      "publishedRevisionId": "9a15b0b9-0963-457c-bb60-e867aba56478",
+      "changedFields": []
+    },
+    {
+      "id": "d19d6c82-66e1-89fe-8d36-fbc256137095",
+      "kind": "statistic",
+      "version": 2,
+      "publishedRevisionId": "cb192045-d8de-44b7-8ec9-1544899f505e",
+      "changedFields": []
+    },
+    {
+      "id": "70aef5ed-db2f-85f2-8267-f480b4fa56df",
+      "kind": "statistic",
+      "version": 2,
+      "publishedRevisionId": "6d9f4acb-217a-49f3-ace3-2768267093a9",
+      "changedFields": []
+    },
+    {
+      "id": "2bb59bec-a08c-8c63-8d26-8e7abf2f9adb",
+      "kind": "settings",
+      "version": 3,
+      "publishedRevisionId": "d27f84a4-6f2e-4974-baa7-fa9ef0a84025",
+      "changedFields": []
+    },
+    {
+      "id": "1ca8709a-e466-8bad-a191-67125cc82704",
+      "kind": "home",
+      "version": 5,
+      "publishedRevisionId": "a39d1855-aa3c-4027-a303-954106f98dfb",
+      "changedFields": []
+    },
+    {
+      "id": "35fd98e5-e100-8a9a-9f1f-1327cdb11776",
+      "kind": "page",
+      "version": 3,
+      "publishedRevisionId": "620aa708-3428-43a9-bfa4-44ca69507515",
+      "changedFields": []
+    },
+    {
+      "id": "7c41aeb1-d378-88cb-9575-fe1be92c42d1",
+      "kind": "page",
+      "version": 3,
+      "publishedRevisionId": "9daa7e8e-b6d6-4f3c-9cd6-25b7038bd863",
+      "changedFields": []
+    },
+    {
+      "id": "43da1b5c-9c06-83f9-8a18-c3421533ee76",
+      "kind": "page",
+      "version": 3,
+      "publishedRevisionId": "ba3a0271-8d0a-422b-b745-26a10c002a66",
+      "changedFields": []
+    },
+    {
+      "id": "eb5c249a-85b4-8dab-a035-e15a9c94ecda",
+      "kind": "page",
+      "version": 3,
+      "publishedRevisionId": "567d23b0-de1f-4e2c-994d-85d85530147a",
+      "changedFields": []
+    },
+    {
+      "id": "cf27f968-44e0-8fc1-b796-b2a25c2c8a7f",
+      "kind": "page",
+      "version": 2,
+      "publishedRevisionId": "bacc0b9a-a029-4166-b57f-cc28f78f0a1b",
+      "changedFields": []
+    },
+    {
+      "id": "508b62d3-e3a8-894a-b14e-ab00e6260223",
+      "kind": "page",
+      "version": 3,
+      "publishedRevisionId": "c8d9f3d6-e427-4fed-a45d-d4e77ee746a0",
+      "changedFields": []
+    },
+    {
+      "id": "e86c5b64-1538-80f5-aabd-8c149f8b7b3b",
+      "kind": "page",
+      "version": 3,
+      "publishedRevisionId": "026e4eea-f943-4e77-a236-7ea507f30cb4",
+      "changedFields": []
+    },
+    {
+      "id": "2b433151-a84f-82b7-a8fc-f4f8d9928e4a",
+      "kind": "page",
+      "version": 3,
+      "publishedRevisionId": "ccf52d19-a678-4cf4-8340-c0991460b256",
+      "changedFields": []
+    },
+    {
+      "id": "c73f9680-0c2a-8d73-b4e0-aedc8fb2ad94",
+      "kind": "category",
+      "version": 2,
+      "publishedRevisionId": "d3a1c60c-2165-46e1-804e-cfc9e5d8aa40",
+      "changedFields": []
+    },
+    {
+      "id": "7b047797-8cf4-8be1-b04d-6ae1d5be0742",
+      "kind": "article",
+      "version": 2,
+      "publishedRevisionId": "b1edd2dc-68d3-4ec3-9058-1b957a63531d",
+      "changedFields": []
+    },
+    {
+      "id": "3400528c-6a57-87d5-8480-737001b182f6",
+      "kind": "article",
+      "version": 2,
+      "publishedRevisionId": "f4ae6e1b-d131-46f4-a2b5-283547f28d5e",
+      "changedFields": []
+    },
+    {
+      "id": "f79cf5d6-9b92-8ffd-88a7-3bc4a43ea745",
+      "kind": "article",
+      "version": 2,
+      "publishedRevisionId": "46860333-e20a-4362-87ee-220f3a7c69bb",
+      "changedFields": []
+    },
+    {
+      "id": "fc711052-b7c2-8411-a2ed-5d400b1e1229",
+      "kind": "article",
+      "version": 2,
+      "publishedRevisionId": "ec9602fe-25fb-408f-8a07-d7546c116131",
+      "changedFields": []
+    },
+    {
+      "id": "8bf8fb18-ccf0-845b-9df9-092afbb5f129",
+      "kind": "article",
+      "version": 2,
+      "publishedRevisionId": "5aadf697-96ad-4b80-a2cb-36362d6cc040",
+      "changedFields": []
+    }
+  ],
+  "totalChanged": 0,
+  "unrelatedUnpublishedChanges": false,
+  "final": [
+    {
+      "id": "7653c186-4529-85e5-9113-425be17fc942",
+      "kind": "person",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "6f857d0f-5b3a-81c4-9548-4c018b6b4619",
+      "kind": "person",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "66d0d9ad-3bae-8e69-bc0a-0e10166375e4",
+      "kind": "statistic",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "e7d1c619-3bbf-8ac9-809c-a7beb33fe510",
+      "kind": "statistic",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "d3155773-8be5-884e-a150-2b5f93758aa1",
+      "kind": "statistic",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "2aa8951d-f01d-81c5-8f8a-68abdb1b58c6",
+      "kind": "statistic",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "d19d6c82-66e1-89fe-8d36-fbc256137095",
+      "kind": "statistic",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "70aef5ed-db2f-85f2-8267-f480b4fa56df",
+      "kind": "statistic",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "2bb59bec-a08c-8c63-8d26-8e7abf2f9adb",
+      "kind": "settings",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "1ca8709a-e466-8bad-a191-67125cc82704",
+      "kind": "home",
+      "version": 5,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "35fd98e5-e100-8a9a-9f1f-1327cdb11776",
+      "kind": "page",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "7c41aeb1-d378-88cb-9575-fe1be92c42d1",
+      "kind": "page",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "43da1b5c-9c06-83f9-8a18-c3421533ee76",
+      "kind": "page",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "eb5c249a-85b4-8dab-a035-e15a9c94ecda",
+      "kind": "page",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "cf27f968-44e0-8fc1-b796-b2a25c2c8a7f",
+      "kind": "page",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "508b62d3-e3a8-894a-b14e-ab00e6260223",
+      "kind": "page",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "e86c5b64-1538-80f5-aabd-8c149f8b7b3b",
+      "kind": "page",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "2b433151-a84f-82b7-a8fc-f4f8d9928e4a",
+      "kind": "page",
+      "version": 3,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "c73f9680-0c2a-8d73-b4e0-aedc8fb2ad94",
+      "kind": "category",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "7b047797-8cf4-8be1-b04d-6ae1d5be0742",
+      "kind": "article",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "3400528c-6a57-87d5-8480-737001b182f6",
+      "kind": "article",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "f79cf5d6-9b92-8ffd-88a7-3bc4a43ea745",
+      "kind": "article",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "fc711052-b7c2-8411-a2ed-5d400b1e1229",
+      "kind": "article",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    },
+    {
+      "id": "8bf8fb18-ccf0-845b-9df9-092afbb5f129",
+      "kind": "article",
+      "version": 2,
+      "status": "published",
+      "hasUnpublishedChanges": false
+    }
+  ],
+  "verification": {
+    "previousRevisionsUnchanged": true,
+    "unrelatedDocumentsUnchanged": true,
+    "allTargetedPublished": true,
+    "statistics": 6,
+    "linkedInArticles": 5,
+    "registration": "2026.16.004",
+    "qualificationStatus": "pending",
+    "totalDocuments": 29,
+    "newPage": true
+  },
+  "completedAt": "2026-11-02T17:24:16.052Z"
+}

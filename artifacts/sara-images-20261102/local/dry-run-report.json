@@ -1,0 +1,27 @@
+{
+  "origin": "http://localhost:4336",
+  "mode": "dry-run",
+  "startedAt": "2026-11-02T18:48:16.841Z",
+  "contentMutated": false,
+  "mediaUploaded": 0,
+  "documentsPublished": 0,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "snapshotSaved": true,
+  "documents": [
+    {
+      "key": "sara",
+      "version": 3
+    },
+    {
+      "key": "home",
+      "version": 5
+    },
+    {
+      "key": "sensitive",
+      "version": 2
+    }
+  ],
+  "localServerStopped": true,
+  "completedAt": "2026-11-02T18:48:22.658Z"
+}

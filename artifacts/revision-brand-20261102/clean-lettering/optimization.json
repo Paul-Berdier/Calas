@@ -1,0 +1,25 @@
+{
+  "source": "native glyphs and analytic C, before/after SVG command compaction",
+  "beforeBytes": 10847,
+  "afterBytes": 5664,
+  "views": [
+    {
+      "width": 176,
+      "meanChannelDifference": 0,
+      "maxChannelDifference": 0,
+      "identical": true
+    },
+    {
+      "width": 208,
+      "meanChannelDifference": 0,
+      "maxChannelDifference": 0,
+      "identical": true
+    },
+    {
+      "width": 1040,
+      "meanChannelDifference": 0,
+      "maxChannelDifference": 0,
+      "identical": true
+    }
+  ]
+}

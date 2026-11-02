@@ -1,0 +1,50 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "mode": "verify",
+  "startedAt": "2026-11-02T18:50:52.662Z",
+  "contentMutated": false,
+  "mediaUploaded": 0,
+  "documentsPublished": 0,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "publishedMedia": [
+    {
+      "key": "portrait-sara",
+      "mediaId": "b7b85700-f29f-46d3-a93e-4753d5ff7606",
+      "status": 200,
+      "uses": [
+        "person:sara:portrait"
+      ]
+    },
+    {
+      "key": "kintsugi",
+      "mediaId": "bffb0801-3bc6-4b2c-b486-4d57b494e468",
+      "status": 200,
+      "uses": [
+        "home:visuals.kintsugi",
+        "page:situations-sensibles:image"
+      ]
+    },
+    {
+      "key": "ripples",
+      "mediaId": "bace3eb6-0c64-44bd-ab33-e14838382fca",
+      "status": 200,
+      "uses": [
+        "home:visuals.ripples"
+      ]
+    }
+  ],
+  "privateReserves": [
+    {
+      "key": "threads-reserve",
+      "status": 404
+    },
+    {
+      "key": "compass-reserve",
+      "status": 404
+    }
+  ],
+  "onlyReviewedImageFieldsChanged": true,
+  "previousRevisionsUnchanged": true,
+  "completedAt": "2026-11-02T18:50:54.334Z"
+}

@@ -1,0 +1,50 @@
+{
+  "origin": "http://localhost:4336",
+  "checkedAt": "2026-11-01T18:48:02.838Z",
+  "contentMutated": false,
+  "emailsSent": false,
+  "realPasswordAndTotp": true,
+  "checks": [
+    {
+      "name": "home-new-fields",
+      "width": 390,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "home-new-fields",
+      "width": 1440,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "settings-new-fields",
+      "width": 390,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "settings-new-fields",
+      "width": 1440,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "article-link",
+      "width": 390,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "article-link",
+      "width": 1440,
+      "noOverflow": true,
+      "violations": []
+    }
+  ],
+  "runtimeErrors": 0,
+  "unexpectedWrites": 0,
+  "ownSessionSignedOut": true,
+  "testServerStopped": true,
+  "passed": true
+}

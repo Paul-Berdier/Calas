@@ -1,0 +1,271 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "startedAt": "2026-11-02T17:30:59.426Z",
+  "readOnly": true,
+  "authenticated": false,
+  "checks": [
+    {
+      "kind": "health",
+      "path": "/api/health/",
+      "status": 200,
+      "noStore": true
+    },
+    {
+      "kind": "health",
+      "path": "/api/ready/",
+      "status": 200,
+      "noStore": true
+    },
+    {
+      "kind": "image",
+      "path": "/images/symbols/threads.webp",
+      "sha256": "59d8b5c74565d6565846757abecb4b59ecd6f33c4b620ff5b4629f8929612583",
+      "matchesLocal": true
+    },
+    {
+      "kind": "image",
+      "path": "/images/symbols/nautilus.webp",
+      "sha256": "24c7a73d12a72478a6ef2420ae4b5b439b08a120ee1bd10cfbff5ddc845588b3",
+      "matchesLocal": true
+    },
+    {
+      "kind": "image",
+      "path": "/images/symbols/roots.webp",
+      "sha256": "5c9d9126117705075b3031c6086f04fa4669e9fc9e9d1df775c96c0505a5285a",
+      "matchesLocal": true
+    },
+    {
+      "kind": "image",
+      "path": "/images/symbols/compass.webp",
+      "sha256": "9f5d472f7b74164370edcb71cd89738bcdcb62f9a0426228ac4ca4015eaf73cb",
+      "matchesLocal": true
+    },
+    {
+      "kind": "image",
+      "path": "/images/symbols/tree.webp",
+      "sha256": "2b312f100761f827892b8c8fe6a62c21c0f57c31cf23497f69b752fc7e875bf6",
+      "matchesLocal": true
+    },
+    {
+      "kind": "image",
+      "path": "/images/symbols/kintsugi.webp",
+      "sha256": "f1b254a82684c185e58a75394ee2b217f42405e8a8c1913bc3962e0022ab805b",
+      "matchesLocal": true
+    },
+    {
+      "kind": "image",
+      "path": "/images/symbols/ripples.webp",
+      "sha256": "3ba807b157b84a497c5828cd7bd28f361edd5c7b12022631638e389218fb2528",
+      "matchesLocal": true
+    },
+    {
+      "kind": "image",
+      "path": "/images/symbols/murmuration.webp",
+      "sha256": "ff4695d9f5fe19b3d51966704a82f6f254b4aa120a376412cba8adf265ed1d5e",
+      "matchesLocal": true
+    },
+    {
+      "kind": "route",
+      "path": "/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/diagnostic-rps/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/equipes/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/managers/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/situations-sensibles/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/notre-approche/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/qui-sommes-nous/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/reflexions/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/contact/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/mentions-legales/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/confidentialite/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "route",
+      "path": "/admin/login/",
+      "status": 200,
+      "noindex": true,
+      "csp": true
+    },
+    {
+      "kind": "anonymous",
+      "path": "/api/admin/content/pages/",
+      "status": 401
+    },
+    {
+      "kind": "anonymous",
+      "path": "/api/admin/media/",
+      "status": 401
+    },
+    {
+      "kind": "anonymous",
+      "path": "/api/admin/users/",
+      "status": 401
+    },
+    {
+      "kind": "anonymous",
+      "path": "/admin/",
+      "redirectsToLogin": true
+    },
+    {
+      "kind": "indexation",
+      "robotsDisallowAll": true,
+      "sitemapStatus": 404
+    },
+    {
+      "kind": "noJavaScriptHome",
+      "sections": 7,
+      "journeyCards": 3,
+      "statistics": 6,
+      "registration": "2026.16.004"
+    },
+    {
+      "kind": "noJavaScriptArticles",
+      "linkedInCards": 5,
+      "clearlyLabelled": true
+    },
+    {
+      "kind": "noJavaScriptSensitive",
+      "limits": 3,
+      "telephone": true
+    }
+  ],
+  "pages": [
+    {
+      "path": "/",
+      "width": 390,
+      "status": 200,
+      "noOverflow": true,
+      "imagesLoaded": true,
+      "axeViolations": [],
+      "browserErrors": []
+    },
+    {
+      "path": "/diagnostic-rps/",
+      "width": 390,
+      "status": 200,
+      "noOverflow": true,
+      "imagesLoaded": true,
+      "axeViolations": [],
+      "browserErrors": []
+    },
+    {
+      "path": "/managers/",
+      "width": 390,
+      "status": 200,
+      "noOverflow": true,
+      "imagesLoaded": true,
+      "axeViolations": [],
+      "browserErrors": []
+    },
+    {
+      "path": "/situations-sensibles/",
+      "width": 390,
+      "status": 200,
+      "noOverflow": true,
+      "imagesLoaded": true,
+      "axeViolations": [],
+      "browserErrors": []
+    },
+    {
+      "path": "/",
+      "width": 1440,
+      "status": 200,
+      "noOverflow": true,
+      "imagesLoaded": true,
+      "axeViolations": [],
+      "browserErrors": []
+    },
+    {
+      "path": "/diagnostic-rps/",
+      "width": 1440,
+      "status": 200,
+      "noOverflow": true,
+      "imagesLoaded": true,
+      "axeViolations": [],
+      "browserErrors": []
+    },
+    {
+      "path": "/managers/",
+      "width": 1440,
+      "status": 200,
+      "noOverflow": true,
+      "imagesLoaded": true,
+      "axeViolations": [],
+      "browserErrors": []
+    },
+    {
+      "path": "/situations-sensibles/",
+      "width": 1440,
+      "status": 200,
+      "noOverflow": true,
+      "imagesLoaded": true,
+      "axeViolations": [],
+      "browserErrors": []
+    }
+  ],
+  "browserErrors": [],
+  "passed": true,
+  "completedAt": "2026-11-02T17:31:19.907Z"
+}

@@ -1,0 +1,9 @@
+export type CoilVariant='A'|'B'|'C';
+export const coilVariants:Record<CoilVariant,{title:string;twist:number;opening:number;wave:number;stagger:number;duration:number}>;
+export const coilOrder:number[];
+export const coilDuration:number;
+export const coilSelected:CoilVariant;
+export function coilPoint(x:number,y:number,progress:number,variant?:CoilVariant):number[];
+export function coilFrame(index:number,progress:number,variant?:CoilVariant):string;
+export function coilState(index:number,time:number,variant?:CoilVariant):{progress:number;opacity:number;contour:string};
+export function coilSvg(time:number,options?:{variant?:CoilVariant;background?:string;id?:string}):string;

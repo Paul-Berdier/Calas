@@ -1,0 +1,33 @@
+{
+  "base": "https://calas-web-test-production.up.railway.app",
+  "date": "2026-11-02T20:24:54.489Z",
+  "assets": [
+    {
+      "name": "wordmark",
+      "status": 200,
+      "sha256": "5615c3172742073ff3d76490c9841d427d28278c7a149dccc16ff28422dc115e",
+      "identical": true
+    },
+    {
+      "name": "wordmark-dark",
+      "status": 200,
+      "sha256": "22eb6b8988cb5144fe39005345e014716614b470a628ab0366caffcbfac62beb",
+      "identical": true
+    }
+  ],
+  "ui": {
+    "viewport": "390 × 844",
+    "javascript": false,
+    "reducedMotion": true,
+    "homeStatus": 200,
+    "headerVisible": true,
+    "headerColor": "rgb(20, 33, 58)",
+    "wordmarkLoaded": true,
+    "horizontalOverflow": false,
+    "mobileMenu": "native details visible",
+    "diagnosticLink": "navigation succeeded",
+    "diagnosticStatus": 200,
+    "diagnosticTitle": "Voir clair avant d’agir"
+  },
+  "result": "passed"
+}

@@ -1,71 +1,12 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,rmSync,copyFileSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,readFileSync,writeFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
-import {prepareCms,readCmsConfig,inspectCms} from './cms-config.mjs';
-
-function workspace(t){
- const root=mkdtempSync(resolve(tmpdir(),'calas-cms-config-'));
- for(const app of ['web','studio']){
-  mkdirSync(resolve(root,`apps/${app}`),{recursive:true});
-  copyFileSync(new URL(`../apps/${app}/.env.example`,import.meta.url),resolve(root,`apps/${app}/.env.example`));
- }
- t.after(()=>rmSync(root,{recursive:true,force:true}));
- return root;
-}
-
-test('la préparation conserve le mode de travail, les secrets existants et les réglages de mail',t=>{
- const root=workspace(t);
- prepareCms(root);
- const before=readCmsConfig(root,{});
- assert.equal(before.web.CONTENT_MODE,'demo');
- assert(before.web.PREVIEW_SESSION_SECRET.length>=32);
- const envPath=resolve(root,'apps/web/.env');
- writeFileSync(envPath,readFileSync(envPath,'utf8')+'\n# réglage à préserver\nEXISTING_SETTING="custom value"\n');
- prepareCms(root,{projectId:'project01',dataset:'staging'});
- const after=readCmsConfig(root,{});
- assert.equal(after.web.PREVIEW_SESSION_SECRET,before.web.PREVIEW_SESSION_SECRET);
- assert.equal(after.web.EXISTING_SETTING,'custom value');
- assert.equal(after.web.MAIL_TRANSPORT,'simulation');
- assert.equal(after.web.PUBLIC_SANITY_PROJECT_ID,after.studio.SANITY_STUDIO_PROJECT_ID);
- assert.equal(after.web.CALAS_ALLOW_CONTENT_WRITE,'no');
-});
-
-test('un projet déjà renseigné dans le Studio est repris sans être effacé par un champ vide',t=>{
- const root=workspace(t);
- writeFileSync(resolve(root,'apps/studio/.env'),'SANITY_STUDIO_PROJECT_ID=project01\nSANITY_STUDIO_DATASET=staging\n');
- prepareCms(root);
- assert.equal(readCmsConfig(root,{}).web.PUBLIC_SANITY_PROJECT_ID,'project01');
-});
-
-test('une divergence de projet est refusée sans toucher aux fichiers',t=>{
- const root=workspace(t);
- prepareCms(root,{projectId:'project01'});
- const studioPath=resolve(root,'apps/studio/.env');
- writeFileSync(studioPath,readFileSync(studioPath,'utf8').replace('project01','project02'));
- const before=readFileSync(resolve(root,'apps/web/.env'),'utf8');
- assert.throws(()=>prepareCms(root),/diffèrent/);
- assert.equal(readFileSync(resolve(root,'apps/web/.env'),'utf8'),before);
-});
-
-test('un dataset de production ou une injection de ligne sont refusés avant écriture',t=>{
- const root=workspace(t);
- assert.throws(()=>prepareCms(root,{projectId:'project01',dataset:'production'}),/dataset de test/);
- assert.throws(()=>prepareCms(root,{projectId:'project01\nCONTENT_MODE=sanity'}),/invalide/);
-});
-
-test('le diagnostic ne révèle pas de secret et détecte localhost mélangé avec 127.0.0.1',t=>{
- const root=workspace(t);
- prepareCms(root,{projectId:'project01'});
- const config=readCmsConfig(root,{});
- config.web.SANITY_API_READ_TOKEN='fake-unit-token-never-real';
- assert(!inspectCms(config).some(check=>check.level==='missing'));
- config.studio.SANITY_STUDIO_PREVIEW_URL='http://127.0.0.1:4321';
- config.web.PUBLIC_SANITY_STUDIO_URL='http://127.0.0.1:3333';
- const checks=inspectCms(config);
- assert(checks.some(check=>check.level==='missing'&&check.message.includes('SITE_URL')));
- assert(checks.some(check=>check.level==='missing'&&check.message.includes('hôte')));
- assert(!JSON.stringify(checks).includes(config.web.SANITY_API_READ_TOKEN));
- assert(!JSON.stringify(checks).includes(config.web.PREVIEW_SESSION_SECRET));
-});
+import {prepareLocal} from './local-prepare.mjs';
+function workspace(t){const root=mkdtempSync(resolve(tmpdir(),'calas-local-'));mkdirSync(resolve(root,'apps/web'),{recursive:true});t.after(()=>rmSync(root,{recursive:true,force:true}));return root;}
+test('local configuration generates private distinct secrets and explicit demo mode',t=>{const root=workspace(t);const {webPath}=prepareLocal(root);const data=readFileSync(webPath,'utf8');assert.match(data,/CONTENT_MODE=demo/);assert.match(data,/BETTER_AUTH_SECRET=[a-f0-9]{64}/);assert.match(data,/DATABASE_URL=postgresql:/);assert.match(data,/AUTH_MAIL_TRANSPORT=local/);assert.match(data,/MAIL_TRANSPORT=simulation/);});
+test('repeating local preparation preserves credentials byte for byte',t=>{const root=workspace(t);const paths=prepareLocal(root);const before=readFileSync(paths.webPath,'utf8');prepareLocal(root);assert.equal(readFileSync(paths.webPath,'utf8'),before);});
+test('existing database, storage and mail values are not overwritten',t=>{const root=workspace(t);const path=resolve(root,'apps/web/.env');writeFileSync(path,'SITE_ENV=staging\nCONTENT_MODE=database\nDATABASE_URL=custom-database\nBETTER_AUTH_SECRET=existing-private-value\nSMTP_TO=another@example.test\n');prepareLocal(root);const data=readFileSync(path,'utf8');for(const value of ['CONTENT_MODE=database','DATABASE_URL=custom-database','BETTER_AUTH_SECRET=existing-private-value','SMTP_TO=another@example.test'])assert(data.includes(value));});
+test('local preparation refuses production before changing files',t=>{const root=workspace(t);const path=resolve(root,'apps/web/.env');const previous='SITE_ENV=production\n';writeFileSync(path,previous);assert.throws(()=>prepareLocal(root),/production/);assert.equal(readFileSync(path,'utf8'),previous);});
+test('configuration contains no initial account or default admin password',t=>{const root=workspace(t);const {webPath}=prepareLocal(root);assert.doesNotMatch(readFileSync(webPath,'utf8'),/INIT_ADMIN|ADMIN_PASSWORD|password123/);});

@@ -11,13 +11,14 @@ import {safeHref} from '../lib/links';
 import type {SiteSettings} from '../lib/cms/types';
 interface Props { title: string; description?: string; settings: SiteSettings; noindex?: boolean }
 const {title,description='Calas Conseil : prévention des risques psychosociaux, qualité du lien, accompagnement des équipes et des managers.',settings,noindex=false}=Astro.props;
-const preview=isPreview(Astro.cookies);
+const preview=await isPreview(Astro);
 const Preview=preview?(await import('../lib/cms/Preview.astro')).default:undefined;
 const production=isProductionSite();
 const hidden=noindex || !production || preview;
 const origin=env('SITE_URL','http://localhost:4321');
 const canonical=new URL(Astro.url.pathname,origin).href;
-const nav=[['Diagnostic RPS','/diagnostic-rps/'],['Équipes','/equipes/'],['Managers','/managers/'],['Notre approche','/notre-approche/'],['Qui sommes-nous','/qui-sommes-nous/'],['Réflexions','/reflexions/'],['Contact','/contact/']];
+const nav=[['Notre approche','/notre-approche/'],['Qui sommes-nous','/qui-sommes-nous/'],['Réflexions','/reflexions/'],['Contact','/contact/']];
+const offers=[['Diagnostic et prévention des RPS','/diagnostic-rps/'],['Compétences relationnelles','/equipes/'],['Managers et dirigeants','/managers/'],['Situations sensibles','/situations-sensibles/']];
 const phoneHref=`tel:${settings.phone.replace(/\s/g,'').replace(/^0/,'+33')}`;
 const organization={
   '@context':'https://schema.org','@type':'Organization',name:settings.brand,
@@ -48,17 +49,20 @@ const organization={
     {!production && <div class="environment-note">Version de travail · Relecture avant publication{env('MAIL_TRANSPORT','simulation')==='simulation'?' · Formulaire de test, aucun courriel envoyé':''}</div>}
     <header class="site-header">
       <div class="wrap header-inner">
-        <a class="brand-link" href="/" aria-label="Calas Conseil — Accueil"><Brand /></a>
+        <a class="brand-link" href="/" aria-label="Calas Conseil — Accueil"><Brand dark withTagline /></a>
         <nav class="desktop-nav" aria-label="Navigation principale">
-          {nav.map(([label,href],i)=><a href={href} class:list={{priority:i===0,'nav-contact':i===6}} aria-current={Astro.url.pathname===href?'page':undefined}>{label}</a>)}
+          <a href="/notre-approche/" aria-current={Astro.url.pathname==='/notre-approche/'?'page':undefined}>Notre approche</a>
+          <details class="offers-menu"><summary>Nos offres <span aria-hidden="true">⌄</span></summary><div class="offers-panel">{offers.map(([label,href])=><a href={href} aria-current={Astro.url.pathname===href?'page':undefined}>{label}<span aria-hidden="true">↗</span></a>)}</div></details>
+          {nav.slice(1).map(([label,href])=><a href={href} class:list={{'nav-contact':href==='/contact/'}} aria-current={Astro.url.pathname===href?'page':undefined}>{label}</a>)}
         </nav>
         <details class="mobile-nav" id="mobile-menu">
           <summary aria-controls="mobile-panel">Menu</summary>
-          <nav class="mobile-panel" id="mobile-panel" aria-label="Navigation mobile">{nav.map(([label,href])=><a href={href} aria-current={Astro.url.pathname===href?'page':undefined}>{label}<span aria-hidden="true" style="float:right">↗</span></a>)}</nav>
+          <nav class="mobile-panel" id="mobile-panel" aria-label="Navigation mobile"><a href="/notre-approche/" aria-current={Astro.url.pathname==='/notre-approche/'?'page':undefined}>Notre approche</a><span class="mobile-offers-label">Nos offres</span>{offers.map(([label,href])=><a class="mobile-offer" href={href} aria-current={Astro.url.pathname===href?'page':undefined}>{label}<span aria-hidden="true">↗</span></a>)}{nav.slice(1).map(([label,href])=><a href={href} aria-current={Astro.url.pathname===href?'page':undefined}>{label}</a>)}</nav>
         </details>
       </div>
       <span class="reading-progress" aria-hidden="true"></span>
     </header>
+    <a class="mobile-contact" href="/contact/">Échanger sur vos priorités <span aria-hidden="true">↗</span></a>
     <main id="contenu" tabindex="-1"><slot /></main>
     <footer class="site-footer dark">
       <div class="wrap">
@@ -66,7 +70,7 @@ const organization={
         <div class="footer-top">
           <div><div class="footer-brand"><Brand dark withTagline /></div><p class="footer-description">{settings.footerText}</p></div>
           <div><p class="footer-label">Faire le premier pas</p><div class="footer-links"><a href={phoneHref}>{settings.phone}</a><a href={`mailto:${settings.email}`} style="overflow-wrap:anywhere">{settings.email}</a><a href="/contact/">Échanger sur votre situation ↗</a>{settings.linkedin&&<a href={safeHref(settings.linkedin)} rel="noopener noreferrer">LinkedIn ↗</a>}</div></div>
-          <div><p class="footer-label">Nos accompagnements</p><nav class="footer-links" aria-label="Pied de page">{nav.slice(0,3).map(([label,href])=><a href={href}>{label}</a>)}<a href="/notre-approche/">Notre approche</a></nav></div>
+          <div><p class="footer-label">Nos accompagnements</p><nav class="footer-links" aria-label="Pied de page">{offers.map(([label,href])=><a href={href}>{label}</a>)}<a href="/notre-approche/">Notre approche</a></nav></div>
         </div>
         <div class="footer-bottom"><span>© {new Date().getFullYear()} Calas Conseil</span><nav aria-label="Informations légales"><a href="/mentions-legales/">Mentions légales</a><a href="/confidentialite/">Confidentialité</a></nav><span>La voie de la qualité relationnelle.</span></div>
       </div>
@@ -82,6 +86,12 @@ const organization={
         document.addEventListener('keydown',(event)=>{if(event.key==='Escape'&&menu.open){menu.open=false;summary.focus();}});
         document.addEventListener('click',(event)=>{if(menu.open&&!menu.contains(event.target as Node))menu.open=false;});
       }
+      document.querySelectorAll<HTMLDetailsElement>('.offers-menu').forEach(dropdown=>{
+        const trigger=dropdown.querySelector('summary');
+        const sync=()=>trigger?.setAttribute('aria-expanded',String(dropdown.open));sync();dropdown.addEventListener('toggle',sync);
+        document.addEventListener('keydown',event=>{if(event.key==='Escape'&&dropdown.open){dropdown.open=false;trigger?.focus();}});
+        document.addEventListener('click',event=>{if(dropdown.open&&!dropdown.contains(event.target as Node))dropdown.open=false;});
+      });
       window.addEventListener('pagehide',disposeMotion,{once:true});
     </script>
   </body>

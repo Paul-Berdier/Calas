@@ -1,0 +1,15 @@
+{
+  "environment": "http://localhost:4336",
+  "clockModified": false,
+  "onlyNewSessionsAffected": true,
+  "reports": [
+    {
+      "name": "Actual server-side expired session cannot access private API or admin",
+      "passed": true
+    },
+    {
+      "name": "Official sign-out invalidates the newly created session immediately",
+      "passed": true
+    }
+  ]
+}

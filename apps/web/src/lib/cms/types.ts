@@ -1,31 +1,33 @@
-import type { PortableTextBlock } from '@portabletext/types';
+export interface RichMark { type: 'bold' | 'italic' | 'link' | 'strike' | 'code' | 'underline'; attrs?: Record<string, unknown> }
+export interface RichNode { type: string; text?: string; attrs?: Record<string, unknown>; marks?: RichMark[]; content?: RichNode[] }
+export interface RichDocument extends RichNode { type: 'doc'; content: RichNode[] }
 
 export interface Cta { label: string; href: string }
 export interface Seo { title?: string; description?: string }
 export interface ContentImage {
   alt: string;
-  asset: { _ref?: string; _id?: string; url?: string; metadata?: { dimensions?: { width: number; height: number }; lqip?: string } };
+  mediaId: string; width?: number; height?: number;
   crop?: { top: number; bottom: number; left: number; right: number };
   hotspot?: { x: number; y: number; width: number; height: number };
 }
 export interface ContentFile {
-  asset?: { _id?: string; url?: string; originalFilename?: string; size?: number; mimeType?: string };
+  mediaId: string; originalFilename?: string; size?: number; mimeType?: string;
 }
 export interface Statistic {
-  _id: string; value: string; label: string; source: string; sourceUrl: string;
-  year: string; note: string; verified: boolean;
+  id: string; value: string; label: string; source: string; sourceUrl: string;
+  year: string; note: string; verified: boolean; group?: 'people' | 'cost';
 }
-export interface Person { _id: string; name: string; role: string; bio?: string; portrait?: ContentImage }
+export interface Person { id: string; name: string; role: string; bio?: string; portrait?: ContentImage }
 export interface Section {
-  _key: string; title?: string; eyebrow?: string; text?: string;
+  key: string; title?: string; eyebrow?: string; text?: string;
   kind?: 'text' | 'steps' | 'list' | 'split' | 'notice';
   presentation?: 'default' | 'method' | 'faq' | 'deliverables';
   navigationLabel?: string; instruction?: string; image?: ContentImage;
-  items?: Array<{ _key?: string; title: string; text: string; number?: string }>;
-  body?: PortableTextBlock[];
+  items?: Array<{ key?: string; title: string; text: string; number?: string }>;
+  body?: RichDocument;
 }
 export interface Page {
-  _id: string; slug: string; title: string; eyebrow?: string; intro: string;
+  id: string; slug: string; title: string; eyebrow?: string; intro: string;
   sections: Section[]; cta?: Cta; image?: ContentImage; seo?: Seo;
   format?: { duration?: string; rhythm?: string; delivery?: string };
   offerExcerpt?: string;
@@ -34,24 +36,33 @@ export interface Page {
   contact?: { formEyebrow?: string; formTitle?: string; directHeading?: string; context?: string; linkedinLabel?: string };
 }
 export interface Article {
-  _id: string; slug: string; title: string; date: string; excerpt: string;
-  body: PortableTextBlock[]; author: Person; category?: { title: string; slug?: string };
-  image?: ContentImage; sourcePdf?: ContentFile; seo?: Seo;
+  id: string; slug: string; title: string; date: string; excerpt: string;
+  body: RichDocument; author?: Person; category?: { title: string; slug?: string };
+  image?: ContentImage; sourcePdf?: ContentFile; seo?: Seo; externalUrl?: string;
 }
 export interface SiteSettings {
   brand: string; tagline: string; phone: string; email: string; linkedin?: string;
   qualification: { status: 'pending' | 'verified'; label?: string; registration?: string; personId?: string };
   footerText?: string;
   contactText?: string;
+  contactHours?: string;
+  responseTime?: string;
 }
+export type HomeVisualName = 'threads' | 'nautilus' | 'roots' | 'compass' | 'tree' | 'kintsugi' | 'ripples' | 'murmuration' | 'calmFace' | 'closing';
 export interface Home {
   eyebrow: string; title: string; intro: string; primaryCta: Cta; secondaryCta: Cta;
+  visuals?: Partial<Record<HomeVisualName, ContentImage>>;
+  whyNow?: { title: string; text: string };
+  journey?: {
+    cards: Array<{ key: string; eyebrow: string; title: string; lead?: string; text: string; cta: Cta }>;
+    transition: string; sensitiveText: string; sensitiveCta: Cta;
+  };
   statistics: Statistic[]; statisticsTitle?: string; statisticsTransition?: string;
   diagnostic: { title: string; text: string; cta: Cta; image?: ContentImage };
-  reasons: Array<{ _key?: string; title: string; text: string }>;
+  reasons: Array<{ key?: string; title: string; text: string }>;
   reasonsTitle?: string;
   domainsTitle?: string; domainsIntro?: string;
-  conviction: { title: string; text: string; cta: Cta };
+  conviction: { title: string; text: string; closingQuote?: string; cta: Cta };
   closingTitle?: string; closingCta?: Cta; seo?: Seo;
   editorial?: {
     heroAudience?: string; heroDisciplines?: string[]; heroArtTop?: string; heroArtBottom?: string; heroArtCaption?: string; exploreLabel?: string;

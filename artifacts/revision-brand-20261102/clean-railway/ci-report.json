@@ -1,0 +1,33 @@
+{
+  "commit": "ed90d0ea98c1f8616e6c3b8d583f55286303b25b",
+  "workflowRun": 41528238307,
+  "url": "https://github.com/Paul-Berdier/Calas/actions/runs/41528238307",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "id": 125561411643,
+      "name": "container",
+      "conclusion": "success"
+    },
+    {
+      "id": 125561412228,
+      "name": "validate",
+      "conclusion": "success"
+    }
+  ],
+  "lighthouse": {
+    "recordedAt": "2026-11-02T21:30:01.972Z",
+    "performance": 93,
+    "accessibility": 100,
+    "bestPractices": 96,
+    "lcpMs": 2935.7357023966806,
+    "cls": 0,
+    "tbtMs": 0,
+    "speedIndexMs": 2110.7357023966806
+  },
+  "standalone": {
+    "startedAt": "2026-11-02T21:29:48.606Z",
+    "completedAt": "2026-11-02T21:32:29.568Z"
+  },
+  "source": "GitHub Actions workflow/job APIs and decoded job logs; no rerun requested."
+}

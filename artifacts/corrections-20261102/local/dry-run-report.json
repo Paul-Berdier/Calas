@@ -1,0 +1,23 @@
+{
+  "origin": "http://localhost:4336",
+  "mode": "dry-run",
+  "startedAt": "2026-11-02T20:17:54.936Z",
+  "contentMutated": false,
+  "mediaUploaded": 0,
+  "documentsPublished": 0,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "snapshotSaved": true,
+  "documents": [
+    {
+      "key": "home",
+      "version": 7
+    },
+    {
+      "key": "settings",
+      "version": 3
+    }
+  ],
+  "localServerStopped": true,
+  "completedAt": "2026-11-02T20:17:58.943Z"
+}

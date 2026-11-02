@@ -1,0 +1,56 @@
+{
+  "externalRequests": 0,
+  "reports": [
+    {
+      "file": "texte.pdf",
+      "forceOcr": false,
+      "pages": 1,
+      "ocrPages": 0,
+      "characters": 293,
+      "warnings": [
+        "Relisez le texte avant publication : les tableaux, colonnes, images, notes et la mise en page du PDF ne sont pas conservés fidèlement."
+      ]
+    },
+    {
+      "file": "scan.pdf",
+      "forceOcr": false,
+      "pages": 1,
+      "ocrPages": 1,
+      "characters": 293,
+      "warnings": [
+        "Relisez le texte avant publication : les tableaux, colonnes, images, notes et la mise en page du PDF ne sont pas conservés fidèlement.",
+        "1 page a nécessité l’OCR français/anglais. Des erreurs de mots, de ponctuation ou d’ordre sont possibles : relisez le brouillon avec le PDF original."
+      ]
+    },
+    {
+      "file": "mixte.pdf",
+      "forceOcr": false,
+      "pages": 2,
+      "ocrPages": 1,
+      "characters": 587,
+      "warnings": [
+        "Relisez le texte avant publication : les tableaux, colonnes, images, notes et la mise en page du PDF ne sont pas conservés fidèlement.",
+        "1 page a nécessité l’OCR français/anglais. Des erreurs de mots, de ponctuation ou d’ordre sont possibles : relisez le brouillon avec le PDF original."
+      ]
+    },
+    {
+      "file": "texte.pdf",
+      "forceOcr": true,
+      "pages": 1,
+      "ocrPages": 1,
+      "characters": 293,
+      "warnings": [
+        "Relisez le texte avant publication : les tableaux, colonnes, images, notes et la mise en page du PDF ne sont pas conservés fidèlement.",
+        "1 page a nécessité l’OCR français/anglais. Des erreurs de mots, de ponctuation ou d’ordre sont possibles : relisez le brouillon avec le PDF original."
+      ]
+    },
+    {
+      "check": "Invalid PDF rejected",
+      "result": "passed"
+    },
+    {
+      "check": "Cancellation during OCR model loading without result",
+      "result": "passed"
+    }
+  ]
+}
