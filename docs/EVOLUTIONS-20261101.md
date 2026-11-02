@@ -77,3 +77,8 @@ Synthèse de cette recette : [rapport](../artifacts/brief-20261101/validation-su
 ## Vérification Railway du 2 novembre
 
 La version finale 77493b1 est déployée après correction d'un encadré trop étroit sur mobile. Les 24 documents ciblés sont publiés, l'historique et les autres documents sont conservés, et la vérification idempotente constate zéro correction restante. La recette distante réussit 30 contrôles publics, huit rendus et huit audits d'accessibilité, plus six audits de l'administration avec connexion réelle. Aucun email, achat de domaine ou changement d'identifiant n'a eu lieu. Détails dans [DEPLOYMENT.md](DEPLOYMENT.md#nouveau-cahier-des-charges--2-novembre-2026).
+
+
+## Complément photographique reçu le 2 novembre
+
+Le portrait de Sara est désormais fourni et publié sur l'accueil et Qui sommes-nous. Le bol réparé illustre Situations sensibles et la photo des ondes remplace l'esquisse correspondante dans Notre conviction. Les bobines et la boussole reçues restent disponibles dans la médiathèque privée. Le portrait d'Agnès et les photos d'atelier restent à fournir. Cette intégration utilise les champs CMS existants, sans déploiement applicatif ; provenance et choix dans [MEDIA.md](MEDIA.md#photos-fournies-pour-sara--2-novembre-2026).

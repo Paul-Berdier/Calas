@@ -18,7 +18,7 @@
 - [ ] Le rôle du binôme et la limite de ce que le diagnostic promet sont exacts.
 - [ ] Le numéro d'enregistrement IPRP **2026.16.004**, demandé par Paul, est correctement attribué à Sara. Aucun enregistrement d'Agnès ni contrôle d'attestation n'est déduit de ce numéro.
 - [ ] Les cinq formats de Situations sensibles et leurs limites sont relus ; le téléphone n'est pas présenté comme un service d'urgence et les horaires restent à confirmer.
-- [ ] Les huit illustrations issues du document de Sara conviennent à leurs emplacements ; les portraits authentiques et les éventuelles photos de visages ou d'atelier restent à fournir.
+- [ ] Les illustrations et les photographies conviennent à leurs emplacements. Le portrait de Sara, le bol kintsugi et les ondes sur l'eau reçus le 2 novembre sont intégrés au CMS et à la recette Railway. Le portrait d'Agnès et les éventuelles photos d'atelier restent à fournir.
 - [ ] Les cinq cartes Réflexions renvoient aux articles originaux de Sara sur LinkedIn ; leurs titres, dates et aperçus conviennent. Elles ne sont pas présentées comme des articles intégraux hébergés sur Calas.
 - [ ] Les CTA sont faciles à trouver sur mobile ; l'objet Diagnostic est présélectionné au contact.
 - [ ] Le formulaire et la confidentialité décrivent les nouveaux champs : organisation, fonction et téléphone facultatifs, accord non précoché, objet Situation sensible. Le délai de réponse annoncé est confirmé avant affichage.
@@ -30,7 +30,7 @@ Décision à consigner : date, noms des personnes ayant relu, version du code, f
 
 | Élément | Décision attendue | Comportement avant validation |
 | --- | --- | --- |
-| Portraits Sara et Agnès | Fichiers authentiques, droits d'usage, cadrages et textes alternatifs | Présentation typographique, aucun faux portrait |
+| Portraits Sara et Agnès | Relecture des cadrages ; portrait d'Agnès encore à fournir | Portrait de Sara fourni par Paul le 2 novembre et intégré à l'accueil et à Qui sommes-nous via le CMS ; présentation typographique conservée pour Agnès |
 | Biographies et diplômes | Relecture finale des textes et intitulés par Sara et Agnès | Biographies détaillées reprises du nouveau brief ; aucune biographie inventée |
 | IPRP Sara | Attestation, autorité/région et validité | Numéro **2026.16.004** et formulation « enregistrée auprès de la DREETS » fournis ; numéro affiché et attribué à Sara en recette locale. La qualification structurée reste `pending`, sans preuve marquée vérifiée |
 | Articles | Textes intégraux si une lecture sur Calas est souhaitée ; sixième article et composition de série ; droits des images | Cinq cartes éditables avec auteur, date, aperçu et lien original LinkedIn. Aucun texte intégral ni image LinkedIn importé |

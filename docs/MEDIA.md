@@ -78,3 +78,22 @@ node scripts/pdf-editorial-e2e.mjs
 Les tests d’intégration créent puis suppriment leur propre base locale nommée `calas_media_test_*`. Ils ne modifient pas les contenus éditoriaux de la base de développement. Les objets S3 synthétiques qu’ils créent sont nettoyés à la fin.
 
 Rapports et captures : `artifacts/custom-cms/pdf-import/` et `artifacts/custom-cms/editorial-e2e/`. La session de test `.cache/admin-state.json` reste privée et ignorée par Git. La recette générale de l’administration est documentée dans `docs/RECETTE.md`. Ces vérifications locales ne revendiquent ni un raccordement Railway Buckets, ni un stockage distant de production.
+
+
+## Photos fournies pour Sara — 2 novembre 2026
+
+Paul a transmis l'archive ma_photo_profil_et_images_site.zip, contenant cinq images. Elles ont été importées par les API authentifiées du CMS en local puis sur la préproduction Railway. Les originaux reçus sont conservés dans le dossier opérateur privé, hors Git. L'image AVIF des ondes a été convertie en WebP sans perte avant l'import ; aucune retouche générative ni modification des visages. Le CMS applique ensuite son traitement habituel et ses variantes responsives.
+
+| Fichier reçu | Usage retenu |
+| --- | --- |
+| portrait_fond_naturel.png | Portrait de Sara Serrano Cabeza : accueil et Qui sommes-nous, cadre 4/5, point d'intérêt 50 % / 44 % |
+| kintsugi-art-japonais-bol-repare-or.webp | Lien Situations sensibles sur l'accueil et image d'ouverture de cette page |
+| pexels-photo-36744232.avif | Ondes sur l'eau dans le bloc Notre conviction de l'accueil |
+| Fils-Dores-Tissage-Ethchic.webp | Réserve dans la médiathèque privée, sans référence publiée |
+| stickers-vintage-boussole-se-situe-sur-une-ancienne-carte-du-monde.jpg.jpg | Réserve dans la médiathèque privée, sans référence publiée |
+
+Le bol illustre la réparation du lien et les ondes sa propagation. Les dessins existants de tissage et de boussole restent en place : ils servent mieux la lecture de ces emplacements que les bobines de produit et la carte ancienne. Le portrait d'Agnès n'a pas été fourni ; sa présentation typographique reste inchangée. Tous les médias sont remplaçables dans l'administration.
+
+Seuls les champs d'images de trois documents ont changé : Sara, Accueil et Situations sensibles. Chaque opération utilise un instantané préalable, les versions attendues et une publication explicite. Les anciennes révisions et tous les autres champs sont vérifiés inchangés. Les cinq médias sont inaccessibles anonymement avant publication ; seuls les trois retenus deviennent publics. Les deux réserves restent en HTTP 404 pour un visiteur anonyme. Aucun compte, courriel, code applicatif ni configuration Railway n'a été modifié. Rapports : artifacts/sara-images-20261102/.
+
+Vérification du rendu après publication : six vues en local et six sur Railway (accueil, Qui sommes-nous, Situations sensibles à 390/1440 pixels), sans violation axe, débordement ni erreur JavaScript/HTTP. Portrait chargé, cadre 4/5 et point d'intérêt conservés ; photos de conviction et kintsugi présentes. Cadrages relus visuellement. Typecheck : zéro erreur, zéro avertissement, 18 indications de dépréciation existantes ; lint réussi. Aucun rebuild ni redéploiement n'est nécessaire pour ces changements de contenu. Les sessions opérateur dédiées ont été déconnectées ; le serveur local de test4336 arrêté, l'aperçu4321 reste disponible.

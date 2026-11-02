@@ -107,3 +107,8 @@ Paul a confirmé que le domaine n'a pas été acheté. La proposition OVHcloud r
 ## Publication du nouveau brief sur Railway — 2 novembre 2026
 
 Sur demande explicite de Paul, le code applicatif 6b3394e et les 24 documents du brief ont été déployés sur la préproduction existante. L'opération ponctuelle distante conserve le garde local du script versionné, utilise le rôle SQL applicatif, une sauvegarde PostgreSQL chiffrée, un plan figé et des versions attendues. Elle a publié 24 documents après le succès du nouveau déploiement. Les anciennes révisions et les documents hors périmètre sont vérifiés identiques ; aucun reset, changement de schéma, transfert de comptes ni mutation S3. La qualification IPRP reste pending. La base compte désormais 29 documents avec les anciens contenus conservés. Détails et preuves dans [DEPLOYMENT.md](DEPLOYMENT.md#nouveau-cahier-des-charges--2-novembre-2026) et artifacts/brief-20261101/railway/.
+
+
+## Médias de Sara — 2 novembre 2026
+
+L'archive de photos transmise par Paul a été intégrée au CMS local puis Railway sans nouvelle migration SQL ni déploiement du code. Cinq médias importés, trois utilisés publiquement : portrait Sara, kintsugi, ondes. Deux réserves restent privées. Trois documents seulement ont reçu de nouvelles révisions publiées : Sara v3 → v5, Accueil v5 → v7 et Situations sensibles v2 → v4. Les anciennes révisions et tous les champs non ciblés ont été comparés et conservés ; aucune donnée de compte modifiée. Voir [MEDIA.md](MEDIA.md#photos-fournies-pour-sara--2-novembre-2026) et artifacts/sara-images-20261102/.
