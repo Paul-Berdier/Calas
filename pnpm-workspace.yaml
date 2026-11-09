@@ -7,5 +7,9 @@ allowBuilds:
   tesseract.js: false
 overrides:
   '@opentelemetry/api': 1.9.0
+  # ESLint and typescript-eslint still request the affected v10 matcher (GHSA-g3hv-75wg-m249).
+  'eslint@10.13.0>minimatch': 11.0.1
+  '@eslint/config-array@0.23.5>minimatch': 11.0.1
+  '@typescript-eslint/typescript-estree@8.72.0>minimatch': 11.0.1
   # Drizzle's legacy TypeScript loader still requests the vulnerable esbuild 0.18.
   '@esbuild-kit/core-utils@3.3.2>esbuild': 0.25.12

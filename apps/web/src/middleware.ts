@@ -23,10 +23,20 @@ export const onRequest=defineMiddleware(async(context,next)=>{
     response=new Response('<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Un instant, s’il vous plaît — Calas Conseil</title><body style="margin:0;padding:12vh 8vw;background:#f7f2ea;color:#14213a;font:22px/1.5 Georgia,serif"><main style="max-width:650px;margin:auto"><p>CALAS CONSEIL</p><h1>Le site est momentanément indisponible.</h1><p>Merci de réessayer dans quelques instants. Nous vous remercions de votre patience.</p><a href="/">Réessayer</a></main></body></html>',{status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'private, no-store','Retry-After':'60'}});
   }
   const headers=new Headers(response.headers);
+  // Only an existing public HTML page has a canonical slash. Keep missing URLs,
+  // API calls, files and contact submissions on their original response path.
+  if (response.status === 200 && !privateRoute && !path.endsWith('/') && !path.startsWith('//')
+    && ['GET', 'HEAD'].includes(context.request.method) && headers.get('Content-Type')?.includes('text/html')) {
+    await response.body?.cancel();
+    response = new Response(null, { status: 308 });
+    headers.set('Location', path + '/' + context.url.search);
+    headers.delete('Content-Length');
+    headers.delete('Content-Type');
+  }
   headers.set('X-Content-Type-Options','nosniff');
   headers.set('Referrer-Policy',privateRoute||context.locals.cmsPreview?'no-referrer':'strict-origin-when-cross-origin');
   headers.set('Permissions-Policy','camera=(), microphone=(), geolocation=()');
-  if(!isProductionSite()||privateRoute||context.locals.cmsPreview)headers.set('X-Robots-Tag','noindex, nofollow, noarchive');
+  if(!isProductionSite()||privateRoute||context.locals.cmsPreview||context.url.searchParams.get('preview')==='1')headers.set('X-Robots-Tag','noindex, nofollow, noarchive');
   if(context.locals.cmsPreview||context.url.searchParams.has('preview')||privateRoute||path.startsWith('/contact'))headers.set('Cache-Control','private, no-store');
   if(isProductionSite())headers.set('Strict-Transport-Security','max-age=31536000');
   if(headers.get('content-type')?.includes('text/html')){

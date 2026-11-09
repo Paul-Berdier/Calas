@@ -31,10 +31,10 @@ async function addUser(email:string, role:Fixture['role'], verified=true):Promis
 
 // Exercise the deployed handler's origin/rate/endpoint checks as well as Better Auth.
 let clientNumber = 0;
-async function post(path:string, data:object, cookie='', requestOrigin=origin){
+async function post(path:string, data:object, cookie='', requestOrigin=origin, address='127.0.0.'+(++clientNumber)){
   const url = new URL('/api/auth/' + path + '/',origin);
   const request = new Request(url,{method:'POST',headers:{origin:requestOrigin,'content-type':'application/json',cookie},body:JSON.stringify(data)});
-  return authRoute({params:{all:path},url,request,clientAddress:'127.0.0.'+(++clientNumber)} as Parameters<typeof authRoute>[0]);
+  return authRoute({params:{all:path},url,request,clientAddress:address} as Parameters<typeof authRoute>[0]);
 }
 const login = (user:Fixture) => post('sign-in/email',{email:user.email,password:user.password});
 const cookies = (response:Response) => response.headers.getSetCookie().map(value=>value.split(';')[0]).join('; ');
@@ -123,6 +123,9 @@ test('named production users sign in with verified email and password, including
 
     const wrong=await post('sign-in/email',{email:paul.email,password:'incorrect'});
     assert(!wrong.ok,'Unknown password rejected');
+    const failedLogin = () => post('sign-in/email',{email:'login-budget@example.test',password:'incorrect'},'',origin,'192.0.2.19');
+    for (let attempt=0; attempt<8; attempt++) assert.equal((await failedLogin()).status,401);
+    assert.equal((await failedLogin()).status,429,'Eight invalid attempts exhaust the per-address login budget');
     assert.equal((await post('sign-in/email',{email:paul.email,password:paul.password},'', 'https://external.example')).status,403);
     assert.equal((await post('sign-up/email',{name:'Public',email:'new@example.test',password:'testpassword56789'})).status,404);
     const unverified=await login(agnes);

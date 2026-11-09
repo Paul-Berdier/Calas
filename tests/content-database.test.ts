@@ -185,6 +185,23 @@ test('persistance PostgreSQL réelle, publication et isolation des révisions', 
       assert.equal(await isMediaPublished(pdfId), false);
       assert.equal((await readSiteContent()).articles.find(item => item.id === article.id)!.sourcePdf, undefined);
     });
+    await suite.test('une pièce jointe PDF ne peut obtenir une autorisation en étant aussi référencée comme image', async () => {
+      const cover = { mediaId: pdfId, alt: 'Illustration de recette' };
+      await assert.rejects(saveContent(article.id, { ...article.content, image: cover }, article.version, admin), errorCode('INVALID_IMAGE'));
+      const body = { type: 'doc', content: [{ type: 'image', attrs: cover }] };
+      await assert.rejects(saveContent(article.id, { ...article.content, body }, article.version, admin), errorCode('INVALID_IMAGE'));
+      assert.equal((await getContent(article.id)).version, article.version);
+    });
+    await suite.test('la permission enregistrée dans la version publique prime sur un ancien drapeau média incohérent', async () => {
+      const setLegacyGrant = (flag: boolean) => getPool().query('UPDATE media_references SET is_published=$1, download_allowed=$1 WHERE revision_id=$2 AND media_id=$3', [flag, article.publishedRevisionId, pdfId]);
+      await setLegacyGrant(true);
+      try {
+        assert.equal(await isMediaPublished(pdfId, { download: true }), false);
+        assert.equal((await dashboard(editor)).counts.media, 0);
+        assert(!(await listHistory(editor)).some(event => event.resourceId === pdfId));
+        await assert.rejects(createContent('article', { ...articleInput, slug: 'rattachement-interdit' }, editor), errorCode('PRIVATE_MEDIA'));
+      } finally { await setLegacyGrant(false); }
+    });
     await suite.test('les liens utilisés, slugs uniques et médias historiques sont protégés', async () => {
       const person = await getContent(author.id);
       await assert.rejects(changePublication(person.id, person.version, admin, 'archive'), errorCode('CONTENT_IN_USE'));

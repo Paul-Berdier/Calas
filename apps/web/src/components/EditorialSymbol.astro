@@ -9,5 +9,6 @@ interface Props {
 }
 const {name,class:className='',eager=false,image}=Astro.props;
 const photographic=['nautilus','roots','compass','tree','murmuration'].includes(name);
+const hasCrop = image?.crop && Object.values(image.crop).some(edge => edge > 0);
 ---
-{image?<CmsImage image={image} class={`editorial-symbol editorial-symbol-custom ${className}`} width={960} height={555} sizes="(max-width:599px) 90vw, 45vw" loading={eager?'eager':'lazy'}/>:<img class:list={['editorial-symbol',className,{'editorial-symbol-custom':photographic}]} src={`/images/${photographic?'photographies':'symbols'}/${name}.webp`} width={photographic?960:900} height={photographic?640:520} alt="" aria-hidden="true" loading={eager?'eager':'lazy'} decoding="async" />}
+{image?<CmsImage image={image} class={`editorial-symbol editorial-symbol-custom ${className}`} width={960} height={hasCrop ? 555 : undefined} sizes="(max-width:599px) 90vw, 45vw" loading={eager?'eager':'lazy'}/>:<img class:list={['editorial-symbol',className,{'editorial-symbol-custom':photographic}]} src={`/images/${photographic?'photographies':'symbols'}/${name}.webp`} width={photographic?960:900} height={photographic?640:520} alt="" aria-hidden="true" loading={eager?'eager':'lazy'} decoding="async" />}

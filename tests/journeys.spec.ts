@@ -1,16 +1,22 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import {linkedinArticles} from '../apps/web/src/lib/cms/linkedin-articles';
 
 const paths=['/','/diagnostic-rps/','/equipes/','/managers/','/situations-sensibles/','/notre-approche/','/qui-sommes-nous/','/reflexions/','/contact/','/mentions-legales/','/confidentialite/'];
-test('Diagnostic has one public URL and preserves the query when redirecting', async ({request}) => {
+test('public pages redirect GET and HEAD to their canonical slash with the original query', async ({request}) => {
   const search = '?utm_source=lettre%20Calas&tag=1&tag=2';
-  for (const method of ['GET', 'HEAD']) {
-    const response = await request.fetch('/diagnostic-rps' + search, {method, maxRedirects: 0});
-    expect(response.status()).toBe(308);
-    const location = new URL(response.headers().location, response.url());
-    expect(location.href).toBe(new URL('/diagnostic-rps/' + search, response.url()).href);
-    expect((await request.fetch(location.href, {method, maxRedirects: 0})).status()).toBe(200);
+  const routes = [...paths.slice(1), `/reflexions/${linkedinArticles[0]!.slug}/`];
+  for (const path of routes) {
+    for (const method of ['GET', 'HEAD']) {
+      const response = await request.fetch(path.slice(0,-1) + search, {method, maxRedirects: 0});
+      expect(response.status(), `${method} ${path}`).toBe(308);
+      const location = new URL(response.headers().location, response.url());
+      expect(location.href).toBe(new URL(path + search, response.url()).href);
+      expect((await request.fetch(location.href, {method, maxRedirects: 0})).status()).toBe(200);
+    }
   }
+  expect((await request.get('/page-absente-audit', {maxRedirects:0})).status()).toBe(404);
+  expect((await request.get('/sitemap.xml', {maxRedirects:0})).status()).not.toBe(308);
 });
 test('all editorial routes render, one H1, internal links and clean runtime',async({page,request})=>{
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));page.on('response',response=>{if(response.status()>=400)errors.push(`${response.status()} ${response.url()}`);});
@@ -68,7 +74,7 @@ test('404, private headers, unknown draft and controlled CMS outage',async({page
 test('axe on priority pages, menu and contact errors',async({page})=>{
   for(const width of [1280,390]){
     await page.setViewportSize({width,height:900});
-    for(const path of ['/','/diagnostic-rps/','/contact/']){await page.goto(path);const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();expect(result.violations,JSON.stringify(result.violations,null,2)).toEqual([]);}
+    for(const path of ['/','/diagnostic-rps/','/contact/']){await page.goto(path);const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();expect(result.violations,JSON.stringify(result.violations,null,2)).toEqual([]);}
   }
-  await page.locator('.form-submit').click();await expect(page.locator('#error-name')).not.toBeEmpty();expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);
+  await page.locator('.form-submit').click();await expect(page.locator('#error-name')).not.toBeEmpty();expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);
 });

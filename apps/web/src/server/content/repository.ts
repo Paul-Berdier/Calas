@@ -4,7 +4,7 @@ import { alias } from 'drizzle-orm/pg-core';
 import { getDb, type DatabaseExecutor, type Transaction } from '../db';
 import { articleRevisions, articles, auditLogs, categories, documents, mediaReferences, pageRevisions, pages, people, revisionReferences, revisions, siteSettings, statistics } from '../db/schema';
 import { media } from '../media/schema';
-import { visibleMediaFilter } from '../media/visibility';
+import { publishedMediaFilter, visibleMediaFilter } from '../media/visibility';
 import type { SiteContent } from '../../lib/cms/types';
 import { assertPublishable, ContentError, contentTitle, parseContent, type ArticleDraft, type ContentDetail, type ContentKind, type ContentRevision, type EditorialActor } from './models';
 
@@ -55,15 +55,11 @@ async function currentRevision(db: DatabaseExecutor, document: DocumentRow): Pro
   return revision;
 }
 
-function collectMedia(value: unknown, result = new Map<string, boolean>(), downloadable = true): Map<string, boolean> {
-  if (Array.isArray(value)) { for (const item of value) collectMedia(item, result, downloadable); return result; }
-  if (!value || typeof value !== 'object') return result;
-  const object = value as Record<string, unknown>;
-  if (typeof object.mediaId === 'string') result.set(object.mediaId, (result.get(object.mediaId) || false) || downloadable);
-  for (const [key, child] of Object.entries(object)) {
-    collectMedia(child, result, key === 'sourcePdf' ? object.allowPdfDownload === true : downloadable);
-  }
-  return result;
+function collectImages(value: unknown, mediaIds: Map<string, boolean>): void {
+  if (!value || typeof value !== 'object') return;
+  const node = value as Record<string, unknown>;
+  if (typeof node.mediaId === 'string') mediaIds.set(node.mediaId, true);
+  for (const child of Object.values(node)) collectImages(child, mediaIds);
 }
 
 async function validateReferences(tx: Transaction, kind: ContentKind, content: Record<string, unknown>, actor: ContentWriter, publishing: boolean) {
@@ -82,15 +78,21 @@ async function validateReferences(tx: Transaction, kind: ContentKind, content: R
     if (!target || target.kind !== reference.kind) throw new ContentError(422, 'MISSING_REFERENCE', 'Une personne, une catégorie ou un chiffre référencé est introuvable.');
     if (publishing && ['author', 'category', 'qualification'].includes(reference.relation) && target.status !== 'published') throw new ContentError(422, 'UNPUBLISHED_REFERENCE', 'Publiez d’abord la personne ou la catégorie utilisée par ce contenu.');
   }
-  const mediaIds = collectMedia(content);
+  const { sourcePdf, ...imageContent } = content;
+  const pdfId = (sourcePdf as { mediaId?: string } | undefined)?.mediaId;
+  const mediaIds = new Map<string, boolean>();
+  collectImages(imageContent, mediaIds);
+  if (pdfId) {
+    if (mediaIds.has(pdfId)) throw new ContentError(422, 'INVALID_IMAGE', 'Le PDF original ne peut pas servir d’illustration.');
+    mediaIds.set(pdfId, content.allowPdfDownload === true);
+  }
   for (const [id] of mediaIds) {
     const [asset] = await tx.select().from(media).where(eq(media.id, id)).for('share');
     if (!asset) throw new ContentError(422, 'MISSING_MEDIA', 'Un média sélectionné est introuvable.');
     if (actor.role === 'editor' && asset.createdBy !== actor.id) {
-      const [publicUse] = await tx.select({ id: mediaReferences.id }).from(mediaReferences).where(and(eq(mediaReferences.mediaId, id), eq(mediaReferences.isPublished, true))).limit(1);
+      const [publicUse] = await tx.select({ id: media.id }).from(media).where(and(eq(media.id, id), publishedMediaFilter())).limit(1);
       if (!publicUse) throw new ContentError(403, 'PRIVATE_MEDIA', 'Ce média privé n’appartient pas à votre espace autorisé.');
     }
-    const pdfId = (content.sourcePdf as { mediaId?: string } | undefined)?.mediaId;
     if (id === pdfId && asset.mimeType !== 'application/pdf') throw new ContentError(422, 'INVALID_PDF', 'La pièce jointe doit être un PDF.');
     if (id !== pdfId && !asset.mimeType.startsWith('image/')) throw new ContentError(422, 'INVALID_IMAGE', 'Une illustration doit être une image.');
   }
@@ -411,7 +413,7 @@ export async function readSiteContent(options: { preview?: boolean } = {}): Prom
 }
 
 export async function isMediaPublished(id: string, options: { download?: boolean } = {}): Promise<boolean> {
-  const [reference] = await getDb().select({ id: mediaReferences.id }).from(mediaReferences).where(and(eq(mediaReferences.mediaId, id), eq(mediaReferences.isPublished, true), options.download ? eq(mediaReferences.downloadAllowed, true) : undefined)).limit(1);
+  const [reference] = await getDb().select({ id: media.id }).from(media).where(and(eq(media.id, id), publishedMediaFilter(options.download))).limit(1);
   return Boolean(reference);
 }
 export async function mediaIsReferenced(id: string): Promise<boolean> { const [reference] = await getDb().select({ id: mediaReferences.id }).from(mediaReferences).where(eq(mediaReferences.mediaId, id)).limit(1); return Boolean(reference); }

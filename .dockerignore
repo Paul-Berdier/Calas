@@ -12,6 +12,7 @@
 **/.sanity
 **/.DS_Store
 backups
+tmp
 artifacts
 test-results
 playwright-report
