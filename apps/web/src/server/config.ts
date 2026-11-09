@@ -11,6 +11,7 @@ export function configurationProblems():string[]{
   if(process.env.AUTH_TEST_PASSWORD_ONLY_USER_ID)missing.push('AUTH_TEST_PASSWORD_ONLY_USER_ID interdit en production');
   if(process.env.CONTENT_MODE!=='database')missing.push('CONTENT_MODE=database');
   if(process.env.AUTH_MAIL_TRANSPORT!=='smtp'||process.env.ALLOW_REAL_EMAIL!=='true')missing.push('Transport SMTP authentification autorisé');
+  if(process.env.MAIL_TRANSPORT!=='smtp'||!/^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/.test(process.env.SMTP_TO||''))missing.push('Transport SMTP du formulaire et destinataire unique');
   for(const key of ['SMTP_HOST','SMTP_FROM','SMTP_USER','SMTP_PASS'])if(!process.env[key])missing.push(key);
  }
  return [...new Set(missing)];

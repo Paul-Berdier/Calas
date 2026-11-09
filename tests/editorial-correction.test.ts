@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
-import { demoContent } from '../apps/web/src/lib/cms/demo';
 import { ContentError, parseContent } from '../apps/web/src/server/content/models';
 import { prepareSeedPlan } from '../apps/web/src/server/content/seed-plan';
 import type { SiteContent } from '../apps/web/src/lib/cms/types';
@@ -11,6 +10,21 @@ import { november2ClosingQuote, planNovember2Correction } from '../scripts/conte
 const previous = JSON.parse(readFileSync(new URL('../scripts/editorial/brief-20261101-after.json', import.meta.url), 'utf8')) as SiteContent;
 const oldPlan = prepareSeedPlan(previous);
 const before = (kind: 'home' | 'settings') => structuredClone(oldPlan.entries.find(entry => entry.kind === kind)!.content);
+// Only the eight home fields and the qualification label changed on 2 November.
+const approved = JSON.parse(readFileSync(new URL('./fixtures/editorial-20261102.json', import.meta.url), 'utf8')) as {
+  cards: Array<{ key: string; lead: string; text: string }>;
+  conviction: { text: string; closingQuote: string };
+  qualificationLabel: string;
+};
+const november2 = structuredClone(previous);
+for (const patch of approved.cards) {
+  const card = november2.home.journey!.cards.find(item => item.key === patch.key);
+  assert.ok(card);
+  Object.assign(card, patch);
+}
+Object.assign(november2.home.conviction, approved.conviction);
+november2.settings.qualification.label = approved.qualificationLabel;
+const after = prepareSeedPlan(november2);
 
 test('le 2 novembre sépare les trois accroches et la phrase finale une seule fois', () => {
   for (const kind of ['home', 'settings'] as const) {
@@ -21,7 +35,7 @@ test('le 2 novembre sépare les trois accroches et la phrase finale une seule fo
     assert.deepEqual(input, unchanged);
     assert.deepEqual(planNovember2Correction(kind, result.content), { content: result.content, changes: [] });
     assert.doesNotThrow(() => parseContent(kind, result.content));
-    assert.deepEqual(result.content, prepareSeedPlan(demoContent).entries.find(entry => entry.kind === kind)!.content);
+    assert.deepEqual(result.content, after.entries.find(entry => entry.kind === kind)!.content);
   }
 });
 

@@ -78,7 +78,7 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
   const [email, setEmail] = useState(""),
     [password, setPassword] = useState(""),
     [code, setCode] = useState(""),
-    [step, setStep] = useState<"password" | "mfa" | "backup" | "forgot">(
+    [step, setStep] = useState<"password" | "mfa" | "backup" | "forgot" | "verify">(
       "password",
     );
   const [token] = useState(
@@ -139,6 +139,20 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
         );
         return;
       }
+      if (step === "verify") {
+        const result = await authClient.sendVerificationEmail({
+          email,
+          callbackURL: new URL("/admin/login/", window.location.origin).href,
+        });
+        if (result.error)
+          throw new Error(
+            "La demande n’a pas pu être confirmée. Patientez quelques minutes, puis réessayez.",
+          );
+        setMessage(
+          "Si cette adresse correspond à un compte à activer, un lien de vérification a été envoyé. Consultez aussi vos courriers indésirables.",
+        );
+        return;
+      }
       if (step === "forgot") {
         const result = await authClient.requestPasswordReset({
           email,
@@ -174,6 +188,12 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
         password,
         rememberMe: false,
       });
+      if (result.error?.code === "EMAIL_NOT_VERIFIED") {
+        setPassword("");
+        setStep("verify");
+        setMessage("Vérifiez votre adresse email pour activer votre accès. Vous pouvez demander un nouveau lien ci-dessous.");
+        return;
+      }
       if (result.error) throw new Error(genericError(result));
       setPassword("");
       if (
@@ -203,6 +223,8 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
         ? "Choisir un nouveau mot de passe"
         : step === "forgot"
           ? "Retrouver votre accès"
+          : step === "verify"
+            ? "Activer votre accès"
           : step === "mfa"
             ? "Vérifier votre identité"
             : step === "backup"
@@ -238,10 +260,12 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
               ? "Saisissez les six chiffres affichés dans votre application d’authentification."
               : step === "backup"
                 ? "Chaque code de secours ne peut être utilisé qu’une fois."
-                : "Retrouvez vos pages, vos articles et vos images."}
+                : step === "verify"
+                  ? "Recevez un nouveau lien à l’adresse associée à votre compte."
+                  : "Retrouvez vos pages, vos articles et vos images."}
           </p>
           <form className="auth-form" onSubmit={submit}>
-            {mode === "login" && (step === "password" || step === "forgot") && (
+            {mode === "login" && (step === "password" || step === "forgot" || step === "verify") && (
               <label>
                 Adresse email
                 <input
@@ -299,10 +323,24 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
                   ? "Créer mon compte"
                   : mode === "reset"
                     ? "Enregistrer le mot de passe"
-                    : step === "forgot"
+                    : step === "forgot" || step === "verify"
                       ? "Recevoir un lien"
                       : "Continuer"}
             </button>
+            {mode === "login" && step === "password" && (
+              <button
+                type="button"
+                className="auth-link"
+                onClick={() => {
+                  setStep("verify");
+                  setPassword("");
+                  setMessage("");
+                  setError(false);
+                }}
+              >
+                Recevoir le lien d’activation
+              </button>
+            )}
             {mode === "login" && step === "password" && (
               <button
                 type="button"
@@ -330,7 +368,7 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
                   : "Utiliser mon application"}
               </button>
             )}
-            {(step === "forgot" || mode !== "login") && (
+            {(step === "forgot" || step === "verify" || mode !== "login") && (
               <a className="auth-link" href="/admin/login/">
                 Retour à la connexion
               </a>

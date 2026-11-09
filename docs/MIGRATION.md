@@ -2,6 +2,18 @@
 
 **État au 2 novembre 2026 :** le cahier des charges du 31 octobre, les photos fournies pour Sara et une première livraison des corrections du document « CORRECTIONS SITE AU 02-11.pdf » sont appliqués en recette locale et sur la préproduction Railway. La photo de la femme rousse a ensuite été retirée à la demande de Paul. La reprise du lettrage `a49a2fd` est déployée, mais Paul en rejette les contours irréguliers ; sa CI échoue au seuil de performance. Une nouvelle version à courbes lisses est intégrée et vérifiée localement ; son déploiement, sa mesure de performance et sa CI complète restent à confirmer. Le portrait d’Agnès reste attendu. Le journal ci-dessous conserve les opérations antérieures. Voir [la matrice du nouveau brief](EVOLUTIONS-20261101.md) et [les décisions de validation](VALIDATION.md).
 
+## Coordonnées et informations légales — 9 novembre 2026
+
+Après sauvegarde PostgreSQL/S3, l’opération explicite `scripts/content-production-contact-20261109.ts` a publié les quatre documents dans une même transaction sur la base Railway. Paramètres v5 → v6, mentions légales v1 → v2, confidentialité v3 → v4 et contact v3 → v4. Le contrôle public a retrouvé la nouvelle boîte partagée sur l’accueil et les trois pages, les deux SIRET et la directrice de publication dans les mentions, le délai de trois ans dans la confidentialité et les zones d’intervention sur Contact. La seconde simulation ne détecte plus de changement.
+
+La commande accepte `--dry-run` ou `--apply` dans le processus opérateur, avec `DATABASE_URL`, `CALAS_TARGET_DATABASE` et l’identifiant d’un administrateur actif `CALAS_OPERATOR_ID`. Elle conserve l’historique et applique les seuls champs approuvés aux versions publiées et aux brouillons distincts. Un conflit sur un champ ciblé annule toute la transaction. La règle des trois ans est une règle d’exploitation de la boîte OVH, après le dernier échange et sous réserve des obligations liées à une prestation.
+
+## Attestation RPPS d’Agnès — 3 novembre 2026
+
+Paul a fourni `attestation_10009722090.pdf` le 3 novembre 2026 pour compléter la présentation d’Agnès. L’attestation de l’Agence du Numérique en Santé / Ministère, éditée le 23 août 2026, identifie **LOUPIAS AGNES**, profession **Psychologue**, sous le numéro **RPPS 10009722090**. La fonction et la biographie des données de recette reprennent cet enregistrement, sans modifier le reste de la présentation. Le document atteste un enregistrement RPPS ; aucun nouveau diplôme ni statut IPRP n’en est déduit. Le PDF original n’est pas ajouté aux fichiers publics du site.
+
+La fiche d’Agnès a également été mise à jour puis publiée via l’API authentifiée de la préproduction Railway : version 3 → 5. Seuls `role` et `bio` changent ; aucun brouillon préexistant n’était en attente. L’historique est conservé et la fiche de Sara reste identique. Les deux routes publiques `/` et `/qui-sommes-nous/` affichent le numéro RPPS. Aucun redéploiement applicatif ni téléversement du PDF n’est nécessaire pour cette modification éditoriale. Typecheck et lint réussis sous Node 24.19.0 / pnpm 11.25.0. Rapport et capture : `artifacts/agnes-rpps-20261103/`.
+
 ## Périmètre et référence
 
 Demande initiale du 25 octobre 2026 : remplacer Sanity par PostgreSQL, Drizzle, Better Auth et une administration React/Tiptap dans Astro. Le design public, les routes, les textes, le contact et l'OCR sont conservés. Le déploiement était initialement exclu ; Paul a ensuite explicitement autorisé une préproduction Railway avec PostgreSQL et stockage privé, sans publication de production.

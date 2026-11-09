@@ -15,7 +15,7 @@ export interface ContentFile {
 }
 export interface Statistic {
   id: string; value: string; label: string; source: string; sourceUrl: string;
-  year: string; note: string; verified: boolean; group?: 'people' | 'cost';
+  year: string; note: string; verified: boolean; group?: 'people' | 'cost' | 'financial';
 }
 export interface Person { id: string; name: string; role: string; bio?: string; portrait?: ContentImage }
 export interface Section {
@@ -52,7 +52,7 @@ export type HomeVisualName = 'threads' | 'nautilus' | 'roots' | 'compass' | 'tre
 export interface Home {
   eyebrow: string; title: string; intro: string; primaryCta: Cta; secondaryCta: Cta;
   visuals?: Partial<Record<HomeVisualName, ContentImage>>;
-  whyNow?: { title: string; text: string };
+  whyNow?: { title: string; text: string; sources?: Cta[] };
   journey?: {
     cards: Array<{ key: string; eyebrow: string; title: string; lead?: string; text: string; cta: Cta }>;
     transition: string; sensitiveText: string; sensitiveCta: Cta;

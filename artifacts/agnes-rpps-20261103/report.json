@@ -1,0 +1,27 @@
+{
+  "base": "https://calas-web-test-production.up.railway.app",
+  "id": "6f857d0f-5b3a-81c4-9548-4c018b6b4619",
+  "beforeVersion": 3,
+  "afterVersion": 5,
+  "publishedRevisionId": "9b449bf4-ead1-4035-9b3a-9a4020ae2464",
+  "changedFields": [
+    "role",
+    "bio"
+  ],
+  "appliedAt": "2026-11-03T21:05:43.957Z",
+  "pdfUploaded": false,
+  "verification": {
+    "typecheck": "passed",
+    "httpStatus": 200,
+    "historyPreserved": true,
+    "noHorizontalOverflow": true,
+    "mobileVerified": false,
+    "publicRoutes": [
+      "/",
+      "/qui-sommes-nous/"
+    ],
+    "otherPeopleUnchanged": true,
+    "lint": "passed",
+    "desktopViewport": 1280
+  }
+}

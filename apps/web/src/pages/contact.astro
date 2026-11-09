@@ -66,7 +66,7 @@ const simulated=!isProductionSite()&&env('MAIL_TRANSPORT','simulation')==='simul
         <div class:list={['form-status',{success:result?.ok}]} id="form-status" role="status" tabindex="-1" aria-live="polite">{result?.message}</div>
         {simulated&&<p class="contact-test-note"><strong>Envoi de test.</strong> Aucun courriel n’est envoyé, aucune copie du message n’est conservée.</p>}
         <input type="hidden" name="token" value={token} />
-        <div class="form-trap" aria-hidden="true"><label for="website">Votre site web</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
+        <div class="form-trap" hidden aria-hidden="true"><label for="website">Votre site web</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
 
         <fieldset class="contact-fieldset">
           <legend><span aria-hidden="true">01</span> Votre demande</legend>
@@ -94,7 +94,7 @@ const simulated=!isProductionSite()&&env('MAIL_TRANSPORT','simulation')==='simul
         <div class="field contact-consent"><label for="consent"><input id="consent" name="consent" type="checkbox" value="yes" required checked={fields.consent==='yes'} aria-invalid={errors.consent?'true':undefined} aria-describedby="error-consent" /><span>J’accepte que les informations saisies soient utilisées pour répondre à ma demande, conformément à la <a href="/confidentialite/">politique de confidentialité</a>. *</span></label><p class="field-error" id="error-consent">{errors.consent}</p></div>
         <button class="button form-submit" type="submit" disabled={result?.ok}>Envoyer ma demande <span aria-hidden="true">↗</span></button>
         {settings.responseTime&&<p class="form-response-time">Délai de réponse indicatif : {settings.responseTime}</p>}
-        <p class="form-privacy">Ces informations servent à traiter votre demande. Consultez notre <a href="/confidentialite/">page de confidentialité</a> pour connaître leur traitement et vos droits.</p>
+        <p class="form-privacy">Votre message est envoyé à Sara Serrano Cabeza et Agnès Loupias pour répondre à votre demande. Consultez notre <a href="/confidentialite/">politique de confidentialité</a> pour connaître la durée de conservation et exercer vos droits.</p>
       </form>
     </div>
   </section>

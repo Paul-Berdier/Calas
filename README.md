@@ -2,7 +2,7 @@
 
 Site éditorial Astro SSR avec administration propriétaire sous `/admin`, PostgreSQL/Drizzle, Better Auth, Tiptap, médias S3 privés et OCR local. Le site public reprend le cahier des charges du 31 octobre 2026 et les illustrations fournies par Sara. Sanity a été remplacé ; aucun compte Sanity n’est nécessaire.
 
-La version livrée est destinée à la recette. Sur autorisation de Paul, un site de test avec PostgreSQL et stockage privé est hébergé dans le projet Railway **Calas** : [ouvrir la préproduction](https://calas-web-test-production.up.railway.app/). La production reste soumise à la validation de Sara et Agnès, aux informations juridiques et au raccordement du courriel. Aucun email de test n’est envoyé à Sara. Voir [le déploiement de recette](docs/DEPLOYMENT.md#préproduction-railway-du-25-octobre-2026).
+Le site et l’administration sont hébergés dans le projet Railway **Calas**, avec PostgreSQL et un stockage privé. L’adresse canonique de production est [www.calas-conseil.fr](https://www.calas-conseil.fr/). Le formulaire adresse les demandes à la boîte OVH partagée `contact@calas-conseil.fr`. Voir [l’exploitation de la messagerie](docs/COURRIEL.md) et [les déploiements](docs/DEPLOYMENT.md).
 
 ## Démarrage local
 
@@ -77,7 +77,7 @@ Le contact conserve validation, contrôle d’origine, honeypot, simulation et S
 - [Recette et limites](docs/RECETTE.md)
 - [Validation éditoriale](docs/VALIDATION.md)
 - [Évolutions du 1er novembre et éléments restant à fournir](docs/EVOLUTIONS-20261101.md)
-- [Création de la boîte sara@calasconseil.fr](docs/COURRIEL.md)
+- [Boîte de contact et alertes du formulaire](docs/COURRIEL.md)
 - [Sources métier](docs/SOURCES.md), [logo](docs/LOGO.md), [prestation et maintenance](docs/PROPOSITION.md)
 
 Les résultats historiques et les résultats de cette migration sont distingués dans la recette. Un succès local ne vaut ni validation éditoriale ni test de l’infrastructure de production.

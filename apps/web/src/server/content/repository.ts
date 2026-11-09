@@ -209,6 +209,35 @@ export async function publishContent(id: string, expectedVersion: number, actor:
   return getContent(id);
 }
 
+/** Operator-only revision of a published structural page or settings. The caller owns the transaction. */
+export async function revisePublishedStructure(tx: Transaction, input: {
+  id: string; kind: 'page' | 'settings'; actor: EditorialActor; apply: boolean;
+  edit: (content: Record<string, unknown>) => Record<string, unknown>;
+}) {
+  const document = await lockedDocument(tx, input.id);
+  if (document.kind !== input.kind || document.status !== 'published' || !document.publishedRevisionId) {
+    throw new ContentError(409, 'EXPECTED_PUBLICATION', 'La publication attendue est absente.');
+  }
+  assertWritePermission(document.kind, input.actor);
+  const draft = await currentRevision(tx, document);
+  const [published] = await tx.select().from(revisions).where(and(eq(revisions.documentId, document.id), eq(revisions.id, document.publishedRevisionId)));
+  if (!published) throw new ContentError(409, 'EXPECTED_PUBLICATION', 'Révision publiée introuvable.');
+  const edit = (revision: RevisionRow) => normalizeContent(document.kind, input.edit(clean(revision.content)), document.id);
+  const nextPublished = edit(published);
+  const nextDraft = draft.id === published.id ? nextPublished : edit(draft);
+  if (document.kind === 'page' && (nextPublished.slug !== published.content.slug || nextDraft.slug !== draft.content.slug)) {
+    throw new ContentError(422, 'FIXED_ROUTE', 'L’adresse des pages du site est protégée.');
+  }
+  assertPublishable(document.kind, nextPublished);
+  const publish = checksum(nextPublished) !== checksum(published.content);
+  const draftChanged = checksum(nextDraft) !== checksum(draft.content);
+  const draftDiffers = checksum(nextDraft) !== checksum(nextPublished);
+  let current = document;
+  if (input.apply && publish) current = await appendRevision(tx, current, nextPublished, input.actor, 'published', true);
+  if (input.apply && (publish ? draftDiffers : draftChanged)) current = await appendRevision(tx, current, nextDraft, input.actor, 'saved');
+  return { id: document.id, versionBefore: document.version, versionAfter: current.version, publish, draftChanged, draftDiffers };
+}
+
 export async function changePublication(id: string, expectedVersion: number, actor: EditorialActor, action: 'unpublish' | 'archive'): Promise<ContentDetail> {
   await getDb().transaction(async tx => {
     const document = await lockedDocument(tx, id);

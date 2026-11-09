@@ -1,5 +1,6 @@
 import type { SiteContent } from './types';
 import { linkedinArticles } from './linkedin-articles';
+import { contactDescription, contactEmail, interventionArea, legalNotice, privacyNotice } from './legal';
 
 // Contenus issus du cahier des charges du 31 octobre 2026. Relecture avant lancement définitif.
 // Mode de recette explicite, jamais un repli après une panne du CMS.
@@ -8,7 +9,7 @@ export const demoContent: SiteContent = {
     "brand": "Calas Conseil",
     "tagline": "La voie de la qualité relationnelle.",
     "phone": "06 43 16 83 81",
-    "email": "saraserranocabeza@gmail.com",
+    "email": contactEmail,
     "qualification": {
       "status": "pending",
       "label": "IPRP enregistrée auprès de la DREETS Nouvelle-Aquitaine",
@@ -45,26 +46,59 @@ export const demoContent: SiteContent = {
         "group": "people"
       },
       {
-        "id": "stat-detresse",
-        "value": "1 sur 2",
-        "label": "salarié présente un signe de détresse psychologique.",
-        "source": "Empreinte Humaine / Ipsos bva · juin 2026",
-        "sourceUrl": "https://empreintehumaine.com/aef-info-la-moitie-des-salaries-francais-presente-un-signe-de-detresse-psychologique-empreinte-humaine/",
-        "year": "2026",
-        "note": "Salariés français interrogés. Un signe de détresse n’est pas un diagnostic médical.",
+        "id": "stat-intensite",
+        "value": "62 %",
+        "label": "citent l’intensité et le temps de travail parmi les motifs professionnels de leur mal-être.",
+        "source": "Malakoff Humanis · Baromètre Santé des salariés 2023",
+        "sourceUrl": "https://www.malakoffhumanis.com/groupe/lecomptoir/barometre-sante-salaries/",
+        "year": "2023",
+        "note": "Salariés déclarant une santé mentale fragile et des motifs professionnels. Enquête Ipsos, mars–avril 2023.",
         "verified": true,
         "group": "people"
       },
       {
-        "id": "stat-engagement",
-        "value": "8 %",
-        "label": "des salariés interrogés en France sont engagés au travail ; 20 % sont activement désengagés.",
-        "source": "Gallup · State of the Global Workplace 2026",
-        "sourceUrl": "https://www.gallup.com/workplace/705338/state-global-workplace-france-country-level-data.aspx",
-        "year": "2026",
-        "note": "France · moyennes glissantes 2023–2025. L’engagement est mesuré selon la méthode Gallup.",
+        "id": "stat-sante",
+        "value": "25 %",
+        "label": "des salariés interrogés, soit un sur quatre, déclarent être en mauvaise santé mentale.",
+        "source": "Qualisocial / Ipsos · Santé mentale et QVCT 2025",
+        "sourceUrl": "https://www.ipsos.com/fr-fr/travail-les-salaries-francais-face-une-sante-mentale-degradee",
+        "year": "2025",
+        "note": "Enquête auprès de 3 000 salariés des secteurs privé et public, du 3 au 9 décembre 2024.",
         "verified": true,
         "group": "people"
+      },
+      {
+        "id": "stat-cout",
+        "value": "Plus de 120 Md€",
+        "label": "par an de coûts directs et indirects liés à l’absentéisme pour les entreprises françaises.",
+        "source": "Estimation relayée par WTW · 2025",
+        "sourceUrl": "https://www.wtwco.com/fr-fr/news/2025/09/hausse-del-absenteisme-en-2024-un-signal-dalerte-pour-les-entreprises",
+        "year": "2025",
+        "note": "Le baromètre situe le taux d’absentéisme à 5,1 % en 2024, en hausse de 34 % depuis 2019.",
+        "verified": true,
+        "group": "financial"
+      },
+      {
+        "id": "stat-troubles-psychiques",
+        "value": "7,6 Md€",
+        "label": "par an supportés par les employeurs dans le coût des troubles psychiques des actifs en France.",
+        "source": "Asterès / MGEN · Santé mentale des actifs",
+        "sourceUrl": "https://asteres.fr/etude/la-sante-mentale-des-actifs-un-cout-de-25-milliards-deuros-par-an/",
+        "year": "2025",
+        "note": "Estimation pour 2022. Les employeurs supportent 31 % des 24,7 milliards d’euros estimés dans l’étude.",
+        "verified": true,
+        "group": "financial"
+      },
+      {
+        "id": "stat-pib",
+        "value": "9 %",
+        "label": "du PIB mondial : environ 10 000 milliards de dollars de productivité perdue à cause du faible engagement.",
+        "source": "Gallup · State of the Global Workplace 2026",
+        "sourceUrl": "https://www.gallup.com/workplace/349484/state-of-the-global-workplace.aspx",
+        "year": "2026",
+        "note": "Estimation mondiale pour 2025 ; elle ne mesure pas le coût du désengagement dans une entreprise particulière.",
+        "verified": true,
+        "group": "financial"
       },
       {
         "id": "stat-absenteisme-2026",
@@ -89,13 +123,13 @@ export const demoContent: SiteContent = {
         "group": "cost"
       },
       {
-        "id": "stat-pib",
-        "value": "9 %",
-        "label": "du PIB mondial : environ 10 000 milliards de dollars de productivité perdue à cause du faible engagement.",
-        "source": "Gallup · State of the Global Workplace 2026",
-        "sourceUrl": "https://www.gallup.com/workplace/349484/state-of-the-global-workplace.aspx",
-        "year": "2026",
-        "note": "Estimation mondiale pour 2025 ; elle ne mesure pas le coût du désengagement dans une entreprise particulière.",
+        "id": "stat-arrets",
+        "value": "36 %",
+        "label": "des arrêts longs sont liés aux risques psychosociaux dans les données WTW.",
+        "source": "WTW · Baromètre absentéisme 2025",
+        "sourceUrl": "https://www.wtwco.com/fr-fr/news/2025/09/hausse-del-absenteisme-en-2024-un-signal-dalerte-pour-les-entreprises",
+        "year": "2025",
+        "note": "Données 2024 du secteur privé. La publication 2025 définit un arrêt long comme une absence supérieure à 90 jours.",
         "verified": true,
         "group": "cost"
       }
@@ -111,8 +145,8 @@ export const demoContent: SiteContent = {
     "reasonsTitle": "Pourquoi choisir Calas Conseil",
     "reasons": [
       {
-        "title": "Un binôme qui conjugue finesse d’analyse humaine et connaissance de l’entreprise.",
-        "text": "Sara Serrano Cabeza a été DRH et chef d’entreprise : elle connaît les enjeux stratégiques, les contraintes du terrain et l’exigence de résultat. Dix ans d’accompagnement en institution, auprès des situations humaines les plus complexes, ont affûté son observation et son analyse des comportements. Agnès Loupias, psychologue clinicienne, apporte une compréhension profonde des mécanismes psychiques et de ce qui se joue dans les relations."
+        "title": "Deux parcours, une double lecture : l’entreprise et l’humain.",
+        "text": "Sara Serrano Cabeza a été DRH et chef d’entreprise : elle connaît les enjeux stratégiques, les contraintes du terrain et l’exigence de résultat. Experte en analyse du comportement, elle a accompagné pendant dix ans les situations humaines les plus complexes en institution. Agnès Loupias a passé vingt ans en entreprise avant de devenir psychologue clinicienne ; elle apporte une compréhension fine des mécanismes psychiques et de ce qui se joue dans les relations. Seule ou en binôme, chaque intervention réunit la connaissance de l’entreprise et l’analyse fine des comportements humains."
       },
       {
         "title": "De la stratégie aux outils",
@@ -120,15 +154,14 @@ export const demoContent: SiteContent = {
       },
       {
         "title": "Un même regard sur l’humain, du diagnostic à l’action.",
-        "text": "Les associées sont vos interlocutrices et vos intervenantes du diagnostic au terrain."
+        "text": "Ce sont les associées qui interviennent, seules ou ensemble, du diagnostic au terrain."
       }
     ],
     "domainsTitle": "Notre chemin en trois temps",
     "domainsIntro": "Du diagnostic à la transformation managériale.",
     "conviction": {
-      "title": "Notre conviction",
-      "text": "Une organisation tient par ses process, et plus encore par la qualité des liens entre les personnes qui la font vivre.\n\nChacun arrive au travail avec ses émotions qui expriment ce qui compte pour lui et font écho à ses valeurs, à ses aspirations et à ses croyances qui influencent sa manière de percevoir les situations et d’entrer en relation avec les autres. Émotions et croyances façonnent ainsi nos comportements et nos interactions.\n\nCes liens reposent sur l’authenticité, qui permet de parler vrai, et un cadre de sécurité, qui permet d’oser. Ils s’apprennent et s’entretiennent, par des rituels de conversation et des temps de régulation.",
-      "closingQuote": "Quand on se sent en sécurité, on ose : c’est là que naît l’autonomie.",
+      "title": "Notre parti pris : professionnaliser le lien.",
+      "text": "Une organisation est un système vivant, où se rencontrent des personnes, des histoires et des regards différents. Chacun y arrive avec ses émotions, qui disent ce qui compte pour lui, et ses croyances, qui orientent sa façon d’agir avec les autres. Le lien qui en naît se cultive, se régule et se pilote, comme toute dimension stratégique.\n\nIl repose sur l’authenticité, qui permet de parler vrai, et sur un cadre de sécurité, qui permet d’oser : c’est là que naît l’autonomie. Et il s’apprend : en comprenant ce qui se joue en soi face aux autres, puis en essayant d’autres façons d’agir, dans les situations réelles de travail.",
       "cta": {
         "label": "Découvrir notre approche",
         "href": "/notre-approche/"
@@ -140,8 +173,8 @@ export const demoContent: SiteContent = {
       "href": "/contact/"
     },
     "seo": {
-      "title": "Calas Conseil — Performance durable et qualité du lien",
-      "description": "Calas Conseil relie prévention des RPS, compétences relationnelles et accompagnement des managers pour construire une performance durable par la qualité du lien."
+      "title": "Calas Conseil · Stratégie RH, prévention des risques psychosociaux et management",
+      "description": "Stratégie RH, prévention des risques psychosociaux et management en Charente, Charente-Maritime, à Bordeaux et à Toulouse. Calas Conseil accompagne les entreprises."
     },
     "editorial": {
       "heroAudience": "Aux côtés des dirigeants, des RH,\ndes managers et des CSE.",
@@ -150,11 +183,11 @@ export const demoContent: SiteContent = {
         "Compétences relationnelles",
         "Management"
       ],
-      "heroArtTop": "LA QUALITÉ DU LIEN",
-      "heroArtBottom": "UNE PERFORMANCE DURABLE",
-      "heroArtCaption": "La voie de la\nqualité relationnelle.",
+      "heroArtTop": "De la prévention des risques psychosociaux",
+      "heroArtBottom": "À la transformation managériale",
+      "heroArtCaption": "Cabinet de conseil\nen stratégie RH.",
       "exploreLabel": "Explorer notre démarche",
-      "statisticsEyebrow": "Quelques repères",
+      "statisticsEyebrow": "Le travail en chiffres",
       "statisticsDescription": "Ce que vivent les équipes, et les conséquences pour les organisations.",
       "statisticsNote": "Des périmètres distincts : chaque donnée est accompagnée de sa source et de sa période d’observation.",
       "diagnosticEyebrow": "Diagnostic & prévention des RPS",
@@ -166,18 +199,28 @@ export const demoContent: SiteContent = {
       ],
       "diagnosticArtTitle": "Relier les signaux.\nFaire émerger le sens.",
       "diagnosticNote": "L’évaluation des RPS fait partie des obligations de prévention de l’employeur. Nous vous aidons à structurer cette démarche.",
-      "reasonsEyebrow": "Pourquoi choisir Calas Conseil",
+      "reasonsEyebrow": "Nos expertises",
       "reasonsLink": {
         "label": "Rencontrer Sara & Agnès",
         "href": "/qui-sommes-nous/"
       },
       "reasonsMotifLabel": "Le lien",
-      "domainsEyebrow": "Notre chemin en trois temps",
-      "convictionEyebrow": "Notre conviction"
+      "domainsEyebrow": "Du diagnostic à la transformation",
+      "convictionEyebrow": "Ce qui nous distingue"
     },
     "whyNow": {
       "title": "Pourquoi maintenant",
-      "text": "Dans un monde en pleine mutation, où les repères changent, chacun cherche ce qui donne sens et stabilité. Les besoins matériels assurent la base ; les besoins existentiels, eux, donnent l’élan : exister, appartenir et grandir. Ils nourrissent le sens du travail et libèrent les ressources de chacun, son énergie, sa créativité, son envie de s’engager. Et cela se construit dans la relation. C’est pourquoi la qualité du lien devient aujourd’hui un levier décisif pour les personnes comme pour l’entreprise."
+      "text": "Crises économiques, sociales, écologiques : elles ne se succèdent plus, elles s’entremêlent. Edgar Morin parlait de polycrise, un temps de transformations profondes et d’incertitude. En France, 8 % des salariés se disent engagés, et un sur deux présente un signe de détresse psychologique. Ce qui permet de tenir et d’avancer se joue entre les personnes : être reconnu, avoir sa place, pouvoir progresser. Investir dans le lien, c’est investir dans l’avenir de votre organisation.",
+      "sources": [
+        {
+          "label": "8 %",
+          "href": "https://www.gallup.com/workplace/705338/state-global-workplace-france-country-level-data.aspx"
+        },
+        {
+          "label": "un sur deux",
+          "href": "https://empreintehumaine.com/aef-info-la-moitie-des-salaries-francais-presente-un-signe-de-detresse-psychologique-empreinte-humaine/"
+        }
+      ]
     },
     "journey": {
       "cards": [
@@ -230,10 +273,12 @@ export const demoContent: SiteContent = {
       "eyebrow": "Le premier pas",
       "title": "Et si nous prenions\nle temps d’en parler ?",
       "intro": "Un premier échange pour comprendre votre situation et envisager la suite, ensemble.",
-      "sections": [],
+      "sections": [
+        interventionArea
+      ],
       "seo": {
         "title": "Échangeons sur votre situation | Calas Conseil",
-        "description": "Échangez avec Calas Conseil sur vos priorités : diagnostic RPS, compétences relationnelles, accompagnement des managers ou situations sensibles."
+        "description": contactDescription
       },
       "contact": {
         "formEyebrow": "Nous écrire",
@@ -279,8 +324,8 @@ export const demoContent: SiteContent = {
         "href": "/contact/?objet=diagnostic"
       },
       "seo": {
-        "title": "Diagnostic RPS, DUERP et prévention — IPRP | Calas Conseil",
-        "description": "Un diagnostic des risques psychosociaux, une démarche en cinq étapes et un double regard IPRP et psychologie clinique pour construire des priorités d’action utiles au DUERP."
+        "title": "Diagnostic des risques psychosociaux, DUERP et IPRP en Charente, Nouvelle-Aquitaine | Calas Conseil",
+        "description": "Diagnostic des risques psychosociaux avec une IPRP pour orienter votre DUERP en Charente et en Nouvelle-Aquitaine. Interventions en Charente-Maritime, à Bordeaux et à Toulouse."
       },
       "sections": [
         {
@@ -450,8 +495,8 @@ export const demoContent: SiteContent = {
       ],
       "offerExcerpt": "Voir ce qui se joue avant d’agir. Un diagnostic des risques psychosociaux, utile à votre document unique (DUERP), pour lire les risques et les ressources de votre organisation avec justesse et décider sur une base claire.",
       "editorial": {
-        "artTop": "LIRE LE TRAVAIL AUTREMENT",
-        "artBottom": "ORGANISATION · MANAGEMENT · RELATIONS",
+        "artTop": "Voir clair",
+        "artBottom": "Organisation · Relations · Personnes",
         "methodLinkLabel": "Explorer la démarche",
         "invitationEyebrow": "Et maintenant ?",
         "invitationTitle": "Commençons par\nvotre situation."
@@ -501,19 +546,19 @@ export const demoContent: SiteContent = {
         {
           "key": "cadre",
           "title": "Un cadre professionnel",
-          "text": "Un cadre professionnel, centré sur les situations de travail, qui complète les actions sur l’organisation sans les remplacer.",
+          "text": "Centré sur les situations de travail, il complète les actions sur l’organisation sans les remplacer.",
           "kind": "text",
           "presentation": "default"
         }
       ],
       "seo": {
         "title": "Formation et compétences relationnelles — Stress et émotions | Calas Conseil",
-        "description": "Conférence Stress et émotions au travail, La Boussole émotionnelle et ateliers : développer les compétences relationnelles au contact des situations réelles."
+        "description": "Conférence Stress et émotions au travail, La Boussole émotionnelle et ateliers : développer les compétences relationnelles au contact des situations réelles. En Charente, Charente-Maritime, à Bordeaux et à Toulouse."
       },
       "offerExcerpt": "Développer ses compétences relationnelles. Des processus d’apprentissage, conférences et ateliers, sur les émotions et les croyances pour mieux se comprendre, ajuster son comportement au sein du collectif et agir en conscience dans la relation.",
       "editorial": {
-        "artTop": "LIRE LE TRAVAIL AUTREMENT",
-        "artBottom": "ORGANISATION · MANAGEMENT · RELATIONS",
+        "artTop": "Comprendre",
+        "artBottom": "Expérimenter · Ajuster",
         "invitationEyebrow": "Et maintenant ?",
         "invitationTitle": "Commençons par\nvotre situation."
       },
@@ -617,12 +662,12 @@ export const demoContent: SiteContent = {
       ],
       "seo": {
         "title": "Accompagnement des managers — Le manager professionnel du lien | Calas Conseil",
-        "description": "Un parcours pour les managers et dirigeants : soi, la relation, le système. Faire évoluer la posture, les pratiques et la culture du lien dans l’organisation."
+        "description": "Un parcours pour les managers et dirigeants : soi, la relation, le système. Faire évoluer la posture, les pratiques et la culture du lien dans l’organisation. En Charente, Charente-Maritime, à Bordeaux et à Toulouse."
       },
       "offerExcerpt": "Faire du manager un professionnel du lien. Un parcours sur la posture, pour que chaque manager devienne un point d’appui pour son équipe.",
       "editorial": {
-        "artTop": "LIRE LE TRAVAIL AUTREMENT",
-        "artBottom": "ORGANISATION · MANAGEMENT · RELATIONS",
+        "artTop": "Soi",
+        "artBottom": "La relation · Le système",
         "invitationEyebrow": "Et maintenant ?",
         "invitationTitle": "Commençons par\nvotre situation."
       },
@@ -636,7 +681,7 @@ export const demoContent: SiteContent = {
       "slug": "situations-sensibles",
       "eyebrow": "Accompagner les situations sensibles",
       "title": "Quand la relation se tend, agir vite et juste",
-      "intro": "Un conflit qui s’enlise, un événement qui ébranle une équipe, une personne en difficulté : certaines situations ne peuvent pas attendre un plan d’action. Notre binôme intervient avec la rigueur de l’entreprise et la finesse de la clinique, pour apaiser, comprendre et remettre le collectif en mouvement.",
+      "intro": "Un conflit qui s’enlise, un événement qui ébranle une équipe, une personne en difficulté : certaines situations ne peuvent pas attendre un plan d’action. Seules ou en binôme, nous intervenons avec la rigueur de l’entreprise et la finesse de la clinique, pour apaiser, comprendre et remettre le collectif en mouvement.",
       "cta": {
         "label": "Échanger sur votre situation",
         "href": "/contact/?objet=sensible"
@@ -644,7 +689,7 @@ export const demoContent: SiteContent = {
       "offerExcerpt": "Conflit, événement difficile, personne en difficulté : retrouver des repères et remettre le collectif en mouvement.",
       "seo": {
         "title": "Situations sensibles — Régulation de conflits au travail | Calas Conseil",
-        "description": "Régulation de conflits, soutien après un événement difficile, groupes de parole, analyse de la pratique et accompagnement individuel dans un cadre professionnel."
+        "description": "Régulation de conflits, soutien après un événement difficile, groupes de parole, analyse de la pratique et accompagnement individuel dans un cadre professionnel. En Charente, Charente-Maritime, à Bordeaux et à Toulouse."
       },
       "editorial": {
         "artTop": "RETROUVER LE DIALOGUE",
@@ -718,7 +763,7 @@ export const demoContent: SiteContent = {
     {
       "id": "page-approche",
       "slug": "notre-approche",
-      "eyebrow": "Notre conviction",
+      "eyebrow": "Notre approche",
       "title": "Le lien ne se décrète pas.\nIl se construit dans l’altérité.",
       "intro": "Exister, appartenir, grandir. Comprendre ce qui nous met en mouvement et créer les conditions d’une relation authentique, sûre et autonome.",
       "cta": {
@@ -806,7 +851,7 @@ export const demoContent: SiteContent = {
       "slug": "qui-sommes-nous",
       "eyebrow": "Calas Conseil",
       "title": "Deux parcours.\nUn même regard sur le lien.",
-      "intro": "Un binôme qui conjugue finesse d’analyse humaine et connaissance de l’entreprise. Les associées sont vos interlocutrices et vos intervenantes du diagnostic au terrain.",
+      "intro": "Un binôme qui conjugue finesse d’analyse humaine et connaissance de l’entreprise. Ce sont les associées qui interviennent, seules ou ensemble, du diagnostic au terrain.",
       "cta": {
         "label": "Faire connaissance",
         "href": "/contact/"
@@ -831,65 +876,21 @@ export const demoContent: SiteContent = {
         "invitationTitle": "Commençons par\nvotre situation."
       }
     },
-    {
-      "id": "page-legal",
-      "slug": "mentions-legales",
-      "eyebrow": "Informations du site",
-      "title": "Mentions légales",
-      "intro": "Calas Conseil — La voie de la qualité relationnelle.",
-      "sections": [
-        {
-          "key": "contact",
-          "kind": "text",
-          "title": "Nous joindre",
-          "text": "Pour toute question concernant ce site : saraserranocabeza@gmail.com ou 06 43 16 83 81.",
-          "presentation": "default"
-        }
-      ]
-    },
-    {
-      "id": "page-privacy",
-      "slug": "confidentialite",
-      "eyebrow": "Vos données",
-      "title": "Confidentialité",
-      "intro": "Nous limitons les informations demandées à ce qui est utile pour comprendre votre demande et vous répondre.",
-      "sections": [
-        {
-          "key": "form",
-          "kind": "text",
-          "title": "Les informations du formulaire",
-          "text": "Le formulaire recueille votre nom, votre courriel, l’objet de votre demande et votre message. L’organisation, la fonction et le téléphone sont facultatifs. Une case non précochée permet de confirmer votre accord pour être recontacté au sujet de cette demande, avec un lien vers cette politique de confidentialité. Ces informations servent à traiter votre demande. Merci de ne pas transmettre d’informations médicales ni de données concernant un tiers.",
-          "presentation": "default"
-        },
-        {
-          "key": "droits",
-          "kind": "text",
-          "title": "Vos demandes concernant vos données",
-          "text": "Vous pouvez écrire à saraserranocabeza@gmail.com pour toute demande d’accès, de rectification ou d’effacement concernant vos informations. Les modalités applicables sont précisées avec le responsable du traitement.",
-          "presentation": "default"
-        },
-        {
-          "key": "traceurs",
-          "kind": "text",
-          "title": "Une navigation sobre",
-          "text": "Ce site n’utilise pas d’outil publicitaire ni de widget social tiers. Les polices sont hébergées avec le site. Un cookie technique est réservé aux personnes autorisées à prévisualiser les contenus.",
-          "presentation": "default"
-        }
-      ]
-    }
+    legalNotice,
+    privacyNotice
   ],
   "people": [
     {
       "id": "person-sara",
       "name": "Sara Serrano Cabeza",
-      "role": "Consultante en relations humaines et stratégie RH. IPRP, praticienne en analyse transactionnelle.",
+      "role": "Consultante en relations humaines et stratégie RH, ancienne DRH. IPRP, praticienne en analyse transactionnelle.",
       "bio": "Licences de psychologie et d’éducation sociale, Master DRH.\n\nMon parcours croise deux mondes. D’un côté, dix ans d’accompagnement des personnes en institution, qui m’ont appris à observer et comprendre les comportements humains et les interactions sociales dans ce qu’elles ont de plus complexe. Auprès des situations les plus difficiles, j’ai appris ce qui se joue au-delà des comportements visibles. De l’autre, des postes de direction en entreprise, jusqu’à DRH : je connais les exigences, les contraintes et l’objectif de résultat. C’est ce double ancrage qui me permet de relier performance et qualité relationnelle, de la stratégie à la conception des outils, jusqu’à l’animation sur le terrain."
     },
     {
       "id": "person-agnes",
       "name": "Agnès Loupias",
-      "role": "Psychologue clinicienne",
-      "bio": "Master en psychologie clinique et psychopathologie.\n\nAprès vingt ans d’expérience en entreprise, j’ai choisi une reconversion professionnelle pour devenir psychologue clinicienne. Ce parcours singulier me permet aujourd’hui de conjuguer une connaissance concrète du monde de l’entreprise avec une compréhension fine du fonctionnement humain et des dynamiques relationnelles.\n\nJ’interviens auprès des salariés, notamment dans le cadre d’entretiens individuels et de situations de crise en entreprise. Je conduis également des actions de prévention en santé au travail, en particulier auprès des salariés en fin de carrière. Ces expériences m’ont permis de mieux appréhender les réalités humaines du monde professionnel, les difficultés rencontrées par les personnes et leurs répercussions sur le travail et les collectifs.\n\nAu sein de Calas Conseil, je contribue à éclairer les situations de travail et les relations humaines. Mon approche consiste à dépasser les comportements visibles pour comprendre ce qui se joue, tant au niveau individuel que collectif : les tensions, les difficultés relationnelles, les fragilités et les facteurs qui influencent le bien-être et la coopération au travail. Cette compréhension nourrit notre approche des risques psychosociaux et notre accompagnement des organisations."
+      "role": "Psychologue clinicienne. Enregistrement RPPS n° 10009722090.",
+      "bio": "Master en psychologie clinique et psychopathologie.\n\nEnregistrée au Répertoire partagé des professionnels intervenant dans le système de santé (RPPS), sous le numéro 10009722090.\n\nAprès vingt ans d’expérience en entreprise, j’ai choisi une reconversion professionnelle pour devenir psychologue clinicienne. Ce parcours singulier me permet aujourd’hui de conjuguer une connaissance concrète du monde de l’entreprise avec une compréhension fine du fonctionnement humain et des dynamiques relationnelles.\n\nJ’interviens auprès des salariés, notamment dans le cadre d’entretiens individuels et de situations de crise en entreprise. Je conduis également des actions de prévention en santé au travail, en particulier auprès des salariés en fin de carrière. Ces expériences m’ont permis de mieux appréhender les réalités humaines du monde professionnel, les difficultés rencontrées par les personnes et leurs répercussions sur le travail et les collectifs.\n\nAu sein de Calas Conseil, je contribue à éclairer les situations de travail et les relations humaines. Mon approche consiste à dépasser les comportements visibles pour comprendre ce qui se joue, tant au niveau individuel que collectif : les tensions, les difficultés relationnelles, les fragilités et les facteurs qui influencent la santé et la coopération au travail. Cette compréhension nourrit notre approche des risques psychosociaux et notre accompagnement des organisations."
     }
   ],
   "articles": linkedinArticles

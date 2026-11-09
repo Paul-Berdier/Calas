@@ -1,6 +1,6 @@
 # Déployer et exploiter le CMS Calas Conseil
 
-Le dépôt prépare une préproduction avec une application Astro SSR, PostgreSQL et un bucket S3 privé. Aucun projet Railway, abonnement, domaine, transport SMTP externe ou déploiement public n’a été créé par cette livraison. Les comptes d’exploitation doivent appartenir à Calas Conseil. La validation de Sara et Agnès et la relecture finale restent indispensables avant ouverture au public.
+Le projet Railway **Calas** héberge l’application Astro SSR, PostgreSQL et le bucket privé. Le service web historique `Calas-Web-Test` porte la production sous `www.calas-conseil.fr`. Le domaine est géré chez OVH, qui héberge également la boîte de contact. Les étapes de recette datées ci-dessous documentent les versions précédentes.
 
 ## Démarrage local
 

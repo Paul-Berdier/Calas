@@ -9,7 +9,7 @@ const { prepareSeedPlan, validateSeedPlan, stableContentId } = await import(`dat
 
 test('le contenu initial contient dix pages et les cinq publications LinkedIn fournies', () => {
   const { entries, warnings } = prepareSeedPlan(demoContent);
-  assert.equal(entries.length, 26);
+  assert.equal(entries.length, 29);
   assert.equal(entries.filter(entry => entry.kind === 'page').length, 10);
   assert.equal(entries.filter(entry => entry.kind === 'article').length, 5);
   const diagnostic = entries.find(entry => entry.content.slug === 'diagnostic-rps');

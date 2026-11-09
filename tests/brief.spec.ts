@@ -1,6 +1,5 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import {mkdir} from 'node:fs/promises';
 
 test('le nouveau chemin et le numéro IPRP sont visibles sans JavaScript',async({browser})=>{
  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});
@@ -9,8 +8,12 @@ test('le nouveau chemin et le numéro IPRP sont visibles sans JavaScript',async(
  await expect(page.locator('main>section')).toHaveCount(7);
  await expect(page.locator('.journey-card')).toHaveCount(3);
  await expect(page.locator('.journey-lead strong em')).toHaveText(['Voir ce qui se joue avant d’agir.','Développer des compétences relationnelles.','Faire du manager un professionnel du lien.']);
- await expect(page.locator('.conviction-quote em')).toHaveText('Quand on se sent en sécurité, on ose : c’est là que naît l’autonomie.');
- await expect(page.locator('.stat')).toHaveCount(6);
+ await expect(page.locator('.hero-identity em')).toHaveText('en stratégie RH.');
+ await expect(page.locator('.hero-scroll')).toHaveAttribute('href','#chemin');
+ await expect(page.locator('main>section').nth(1)).toHaveAttribute('id','chemin');
+ await expect(page.locator('.home-now a')).toHaveText(['8 %','un sur deux']);
+ await expect(page.locator('#conviction-title')).toContainText('professionnaliser le lien.');
+ await expect(page.locator('.stat')).toHaveCount(9);
  await expect(page.locator('.registration')).toContainText('2026.16.004');
  await expect(page.locator('.registration')).toContainText('Sara Serrano Cabeza');
  await expect(page.locator('.registration')).toContainText('DREETS Nouvelle-Aquitaine');
@@ -32,8 +35,8 @@ test('le menu des offres fonctionne au clavier sur ordinateur',async({page})=>{
  await expect(page.locator('.offers-panel a')).toHaveCount(4);await page.keyboard.press('Escape');await expect(summary).toBeFocused();await expect(summary).toHaveAttribute('aria-expanded','false');
 });
 
-test('les illustrations chargent et les nouvelles pages restent lisibles',async({page})=>{
- await mkdir('artifacts/brief-20261101',{recursive:true});await page.emulateMedia({reducedMotion:'reduce'});
+test('les illustrations chargent et les nouvelles pages restent lisibles',async({page},testInfo)=>{
+ await page.emulateMedia({reducedMotion:'reduce'});
  for(const width of [390,1440]){
   await page.setViewportSize({width,height:960});
   for(const [path,name] of [['/','home'],['/situations-sensibles/','situations'],['/qui-sommes-nous/','people'],['/equipes/','equipes'],['/managers/','managers']]){
@@ -41,7 +44,7 @@ test('les illustrations chargent et les nouvelles pages restent lisibles',async(
    for(const img of await page.locator('main img:visible').all()){await img.scrollIntoViewIfNeeded();await expect(img).toHaveJSProperty('complete',true);expect(await img.evaluate(el=>(el as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);}
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
    if(path==='/situations-sensibles/')expect(await page.locator('#section-cadre .notice-content').evaluate(el=>el.getBoundingClientRect().width)).toBeGreaterThan(width<800?width*.65:300);
-   await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`artifacts/brief-20261101/${name}-${width}.png`,fullPage:true});
+   await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:testInfo.outputPath(`${name}-${width}.png`),fullPage:true});
    if(path==='/'||path==='/situations-sensibles/')expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);
   }
  }

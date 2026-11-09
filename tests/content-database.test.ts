@@ -4,11 +4,11 @@ import { randomUUID } from 'node:crypto';
 import { loadEnvFile } from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { demoContent } from '../apps/web/src/lib/cms/demo';
-import { closeDatabase, getPool } from '../apps/web/src/server/db';
+import { closeDatabase, getDb, getPool } from '../apps/web/src/server/db';
 import { migrateDatabase } from '../apps/web/src/server/db/migrate';
 import { ContentError, type EditorialActor } from '../apps/web/src/server/content/models';
 import { prepareSeedPlan } from '../apps/web/src/server/content/seed-plan';
-import { changePublication, createContent, dashboard, getContent, isMediaPublished, listContent, listRevisions, mediaIsReferenced, publishContent, readSiteContent, restoreContent, saveContent, seedDocuments } from '../apps/web/src/server/content/repository';
+import { changePublication, createContent, dashboard, getContent, isMediaPublished, listContent, listRevisions, mediaIsReferenced, publishContent, readSiteContent, restoreContent, revisePublishedStructure, saveContent, seedDocuments } from '../apps/web/src/server/content/repository';
 
 try { loadEnvFile(fileURLToPath(new URL('../apps/web/.env', import.meta.url))); } catch { /* CI supplies its own environment. */ }
 const originalUrl = process.env.DATABASE_URL;
@@ -31,12 +31,12 @@ test('persistance PostgreSQL réelle, publication et isolation des révisions', 
     const plan = prepareSeedPlan(demoContent);
     await suite.test('initialisation idempotente sans remplacement des contenus', async () => {
       const first = await seedDocuments(plan.entries, { publish: true });
-      assert.equal(first.filter(entry => entry.result === 'created').length, 26);
+      assert.equal(first.filter(entry => entry.result === 'created').length, 29);
       const second = await seedDocuments(plan.entries, { publish: true });
-      assert.equal(second.filter(entry => entry.result === 'skipped').length, 26);
+      assert.equal(second.filter(entry => entry.result === 'skipped').length, 29);
       const publicContent = await readSiteContent();
       assert.equal(publicContent.pages.length, 10);
-      assert.equal(publicContent.home.statistics.length, 6);
+      assert.equal(publicContent.home.statistics.length, 9);
       assert.equal(publicContent.articles.length, 5);
       assert(publicContent.articles.every(article => article.externalUrl?.startsWith('https://www.linkedin.com/pulse/')));
       assert(publicContent.articles.every(article => article.body.content.length === 0));
@@ -95,6 +95,25 @@ test('persistance PostgreSQL réelle, publication et isolation des révisions', 
       const settings = plan.entries.find(entry => entry.kind === 'settings')!;
       const detail = await getContent(settings.id);
       await assert.rejects(saveContent(detail.id, { ...detail.content, phone: '0102030405' }, detail.version, editor), errorCode('ADMINISTRATOR_REQUIRED'));
+    });
+    await suite.test('une correction publiée conserve un brouillon privé et reste idempotente', async () => {
+      const entry = plan.entries.find(item => item.content.slug === 'mentions-legales')!;
+      const original = await getContent(entry.id);
+      const draft = await saveContent(entry.id, { ...original.content, title: 'Titre privé en cours de rédaction' }, original.version, admin);
+      const edit = () => getDb().transaction(tx => revisePublishedStructure(tx, {
+        id: entry.id, actor: admin, kind: 'page', apply: true,
+        edit: content => ({ ...content, intro: 'Introduction publique corrigée.' }),
+      }));
+      const change = await edit();
+      assert.equal(change.versionAfter, draft.version + 2);
+      const live = (await readSiteContent()).pages.find(item => item.slug === 'mentions-legales')!;
+      assert.equal(live.title, original.content.title);
+      assert.equal(live.intro, 'Introduction publique corrigée.');
+      const current = await getContent(entry.id);
+      assert.equal(current.content.title, 'Titre privé en cours de rédaction');
+      assert.equal(current.content.intro, live.intro);
+      assert(current.hasUnpublishedChanges);
+      assert.equal((await edit()).versionAfter, current.version);
     });
     await suite.test('une restauration ne peut emprunter la révision d’une autre ressource', async () => {
       const detail = await getContent(home.id);

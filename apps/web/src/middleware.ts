@@ -1,11 +1,19 @@
 import {defineMiddleware} from 'astro:middleware';
 import {randomBytes} from 'node:crypto';
 import {ContentUnavailableError} from './lib/cms/client';
-import {isProductionSite} from './lib/environment';
+import {env,isProductionSite} from './lib/environment';
 import {isPreview} from './lib/cms/preview';
 export const onRequest=defineMiddleware(async(context,next)=>{
   let response:Response;
   const path=context.url.pathname;
+  const canonical=env('SITE_URL');
+  const alias=env('PUBLIC_SITE_ALIAS');
+  if(isProductionSite()&&alias&&canonical&&context.request.headers.get('host')?.toLowerCase()===alias&&['GET','HEAD'].includes(context.request.method)&&!path.startsWith('/api/')){
+    const destination=new URL(canonical);
+    destination.pathname=path;
+    destination.search=context.url.search;
+    return Response.redirect(destination,308);
+  }
   const privateRoute=path.startsWith('/admin')||path.startsWith('/api/')||path.startsWith('/media/');
   try{
     context.locals.cmsPreview=await isPreview(context);

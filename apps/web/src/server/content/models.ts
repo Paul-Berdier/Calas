@@ -111,7 +111,7 @@ export const pageSchema = z.object({
   if (page.slug === 'diagnostic-rps' && !page.sections.some(section => section.presentation === 'method' && section.items?.length === 5)) context.addIssue({ code: 'custom', path: ['sections'], message: 'Le Diagnostic doit conserver sa méthode en cinq étapes.' });
   if (page.slug === 'diagnostic-rps' && ['signaux', 'etapes', 'regards', 'livrables', 'confiance', 'questions', 'prevention'].some(key => !page.sections.some(section => section.key === key))) context.addIssue({ code: 'custom', path: ['sections'], message: 'Les sections essentielles du Diagnostic sont protégées ; leurs textes restent modifiables.' });
 });
-export const statisticSchema = z.object({ id: optionalId, value: required(80), label: required(800), source: required(300), sourceUrl: httpsUrl, year: required(150), note: required(2000), verified: z.boolean(), group: z.enum(['people', 'cost']).optional(), observationPeriod: optionalText(150), publicationYear: z.number().int().min(1900).max(2200).optional(), order: z.number().int().min(0).max(1000).optional() }).strict();
+export const statisticSchema = z.object({ id: optionalId, value: required(80), label: required(800), source: required(300), sourceUrl: httpsUrl, year: required(150), note: required(2000), verified: z.boolean(), group: z.enum(['people', 'cost', 'financial']).optional(), observationPeriod: optionalText(150), publicationYear: z.number().int().min(1900).max(2200).optional(), order: z.number().int().min(0).max(1000).optional() }).strict();
 export const personSchema = z.object({ id: optionalId, name: required(150), role: required(600), bio: optionalText(8000), portrait: imageSchema.optional(), order: z.number().int().min(0).max(1000).optional() }).strict();
 export const categorySchema = z.object({ id: optionalId, title: required(100), slug: slugSchema, description: optionalText(1000) }).strict();
 export const settingsSchema = z.object({
@@ -131,9 +131,9 @@ export const homeSchema = z.object({
     threads: imageSchema.optional(), nautilus: imageSchema.optional(), roots: imageSchema.optional(), compass: imageSchema.optional(), tree: imageSchema.optional(),
     kintsugi: imageSchema.optional(), ripples: imageSchema.optional(), murmuration: imageSchema.optional(), calmFace: imageSchema.optional(), closing: imageSchema.optional(),
   }).strict().optional(),
-  whyNow: z.object({ title: required(250), text: required(2500) }).strict().optional(),
+  whyNow: z.object({ title: required(250), text: required(2500), sources: z.array(z.object({ label: required(120), href: httpsUrl }).strict()).max(2).optional() }).strict().optional(),
   journey: z.object({ cards: z.array(z.object({ key: required(100), eyebrow: required(140), title: required(220), lead: optionalText(350), text: required(2500), cta: ctaSchema }).strict()).length(3), transition: required(1000), sensitiveText: required(1200), sensitiveCta: ctaSchema }).strict().optional(),
-  statistics: z.array(statisticSchema).max(6).default([]), statisticIds: z.array(uuid).max(6).optional(), statisticsTitle: optionalText(250), statisticsTransition: optionalText(1000),
+  statistics: z.array(statisticSchema).max(9).default([]), statisticIds: z.array(uuid).max(9).optional(), statisticsTitle: optionalText(250), statisticsTransition: optionalText(1000),
   diagnostic: z.object({ title: required(250), text: required(2500), cta: ctaSchema, image: imageSchema.optional() }).strict(),
   reasons: z.array(item).length(3, 'L’accueil doit conserver ses trois raisons.'), reasonsTitle: optionalText(250), domainsTitle: optionalText(250), domainsIntro: optionalText(1200),
   conviction: z.object({ title: required(250), text: required(2500), closingQuote: optionalText(500), cta: ctaSchema }).strict(), closingTitle: optionalText(250), closingCta: ctaSchema.optional(), seo: seoSchema.optional(), editorial: homeEditorial.optional(),

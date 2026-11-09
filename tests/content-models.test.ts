@@ -6,19 +6,20 @@ import { prepareSeedPlan, stableContentId } from '../apps/web/src/server/content
 import { convertPortableText } from '../apps/web/src/server/content/legacy-rich-text';
 
 const id = stableContentId('media', 'fixture');
-test('le plan initial contient les onze pages, deux personnes, six chiffres et cinq liens fournis par Sara', () => {
+test('le plan initial contient les onze pages, deux personnes, neuf chiffres et cinq liens fournis par Sara', () => {
   const first = prepareSeedPlan(demoContent);
-  assert.equal(first.entries.length, 26);
+  assert.equal(first.entries.length, 29);
   assert.deepEqual(first, prepareSeedPlan(demoContent));
   assert.equal(first.entries.filter(entry => ['home', 'page'].includes(entry.kind)).length, 11);
   assert.equal(first.entries.filter(entry => entry.kind === 'article').length, 5);
-  assert.equal(first.entries.filter(entry => entry.kind === 'statistic').length, 6);
-  assert.equal(new Set(first.entries.map(entry => entry.id)).size, 26);
+  assert.equal(first.entries.filter(entry => entry.kind === 'person').length, 2);
+  assert.equal(first.entries.filter(entry => entry.kind === 'statistic').length, 9);
+  assert.equal(new Set(first.entries.map(entry => entry.id)).size, 29);
   assert.deepEqual(first.warnings, []);
   const diagnostic = first.entries.find(entry => entry.content.slug === 'diagnostic-rps')!;
   assert.equal((diagnostic.content.sections as Array<{ presentation?: string; items?: unknown[] }>).find(section => section.presentation === 'method')!.items!.length, 5);
 });
-test('les pages fixes, six blocs d’accueil et étapes du diagnostic ne peuvent être effacés', () => {
+test('les champs obligatoires de l’accueil et les étapes du diagnostic ne peuvent être effacés', () => {
   const plan = prepareSeedPlan(demoContent);
   const home = plan.entries.find(entry => entry.kind === 'home')!;
   assert.throws(() => parseContent('home', { ...home.content, diagnostic: undefined }), ContentError);

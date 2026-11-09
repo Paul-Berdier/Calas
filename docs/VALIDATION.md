@@ -1,8 +1,18 @@
 # Revue éditoriale et autorisation de publication
 
+## Lancement autorisé le 9 novembre 2026
+
+Paul a autorisé le lancement sur **www.calas-conseil.fr**, confirmé les identités des deux EI, les responsabilités de Sara, les destinataires du formulaire et la conservation des demandes. Il a autorisé un essai à la boîte partagée. La racine du domaine en HTTPS est hors du périmètre retenu. Les avis et cases de relecture ci-dessous décrivent les versions historiques.
+
 État de départ : développement local. Le 25 octobre 2026, Paul a ensuite autorisé une préproduction publique dans le projet Railway Calas, avec PostgreSQL, stockage privé et compte de recette sans email externe. [Cette adresse](https://calas-web-test-production.up.railway.app/) permet la relecture ; ce n’est pas une validation de production. Le brief exige la validation de l'accueil et de Diagnostic par Sara et Agnès, puis une relecture générale avant lancement définitif. Ce document est une liste de décision ; les résultats réellement exécutés sont consignés séparément dans le compte rendu de tests.
 
 **État au 2 novembre 2026 :** sur demande explicite de Paul, le nouveau cahier des charges du 31 octobre et ses consignes ont été déployés sur la **préproduction Railway**, après la recette locale. Les 24 documents ciblés sont publiés sur cette adresse de test, avec conservation de l'historique. La matrice [Évolutions du 1er novembre](EVOLUTIONS-20261101.md) distingue ce qui est appliqué, les pièces manquantes et les raccordements encore attendus. Les cases ci-dessous restent des décisions de Sara et Agnès ; le déploiement de recette et ses tests techniques ne les cochent pas à leur place.
+
+## Attestation RPPS d’Agnès reçue le 3 novembre 2026
+
+Le justificatif `attestation_10009722090.pdf`, fourni par Paul et édité le 23 août 2026, porte le nom **LOUPIAS AGNES**, la profession **Psychologue** et le numéro **RPPS 10009722090**. La présentation de recette ajoute « Enregistrement RPPS n° 10009722090 » et précise la date de l’attestation dans la biographie. Il s’agit d’un enregistrement professionnel, sans nouveau diplôme ni enregistrement IPRP déduit. Les mentions antérieures du master et de la spécialité clinique restent issues du brief, pas de cette attestation. Le justificatif original n’est pas rendu téléchargeable.
+
+- [x] Révision CMS d’Agnès publiée sur la préproduction Railway (v3 → v5), historique conservé et fiche de Sara inchangée. L’accueil et Qui sommes-nous répondent 200 et affichent l’enregistrement RPPS ; présentation d’Agnès relue visuellement sur ordinateur, sans débordement à 1 280 px. La tentative de contrôle à 390 px n’a pas changé la largeur effective du navigateur : elle ne constitue pas une validation mobile. Typecheck et lint réussis. Preuves : `artifacts/agnes-rpps-20261103/`. Cette vérification technique ne vaut pas validation du lancement définitif.
 
 ## Corrections reçues le 2 novembre — appliquées en préproduction
 

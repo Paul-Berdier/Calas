@@ -76,7 +76,7 @@ const homeEditorial: TextDefinition[] = [
   { name: "heroAudience", label: "Public accompagné", rows: 3 },
   { name: "heroArtTop", label: "Repère supérieur du coquillage" },
   { name: "heroArtBottom", label: "Repère inférieur du coquillage" },
-  { name: "heroArtCaption", label: "Signature autour du coquillage", rows: 2 },
+  { name: "heroArtCaption", label: "Texte sous le coquillage (seconde ligne en italique)", rows: 2 },
   { name: "exploreLabel", label: "Invitation à explorer la page" },
   { name: "statisticsEyebrow", label: "Surtitre des chiffres" },
   {
@@ -441,7 +441,6 @@ export function ContentForm({
           open
         >
           {texts([
-            { name: "eyebrow", label: "Surtitre", max: 140 },
             {
               name: "title",
               label: "Titre principal",
@@ -460,23 +459,24 @@ export function ContentForm({
           {cta(["primaryCta"], "Lien prioritaire")}
           {cta(["secondaryCta"], "Second lien")}
         </Group>
-        <Group title="02 · Pourquoi maintenant" description="Le contexte et les besoins auxquels répond Calas Conseil.">
-          {texts([{name:"title",label:"Titre",rows:2},{name:"text",label:"Texte",rows:8}],["whyNow"])}
-        </Group>
-        <Group title="03 · Notre chemin en trois temps" description="Les trois cartes, leur destination et l’accès aux situations sensibles.">
+        <Group title="02 · Notre chemin en trois temps" description="Les trois cartes, leur destination et l’accès aux situations sensibles.">
           {text({name:"domainsTitle",label:"Titre de la section",rows:2})}
           {(value.journey?.cards??[]).map((card:EditorialContent,index:number)=><div className="admin-repeat-item" key={String(card.key??index)}><div className="admin-repeat-heading"><strong>Étape {index+1}</strong></div><div className="admin-fields">{texts([{name:"eyebrow",label:"Petit libellé"},{name:"title",label:"Titre",rows:2},{name:"lead",label:"Phrase d’ouverture — gras et italique",rows:2,max:350},{name:"text",label:"Suite de la présentation",rows:6}],["journey","cards",index])}{cta(["journey","cards",index,"cta"],"Lien de l’étape")}</div></div>)}
           {texts([{name:"transition",label:"Phrase après les cartes",rows:2},{name:"sensitiveText",label:"Présentation des situations sensibles",rows:3}],["journey"])}
           {cta(["journey","sensitiveCta"],"Situations sensibles")}
         </Group>
+        <Group title="03 · Pourquoi maintenant" description="Le contexte et les besoins auxquels répond Calas Conseil.">
+          {texts([{name:"title",label:"Titre",rows:2},{name:"text",label:"Texte",rows:8}],["whyNow"])}
+          {[0, 1].map(index=><div key={index}>{texts([{name:"label",label:`Chiffre à relier ${index + 1}`,max:120},{name:"href",label:"Adresse HTTPS de la source",type:"url"}],["whyNow","sources",index])}</div>)}
+        </Group>
         <Group
-          title="04 · Notre conviction"
+          title="04 · Notre parti pris"
           description="La pensée du cabinet et le lien vers notre approche."
         >
           {texts(
             [
-              { name: "title", label: "Notre conviction — titre", rows: 2 },
-              { name: "text", label: "Notre conviction — texte", rows: 10 },
+              { name: "title", label: "Notre parti pris — titre", rows: 2 },
+              { name: "text", label: "Notre parti pris — texte", rows: 10 },
               { name: "closingQuote", label: "Phrase finale en italique", rows: 2, max: 500 },
             ],
             ["conviction"],
@@ -510,7 +510,7 @@ export function ContentForm({
             Les valeurs, les sources et leur vérification se règlent dans la
             rubrique dédiée.
           </p>
-          {[0, 1, 2, 3, 4, 5].map((index) => {
+          {Array.from({length: 9}, (_, index) => index).map((index) => {
             const ids: string[] =
               value.statisticIds ??
               (value.statistics ?? []).map((item: EditorialContent) => item.id);
@@ -556,14 +556,14 @@ export function ContentForm({
           {text({ name: "closingTitle", label: "Invitation finale", rows: 2 })}
           {cta(["closingCta"], "Lien final", true)}
         </Group>
-        <Group title="Images de l’accueil" description="Les illustrations de Sara sont utilisées par défaut. Vous pouvez les remplacer par une image de votre médiathèque.">
-          {([['threads','Fils dorés — premier écran'],['nautilus','Nautile — pourquoi maintenant'],['roots','Racines — diagnostic'],['compass','Boussole — compétences relationnelles'],['tree','Arbre — management'],['kintsugi','Kintsugi — situations sensibles'],['ripples','Ondes — émotions'],['murmuration','Oiseaux — autonomie'],['calmFace','Visage apaisé — fin de Notre conviction'],['closing','Photo de l’invitation finale']] as const).map(([key,label])=>image(["visuals",key],label))}
+        <Group title="Images de l’accueil" description="Choisissez les visuels de chaque rubrique dans la médiathèque.">
+          {([['nautilus','Nautile — pourquoi maintenant'],['roots','Racines — diagnostic'],['compass','Boussole — compétences relationnelles'],['tree','Arbre — management'],['kintsugi','Kintsugi — situations sensibles'],['murmuration','Oiseaux — autonomie'],['calmFace','Visage apaisé — fin de Notre conviction'],['closing','Photo de l’invitation finale']] as const).map(([key,label])=>image(["visuals",key],label))}
         </Group>
         <Group
           title="Repères et textes secondaires"
           description="Légendes, surtitres et petits textes autour des illustrations."
         >
-          {texts(homeEditorial.filter(field=>["heroAudience","statisticsDescription","statisticsNote"].includes(field.name)), ["editorial"])}
+          {texts(homeEditorial.filter(field=>["heroAudience","heroArtCaption","heroArtTop","heroArtBottom","domainsEyebrow","convictionEyebrow","reasonsEyebrow","statisticsEyebrow","statisticsDescription","statisticsNote"].includes(field.name)), ["editorial"])}
           {cta(["editorial", "reasonsLink"], "Rencontre avec l’équipe", true)}
         </Group>
         {seo}
@@ -932,7 +932,7 @@ export function ContentForm({
           "La source et son interprétation ont été vérifiées",
           "La publication ne rend visible le chiffre que si cette vérification est cochée.",
         )}
-        <Field label="Groupe sur l’accueil">{id=><select id={id} className="admin-select" value={value.group??"people"} disabled={disabled} onChange={event=>update(["group"],event.target.value)}><option value="people">Ce que vivent les équipes</option><option value="cost">Les conséquences pour les organisations</option></select>}</Field>
+        <Field label="Groupe sur l’accueil">{id=><select id={id} className="admin-select" value={value.group??"people"} disabled={disabled} onChange={event=>update(["group"],event.target.value)}><option value="people">Ce que vivent les équipes</option><option value="financial">Ce que ça coûte</option><option value="cost">Les conséquences pour les organisations</option></select>}</Field>
       </Group>
     );
   if (kind === "category")

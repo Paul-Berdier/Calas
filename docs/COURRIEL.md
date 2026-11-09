@@ -1,5 +1,15 @@
 # Courriel Calas Conseil
 
+## Messagerie en service depuis novembre 2026
+
+L’unique boîte publique est **contact@calas-conseil.fr**, partagée par Sara et Agnès. Elle utilise Zimbra Starter chez OVHcloud. Elles peuvent la consulter dans [le webmail](https://mail.ovh.net/modern/) ou dans Outlook par IMAP sécurisé sur `imap.mail.ovh.net:993` et SMTP sécurisé sur `smtp.mail.ovh.net:465`. L’identifiant est l’adresse complète.
+
+Le site affiche cette adresse sur la page Contact, en pied de page et dans les informations légales. Le formulaire envoie depuis et vers cette boîte. Répondre à l’alerte adresse la réponse au visiteur via le champ `Reply-To`. Les trois comptes personnels de l’administration utilisent leurs propres adresses pour les liens de vérification et de réinitialisation.
+
+Les demandes sont supprimées de la messagerie au plus tard trois ans après le dernier échange, hors pièces à conserver au titre des obligations contractuelles. Sara et Agnès assurent cette suppression dans la boîte. Les identifiants SMTP restent dans les variables privées du service Railway. La zone DNS OVH publie MX, SPF, DKIM et DMARC.
+
+Les sections datées ci-dessous conservent l’historique des offres envisagées avant la création de la boîte.
+
 ## Domaine et adresses envisagés — état au 2 novembre 2026
 
 Paul envisage désormais le domaine **calas-conseil.fr**, avec un tiret, et a demandé les explications nécessaires pour que Sara l’achète. Il souhaite pouvoir disposer de plusieurs adresses, par exemple **sara@calas-conseil.fr** et **agnes@calas-conseil.fr**. Le nombre de boîtes, leurs noms, le fournisseur et l’offre restent à confirmer. Il s’agit de boîtes capables de recevoir et d’envoyer des messages, pas seulement de liens affichés sur le site.
@@ -47,7 +57,7 @@ L'offre [Email Basic 1](https://www.ionos.fr/solutions-bureau/adresse-email.html
 
 Cette alternative avait également été examinée pour une seule boîte ; au tarif annuel vérifié le 1er novembre, la proposition OVHcloud avec boîte incluse était plus économique pour ce périmètre. Le coût de plusieurs boîtes reste à comparer. Aucun abonnement de messagerie ne doit être ajouté au projet sans nécessité et validation.
 
-## Raccordement au site après création
+## Projet de raccordement envisagé avant le choix de la boîte partagée (historique)
 
 - L'adresse publique du site doit correspondre à la boîte réellement créée. Un texte ou lien `mailto:` ne prouve pas que la réception fonctionne.
 - Si cette boîte est retenue et créée, le formulaire pourra utiliser `SMTP_TO=sara@calas-conseil.fr`. Le destinataire réel reste à confirmer. L’expéditeur SMTP doit être autorisé par le fournisseur ; l’adresse du visiteur est placée dans `Reply-To`, jamais utilisée comme expéditeur du domaine.

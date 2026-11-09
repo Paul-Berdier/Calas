@@ -1,0 +1,24 @@
+{
+  "cards": [
+    {
+      "key": "diagnostic",
+      "lead": "Voir ce qui se joue avant d’agir.",
+      "text": "Un diagnostic des risques psychosociaux, utile à votre document unique (DUERP), pour lire les risques et les ressources de votre organisation avec justesse et décider sur une base claire."
+    },
+    {
+      "key": "equipes",
+      "lead": "Développer des compétences relationnelles.",
+      "text": "Des processus d’apprentissage, conférences et ateliers, sur les émotions et les croyances pour mieux se comprendre, ajuster son comportement au sein du collectif et agir en conscience dans la relation."
+    },
+    {
+      "key": "managers",
+      "lead": "Faire du manager un professionnel du lien.",
+      "text": "Un parcours sur la posture, pour que chaque manager devienne un point d’appui pour son équipe."
+    }
+  ],
+  "conviction": {
+    "text": "Une organisation tient par ses process, et plus encore par la qualité des liens entre les personnes qui la font vivre.\n\nChacun arrive au travail avec ses émotions qui expriment ce qui compte pour lui et font écho à ses valeurs, à ses aspirations et à ses croyances qui influencent sa manière de percevoir les situations et d’entrer en relation avec les autres. Émotions et croyances façonnent ainsi nos comportements et nos interactions.\n\nCes liens reposent sur l’authenticité, qui permet de parler vrai, et un cadre de sécurité, qui permet d’oser. Ils s’apprennent et s’entretiennent, par des rituels de conversation et des temps de régulation.",
+    "closingQuote": "Quand on se sent en sécurité, on ose : c’est là que naît l’autonomie."
+  },
+  "qualificationLabel": "IPRP enregistrée auprès de la DREETS Nouvelle-Aquitaine"
+}
