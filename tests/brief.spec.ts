@@ -5,6 +5,7 @@ test('le nouveau chemin et le numéro IPRP sont visibles sans JavaScript',async(
  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});
  const page=await context.newPage();
  await page.goto('http://127.0.0.1:4322/');
+ await expect(page.locator('#hero-title')).toHaveText('Construire la performance durable par la qualité du lien');
  await expect(page.locator('main>section')).toHaveCount(7);
  await expect(page.locator('.journey-card')).toHaveCount(3);
  await expect(page.locator('.journey-lead strong em')).toHaveText(['Voir ce qui se joue avant d’agir.','Développer des compétences relationnelles.','Faire du manager un professionnel du lien.']);

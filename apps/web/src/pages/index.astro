@@ -47,7 +47,7 @@ const titleMatch=home.title.match(/^(.*?)\s+(par la qualité du lien)$/i);
   <section class="home-hero" aria-labelledby="hero-title">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <h1 id="hero-title">{titleMatch?<>{titleMatch[1]}<em>{titleMatch[2]}</em></>:home.title}</h1>
+        <h1 id="hero-title">{titleMatch?<>{titleMatch[1]}{' '}<em>{titleMatch[2]}</em></>:home.title}</h1>
         <div class="hero-intro">{paragraphs(home.intro).map(p=><p>{p}</p>)}</div>
         <div class="actions"><CTA cta={home.primaryCta}/><CTA cta={home.secondaryCta} variant="link"/></div>
       </div>

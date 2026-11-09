@@ -1,4 +1,9 @@
-FROM node:24.19.0-bookworm-slim AS base
+FROM node:24.19.0-bookworm-slim AS os-base
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends upgrade \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM os-base AS base
 WORKDIR /app
 RUN npm install --global pnpm@11.25.0
 
@@ -23,7 +28,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/package.json
 RUN pnpm install --prod --frozen-lockfile
 
-FROM node:24.19.0-bookworm-slim AS runtime
+FROM os-base AS runtime
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=4321
 WORKDIR /app/apps/web
 COPY --from=production-dependencies --chown=node:node /app/node_modules /app/node_modules

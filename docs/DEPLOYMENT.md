@@ -80,6 +80,8 @@ pnpm start
 
 Le build génère les ressources PDF.js et OCR français/anglais dans les assets publics. Le site public ne charge pas ces moteurs. La compilation et le démarrage ne migrent pas la base, ne créent pas de bucket, n’importent et ne publient rien.
 
+La couche Docker `os-base` applique les mises à jour Debian à la construction. Lors des maintenances de sécurité, rafraîchir l’image de base et invalider le cache de cette couche (en local, `docker build --pull --no-cache .`). Après déploiement, contrôler les versions effectivement installées dans le conteneur Railway ou OVH.
+
 L’entrée SSR est `apps/web/dist/server/entry.mjs`. Le processus doit démarrer depuis `apps/web`, avec `HOST=0.0.0.0` sur l’hébergeur et son `PORT`. Le serveur Node sert les pages et les assets ; les uploads restent dans S3 et les données dans PostgreSQL. Aucun volume de médias sur le disque éphémère de l’application n’est nécessaire. [Adaptateur Node officiel Astro](https://docs.astro.build/en/guides/integrations-guide/node/).
 
 ## Image Docker
