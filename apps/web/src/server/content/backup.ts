@@ -75,6 +75,7 @@ interface BackupOptions {
   directory?: string;
   client?: PoolClient;
   dumpSnapshot?: (snapshot: string, output: string) => Promise<void>;
+  sourceRevision?: string;
 }
 
 export async function createBackup(path: string, storage: MediaStorage = storageFromEnvironment(), options: BackupOptions = {}): Promise<BackupManifest> {
@@ -108,8 +109,8 @@ export async function createBackup(path: string, storage: MediaStorage = storage
     await client.query('COMMIT');
     const migrationDirectory = join(root, 'drizzle');
     const migrations = await Promise.all((await readdir(migrationDirectory)).filter(name => name.endsWith('.sql')).sort().map(async name => ({ name, sha256: await hashFile(join(migrationDirectory, name)) })));
-    let codeRevision = process.env.RAILWAY_GIT_COMMIT_SHA || process.env.SOURCE_REVISION || 'not-recorded';
-    if (codeRevision === 'not-recorded') { try { codeRevision = (await exec('git', ['-c', `safe.directory=${root.replaceAll('\\', '/').replace(/\/$/, '')}`, 'rev-parse', 'HEAD'], { cwd: root, windowsHide: true })).stdout.trim(); } catch { /* Deployment may not include .git. */ } }
+    let codeRevision = options.sourceRevision || process.env.RAILWAY_GIT_COMMIT_SHA || process.env.SOURCE_REVISION || 'not-recorded';
+    if (!options.sourceRevision && codeRevision === 'not-recorded') { try { codeRevision = (await exec('git', ['-c', `safe.directory=${root.replaceAll('\\', '/').replace(/\/$/, '')}`, 'rev-parse', 'HEAD'], { cwd: root, windowsHide: true })).stdout.trim(); } catch { /* Deployment may not include .git. */ } }
     const manifest: BackupManifest = { format: 'calas-backup-v1', createdAt: new Date().toISOString(), codeRevision, migrations, postgresVersion: version[0]!.server_version, objectCount: objectRecords.length, objects: objectRecords.map(({ key: objectKey, size, sha256, mimeType: type }) => ({ key: objectKey!, size, sha256, mimeType: type! })) };
     const manifestPath = join(directory, 'manifest.json'); await writeFile(manifestPath, JSON.stringify(manifest), { flag: 'wx', mode: 0o600 });
     await encryptArchive(target, [

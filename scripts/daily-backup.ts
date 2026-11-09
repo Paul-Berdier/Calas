@@ -8,12 +8,12 @@ import { pathToFileURL } from 'node:url';
 import { closeDatabase, getPool } from '../apps/web/src/server/db';
 import { createBackup, verifyBackup } from '../apps/web/src/server/content/backup';
 import { backupKey, hashFile } from '../apps/web/src/server/content/backup-archive';
+import { dailyName, expiredDailyArchives, parisDay } from '../apps/web/src/server/content/backup-retention';
+export { expiredDailyArchives } from '../apps/web/src/server/content/backup-retention';
 
-const dailyName = /^calas-daily-(\d{4}-\d{2}-\d{2})\.calas-backup$/;
 const temporaryDirectory = /^daily-work-[a-zA-Z0-9]{6}$/;
 const temporaryFile = /^(postgres\.dump|manifest\.json|object-\d+\.bin|verified\.records|checked-\d+\.bin)$/;
 const pendingFile = /^(pending-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.calas-backup|status-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}\.json)$/;
-const timezone = 'Europe/Paris';
 const missingFile = (error: unknown) => (error as NodeJS.ErrnoException)?.code === 'ENOENT';
 
 function childEnvironment() {
@@ -68,35 +68,6 @@ export async function cleanInterruptedDailyWork(directory: string) {
     for (const file of files) await unlink(file);
     await rmdir(path);
   }
-}
-
-function parisDay(date: Date) {
-  const parts = new Intl.DateTimeFormat('fr-FR', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(date);
-  const part = (name: string) => parts.find(item => item.type === name)!.value;
-  return `${part('year')}-${part('month')}-${part('day')}`;
-}
-
-/** Keep the newest capture in each of the most recent distinct weeks and months, in addition to daily copies. */
-export function expiredDailyArchives(files: string[]): string[] {
-  const entries = files.flatMap(name => {
-    const day = dailyName.exec(name)?.[1];
-    if (!day) return [];
-    const date = new Date(day + 'T00:00:00Z');
-    if (Number.isNaN(+date) || date.toISOString().slice(0, 10) !== day) return [];
-    date.setUTCDate(date.getUTCDate() - (date.getUTCDay() + 6) % 7);
-    return [{ name, week: date.toISOString().slice(0, 10), month: day.slice(0, 7) }];
-  }).sort((a, b) => b.name.localeCompare(a.name));
-  const keep = new Set(entries.slice(0, 30).map(entry => entry.name));
-  for (const key of ['week', 'month'] as const) {
-    const seen = new Set<string>();
-    for (const entry of entries) {
-      if (seen.has(entry[key])) continue;
-      seen.add(entry[key]);
-      keep.add(entry.name);
-      if (seen.size === 12) break;
-    }
-  }
-  return entries.filter(entry => !keep.has(entry.name)).map(entry => entry.name);
 }
 
 async function prune(directory: string) {

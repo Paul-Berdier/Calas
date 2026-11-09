@@ -23,7 +23,7 @@
     "content:export": "node scripts/content-export.mjs",
     "content:import": "node scripts/content-import.mjs",
     "test:domain": "pnpm --filter @calas/web exec tsx --test ../../tests/content-models.test.ts ../../tests/media.test.ts",
-    "test:integration": "pnpm --filter @calas/web exec tsx --test ../../tests/content-database.test.ts ../../tests/media-db.test.ts ../../tests/contact-database.test.ts ../../tests/content-backup.test.ts ../../tests/daily-backup.test.ts",
+    "test:integration": "pnpm --filter @calas/web exec tsx --test ../../tests/content-database.test.ts ../../tests/media-db.test.ts ../../tests/contact-database.test.ts ../../tests/content-backup.test.ts ../../tests/daily-backup.test.ts ../../tests/cloud-backup.test.ts",
     "db:generate": "pnpm --filter @calas/web exec drizzle-kit generate --config=../../drizzle.config.ts",
     "db:migrate": "pnpm --filter @calas/web exec tsx ../../scripts/database-migrate.ts",
     "auth:bootstrap": "pnpm --filter @calas/web exec tsx ../../scripts/auth-bootstrap.ts",
