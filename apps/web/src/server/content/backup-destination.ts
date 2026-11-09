@@ -36,7 +36,8 @@ function backupBucket(prefix: 'BACKUP_S3' | 'STATUS_S3') {
   if (endpoint.username || endpoint.password || endpoint.search || endpoint.hash ||
       !(endpoint.protocol === 'https:' || (process.env.SITE_ENV === 'test' && endpoint.protocol === 'http:' &&
         ['localhost', '127.0.0.1', 'minio'].includes(endpoint.hostname)))) throw new Error('Destination de sauvegarde inattendue.');
-  if (bucket === process.env.S3_BUCKET || (prefix === 'STATUS_S3' && bucket === process.env.BACKUP_S3_BUCKET)) {
+  const otherBucket = prefix === 'STATUS_S3' ? process.env.BACKUP_S3_BUCKET : process.env.STATUS_S3_BUCKET;
+  if (bucket === process.env.S3_BUCKET || bucket === otherBucket) {
     throw new Error('Les médias, archives et états doivent être stockés dans trois buckets distincts.');
   }
   const client = new S3Client({
