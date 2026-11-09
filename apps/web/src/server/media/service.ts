@@ -3,6 +3,7 @@ import {and,desc,eq,ilike,sql} from 'drizzle-orm';
 import {getDb} from '../db';
 import {mediaReferences,auditLogs} from '../db/schema';
 import {media,mediaDeletions,type MediaRow,type MediaMetadata} from './schema';
+import {visibleMediaFilter} from './visibility';
 import {getMediaStorage,type MediaStorage} from './storage';
 import {MediaError,prepareMedia,createImageVariants,mediaEditSchema,safeFilename,type PreparedMedia} from './validation';
 
@@ -26,7 +27,7 @@ function assertEditable(row:MediaRow,actor:MediaActor){
 function assertUuid(value:string){if(!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(value))throw new MediaError(400,'INVALID_ID','Identifiant invalide.');}
 export async function listMedia(actor:MediaActor,{search='',offset=0,imagesOnly=false,pdfOnly=false}:{search?:string;offset?:number;imagesOnly?:boolean;pdfOnly?:boolean}={}){
   const rows=await getDb().select().from(media).where(and(
-    actor.role==='administrator'?undefined:sql`(${media.createdBy}=${actor.id} OR EXISTS (SELECT 1 FROM ${mediaReferences} WHERE ${mediaReferences.mediaId}=${media.id} AND ${mediaReferences.isPublished}=true))`,
+    visibleMediaFilter(actor),
     search?ilike(media.originalFilename,`%${search.slice(0,100).replace(/[\\%_]/g,'\\$&')}%`):undefined,
     imagesOnly?sql`${media.mimeType} LIKE 'image/%'`:undefined,
     pdfOnly?eq(media.mimeType,'application/pdf'):undefined,

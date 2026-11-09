@@ -56,6 +56,14 @@ export interface DashboardData {
     media: number;
     needsReview: number;
   };
+  shortcuts: { home?: string; diagnostic?: string };
+  pending: {
+    id: string;
+    kind: ContentKind;
+    title: string;
+    status: ContentSummary["status"];
+    review: "pdf" | "source" | null;
+  }[];
   recent: AuditEvent[];
   recentPublications: AuditEvent[];
 }
@@ -199,4 +207,8 @@ export const actionLabels: Record<string, string> = {
   upload: "Média ajouté",
   replace: "Média remplacé",
   delete: "Suppression",
+  "media.upload": "Média ajouté",
+  "media.edit": "Informations du média modifiées",
+  "media.replace": "Média remplacé",
+  "media.delete": "Média supprimé",
 };

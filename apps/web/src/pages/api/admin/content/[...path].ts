@@ -17,8 +17,8 @@ export const ALL: APIRoute = async ({ request, params }) => {
     const [collection, resourceId, action] = segments;
     if (segments.length > 3) throw new ContentError(404, 'NOT_FOUND', 'Cette action est introuvable.');
     if (request.method !== 'GET') assertSameOrigin(request);
-    if (request.method === 'GET' && collection === 'dashboard' && segments.length === 1) return json(await dashboard());
-    if (request.method === 'GET' && collection === 'history' && segments.length === 1) return json({ items: await listHistory() });
+    if (request.method === 'GET' && collection === 'dashboard' && segments.length === 1) return json(await dashboard(actor));
+    if (request.method === 'GET' && collection === 'history' && segments.length === 1) return json({ items: await listHistory(actor) });
     if (!collection || !isCollection(collection)) throw new ContentError(404, 'NOT_FOUND', 'Cette rubrique est introuvable.');
     if (collection === 'settings') await requireAdministrator(request);
 

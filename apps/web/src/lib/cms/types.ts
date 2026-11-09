@@ -66,6 +66,7 @@ export interface Home {
   closingTitle?: string; closingCta?: Cta; seo?: Seo;
   editorial?: {
     heroAudience?: string; heroDisciplines?: string[]; heroArtTop?: string; heroArtBottom?: string; heroArtCaption?: string; exploreLabel?: string;
+    whyNowEyebrow?: string; whyNowImageCaption?: string; convictionImageCaption?: string; closingEyebrow?: string;
     statisticsEyebrow?: string; statisticsDescription?: string; statisticsNote?: string;
     diagnosticEyebrow?: string; diagnosticArtEyebrow?: string; diagnosticArtLegend?: string[]; diagnosticArtTitle?: string; diagnosticNote?: string;
     reasonsEyebrow?: string; reasonsLink?: Cta; reasonsMotifLabel?: string; domainsEyebrow?: string; convictionEyebrow?: string;

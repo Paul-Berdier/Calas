@@ -8,9 +8,11 @@ import Registration from '../components/Registration.astro';
 import '../styles/home.css';
 import {safeHref} from '../lib/links';
 import {getSiteContent} from '../lib/cms/client';
+import {homeCaptions} from '../lib/cms/home-captions';
 import type {Home} from '../lib/cms/types';
 const {home,settings,pages,people}=await getSiteContent(Astro);
 const editorial=home.editorial??{};
+const captions={...homeCaptions,...editorial};
 const visuals=home.visuals??{};
 const offers=['diagnostic-rps','equipes','managers'].flatMap(slug=>pages.filter(p=>p.slug===slug));
 const cards:NonNullable<Home['journey']>['cards']=home.journey?.cards??offers.map((offer,index)=>({key:offer.id,eyebrow:['Le socle','L’action au quotidien','L’ancrage dans la durée'][index],title:offer.title,text:offer.offerExcerpt??offer.intro,cta:{label:'Découvrir',href:`/${offer.slug}/`}}));
@@ -55,12 +57,24 @@ const titleMatch=home.title.match(/^(.*?)\s+(par la qualité du lien)$/i);
         <p class="hero-specialty"><span>{editorial.heroArtTop}</span><span>{editorial.heroArtBottom}</span></p>
       </div>
     </div>
-    <div class="wrap hero-bottom"><p>{editorial.heroAudience??'Aux côtés des dirigeants, des managers et des équipes.'}</p><a href="#chemin" class="hero-scroll"><span>{editorial.exploreLabel??'Explorer notre démarche'}</span><span class="scroll-circle" aria-hidden="true">↓</span></a></div>
+    <div class="wrap hero-bottom"><p>{editorial.heroAudience??'Aux côtés des dirigeants, des managers et des équipes.'}</p><a href="#chemin" class="hero-scroll"><span>{editorial.exploreLabel||homeCaptions.exploreLabel}</span><span class="scroll-circle" aria-hidden="true">↓</span></a></div>
   </section>
 
   <section class="section home-journey" id="chemin" aria-labelledby="journey-title"><div class="wrap"><div class="journey-heading"><p class="eyebrow">01 / {editorial.domainsEyebrow??'Du diagnostic à la transformation'}</p><h2 id="journey-title" data-reveal>{home.domainsTitle??'Notre chemin en trois temps'}</h2></div><div class="journey-cards" data-reveal="group">{cards.map((card,i)=><a class="journey-card" href={safeHref(card.cta.href)}><div class="journey-symbol"><EditorialSymbol name={symbols[i%3]} image={visuals[symbols[i%3]]}/></div><p class="eyebrow">{card.eyebrow}</p><h3>{card.title}</h3><div class="journey-copy">{card.lead&&<p class="journey-lead"><strong><em>{card.lead}</em></strong></p>}<p>{card.text}</p></div><span class="journey-link">{card.cta.label}<span aria-hidden="true">↗</span></span></a>)}</div><p class="journey-transition">{home.journey?.transition??home.domainsIntro}</p>{home.journey&&<a class="sensitive-link" href={safeHref(home.journey.sensitiveCta.href)}><EditorialSymbol name="kintsugi" image={visuals.kintsugi}/><div><h3>{home.journey.sensitiveCta.label} <span aria-hidden="true">↗</span></h3><p>{home.journey.sensitiveText}</p></div></a>}</div></section>
 
-  {home.whyNow&&<section class="section home-now" id="pourquoi-maintenant" aria-labelledby="now-title"><div class="wrap now-grid"><div class="now-illustration" data-reveal="fade"><EditorialSymbol name="nautilus" image={visuals.nautilus}/><span class="symbol-caption">Grandir, en restant soi-même.</span></div><div><p class="eyebrow">02 / Comprendre notre époque</p><h2 id="now-title" data-reveal>{home.whyNow.title}</h2><div class="now-copy">{paragraphs(home.whyNow.text).map(p=><p>{linkSources(p).map(part=>part.href?<a href={safeHref(part.href)}>{part.text}</a>:part.text)}</p>)}</div></div></div></section>}
+  {home.whyNow&&<section class="section home-now" id="pourquoi-maintenant" aria-labelledby="now-title">
+    <div class="wrap now-grid">
+      <div class="now-illustration" data-reveal="fade">
+        <EditorialSymbol name="nautilus" image={visuals.nautilus}/>
+        {captions.whyNowImageCaption&&<span class="symbol-caption">{captions.whyNowImageCaption}</span>}
+      </div>
+      <div>
+        {captions.whyNowEyebrow&&<p class="eyebrow">02 / {captions.whyNowEyebrow}</p>}
+        <h2 id="now-title" data-reveal>{home.whyNow.title}</h2>
+        <div class="now-copy">{paragraphs(home.whyNow.text).map(p=><p>{linkSources(p).map(part=>part.href?<a href={safeHref(part.href)}>{part.text}</a>:part.text)}</p>)}</div>
+      </div>
+    </div>
+  </section>}
 
   <section class="section home-conviction" aria-labelledby="conviction-title">
     <div class="wrap stance-grid">
@@ -75,7 +89,7 @@ const titleMatch=home.title.match(/^(.*?)\s+(par la qualité du lien)$/i);
       </div>
       <figure class="stance-figure" data-reveal="fade">
         <EditorialSymbol name="murmuration" image={visuals.murmuration}/>
-        <figcaption class="symbol-caption">Un collectif vivant, autonome et relié.</figcaption>
+        {captions.convictionImageCaption&&<figcaption class="symbol-caption">{captions.convictionImageCaption}</figcaption>}
       </figure>
       {visuals.calmFace&&<div class="conviction-calm"><CmsImage image={visuals.calmFace} width={880} height={1100} sizes="(max-width: 489px) 90vw, 440px"/></div>}
     </div>
@@ -108,5 +122,5 @@ const titleMatch=home.title.match(/^(.*?)\s+(par la qualité du lien)$/i);
 
   <section class="section home-stats" id="chiffres" aria-labelledby="stats-title"><div class="wrap"><div class="section-heading"><p class="eyebrow">05 / {editorial.statisticsEyebrow??'Le travail en chiffres'}</p><div><h2 id="stats-title" data-reveal>{home.statisticsTitle??'Quelques repères'}</h2>{editorial.statisticsDescription&&<p class="section-description">{editorial.statisticsDescription}</p>}</div></div>{groups.filter(group=>group.items.length).map(group=><div class="statistics-group"><h3>{group.title}</h3><div class="stats" data-reveal="group">{group.items.map(stat=><article class="stat"><p class="stat-value">{stat.value}</p><p class="stat-label">{stat.label}</p><div class="stat-source"><a href={safeHref(stat.sourceUrl)} target="_blank" rel="noopener noreferrer">{stat.source} <span aria-hidden="true">↗</span><span class="sr-only"> (nouvel onglet)</span></a><p>{stat.note}</p><span>Publication : {stat.year}</span></div></article>)}</div></div>)}<p class="stats-note">{editorial.statisticsNote}</p><div class="stats-transition"><span aria-hidden="true">↳</span><p>{home.statisticsTransition}</p></div></div></section>
 
-  <section class="home-closing" aria-labelledby="closing-title"><div class="wrap">{visuals.closing&&<CmsImage class="closing-image" image={visuals.closing} width={1280} height={640} sizes="90vw"/>}<p class="eyebrow">Le premier pas se fait ensemble</p><h2 id="closing-title" data-reveal>{home.closingTitle??'Parlons de vos priorités.'}</h2>{home.closingCta&&<CTA cta={home.closingCta}/>}</div></section>
+  <section class="home-closing" aria-labelledby="closing-title"><div class="wrap">{visuals.closing&&<CmsImage class="closing-image" image={visuals.closing} width={1280} height={640} sizes="90vw"/>}{captions.closingEyebrow&&<p class="eyebrow">{captions.closingEyebrow}</p>}<h2 id="closing-title" data-reveal>{home.closingTitle??'Parlons de vos priorités.'}</h2>{home.closingCta&&<CTA cta={home.closingCta}/>}</div></section>
 </Layout>

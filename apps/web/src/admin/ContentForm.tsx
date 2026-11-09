@@ -11,7 +11,9 @@ import { Button, Field, Modal } from "./ui";
 import { RichEditor } from "./RichEditor";
 import { MediaPicker } from "./components/MediaPicker";
 import { MediaLibrary } from "./components/MediaLibrary";
+import { ArticleReadiness } from "./components/ArticleReadiness";
 import { fileFromMedia } from "./components/media-client";
+import { homeCaptions } from "../lib/cms/home-captions";
 import type {
   Collection,
   ContentKind,
@@ -53,7 +55,7 @@ interface FormProps {
   statistics: ContentSummary[];
   disabled?: boolean;
   autoSlug?: boolean;
-  onNavigate: (collection: Collection) => void;
+  onNavigate: (collection: Collection, documentId?: string) => void;
 }
 interface TextDefinition {
   name: string;
@@ -62,6 +64,7 @@ interface TextDefinition {
   hint?: string;
   type?: string;
   max?: number;
+  fallback?: string;
   readonly?: boolean;
   required?: boolean;
 }
@@ -77,7 +80,6 @@ const homeEditorial: TextDefinition[] = [
   { name: "heroArtTop", label: "Repère supérieur du coquillage" },
   { name: "heroArtBottom", label: "Repère inférieur du coquillage" },
   { name: "heroArtCaption", label: "Texte sous le coquillage (seconde ligne en italique)", rows: 2 },
-  { name: "exploreLabel", label: "Invitation à explorer la page" },
   { name: "statisticsEyebrow", label: "Surtitre des chiffres" },
   {
     name: "statisticsDescription",
@@ -85,12 +87,7 @@ const homeEditorial: TextDefinition[] = [
     rows: 3,
   },
   { name: "statisticsNote", label: "Précision sur les indicateurs", rows: 3 },
-  { name: "diagnosticEyebrow", label: "Surtitre du diagnostic" },
-  { name: "diagnosticArtEyebrow", label: "Repère du visuel diagnostic" },
-  { name: "diagnosticArtTitle", label: "Titre du visuel diagnostic", rows: 2 },
-  { name: "diagnosticNote", label: "Précision sous le diagnostic", rows: 3 },
   { name: "reasonsEyebrow", label: "Surtitre des raisons" },
-  { name: "reasonsMotifLabel", label: "Légende du motif des relations" },
   { name: "domainsEyebrow", label: "Surtitre des accompagnements" },
   { name: "convictionEyebrow", label: "Surtitre de la conviction" },
 ];
@@ -165,7 +162,7 @@ export function ContentForm({
   };
   function text(definition: TextDefinition, path: ContentPath = []) {
     const keys = [...path, definition.name],
-      current = readPath(value, keys) ?? "";
+      current = readPath(value, keys) ?? definition.fallback ?? "";
     return (
       <Field
         key={keys.join(".")}
@@ -177,6 +174,7 @@ export function ContentForm({
           definition.rows ? (
             <textarea
               id={id}
+              data-editor-field={keys.join(".")}
               className="admin-textarea"
               rows={definition.rows}
               value={String(current)}
@@ -187,6 +185,7 @@ export function ContentForm({
           ) : (
             <input
               id={id}
+              data-editor-field={keys.join(".")}
               className="admin-input"
               type={definition.type ?? "text"}
               value={String(current)}
@@ -261,6 +260,7 @@ export function ContentForm({
       <label className="admin-check">
         <input
           type="checkbox"
+          data-editor-field={path.join(".") === "pdfImport.reviewed" ? "pdfImport" : path.join(".")}
           checked={Boolean(readPath(value, path))}
           disabled={disabled}
           onChange={(event) => update(path, event.target.checked)}
@@ -276,12 +276,14 @@ export function ContentForm({
     return (
       <Field label={label}>
         {() => (
-          <RichEditor
-            label={label}
-            value={readPath(value, path) as JSONContent | undefined}
-            onChange={(next) => update(path, next)}
-            disabled={disabled}
-          />
+          <div data-editor-field={path.join(".")}>
+            <RichEditor
+              label={label}
+              value={readPath(value, path) as JSONContent | undefined}
+              onChange={(next) => update(path, next)}
+              disabled={disabled}
+            />
+          </div>
         )}
       </Field>
     );
@@ -393,14 +395,14 @@ export function ContentForm({
           {
             name: "title",
             label: "Titre de référencement",
-            max: 100,
-            hint: "Le titre éditorial est utilisé si ce champ est vide.",
+            max: 220,
+            hint: "Laissez ce champ vide pour garder le titre proposé par le site.",
           },
           {
             name: "description",
             label: "Description de référencement",
             rows: 3,
-            max: 300,
+            max: 500,
           },
         ],
         ["seo"],
@@ -417,6 +419,7 @@ export function ContentForm({
       {(id) => (
         <select
           id={id}
+          data-editor-field={name}
           className="admin-select"
           value={String(value[name] ?? "")}
           disabled={disabled}
@@ -425,13 +428,29 @@ export function ContentForm({
           <option value="">Choisir…</option>
           {options.map((option) => (
             <option value={option.id} key={option.id}>
-              {option.title}
+              {option.title}{option.status !== "published" ? (option.status === "archived" ? " (archivée)" : " (brouillon)") : ""}
             </option>
           ))}
         </select>
       )}
     </Field>
   );
+  function teamProfiles() {
+    const members = people.filter(person => person.status !== "archived");
+    return (
+      <div>
+        <p className="admin-hint">Choisissez une fiche pour modifier le portrait, la fonction ou la biographie. La publication actualise l’accueil et la page « Qui sommes-nous ».</p>
+        <div className="admin-actions">
+          {members.map(person => (
+            <Button key={person.id} variant="secondary" disabled={disabled} onClick={() => onNavigate("people", person.id)}>
+              {person.title}
+            </Button>
+          ))}
+          {!members.length && <Button variant="secondary" onClick={() => onNavigate("people")}>Ouvrir la rubrique Équipe</Button>}
+        </div>
+      </div>
+    );
+  }
   if (kind === "home")
     return (
       <>
@@ -445,28 +464,33 @@ export function ContentForm({
               name: "title",
               label: "Titre principal",
               rows: 4,
-              max: 250,
+              max: 350,
               required: true,
             },
             {
               name: "intro",
               label: "Introduction",
               rows: 6,
-              max: 1200,
+              max: 2500,
               required: true,
             },
           ])}
           {cta(["primaryCta"], "Lien prioritaire")}
           {cta(["secondaryCta"], "Second lien")}
+          {text({ name: "exploreLabel", label: "Texte du lien vers le chemin en trois temps", hint: "Laissez ce champ vide pour utiliser le libellé initial.", fallback: homeCaptions.exploreLabel, max: 120 }, ["editorial"])}
         </Group>
         <Group title="02 · Notre chemin en trois temps" description="Les trois cartes, leur destination et l’accès aux situations sensibles.">
           {text({name:"domainsTitle",label:"Titre de la section",rows:2})}
           {(value.journey?.cards??[]).map((card:EditorialContent,index:number)=><div className="admin-repeat-item" key={String(card.key??index)}><div className="admin-repeat-heading"><strong>Étape {index+1}</strong></div><div className="admin-fields">{texts([{name:"eyebrow",label:"Petit libellé"},{name:"title",label:"Titre",rows:2},{name:"lead",label:"Phrase d’ouverture — gras et italique",rows:2,max:350},{name:"text",label:"Suite de la présentation",rows:6}],["journey","cards",index])}{cta(["journey","cards",index,"cta"],"Lien de l’étape")}</div></div>)}
-          {texts([{name:"transition",label:"Phrase après les cartes",rows:2},{name:"sensitiveText",label:"Présentation des situations sensibles",rows:3}],["journey"])}
-          {cta(["journey","sensitiveCta"],"Situations sensibles")}
+          {value.journey ? <>
+            {texts([{name:"transition",label:"Phrase après les cartes",rows:2,max:1000},{name:"sensitiveText",label:"Présentation des situations sensibles",rows:3,max:1200}],["journey"])}
+            {cta(["journey","sensitiveCta"],"Situations sensibles")}
+          </> : text({name:"domainsIntro", label:"Phrase après les cartes", rows:2, max:1200})}
         </Group>
         <Group title="03 · Pourquoi maintenant" description="Le contexte et les besoins auxquels répond Calas Conseil.">
+          {text({ name: "whyNowEyebrow", label: "Surtitre de Pourquoi maintenant", fallback: homeCaptions.whyNowEyebrow, max: 140 }, ["editorial"])}
           {texts([{name:"title",label:"Titre",rows:2},{name:"text",label:"Texte",rows:8}],["whyNow"])}
+          {text({ name: "whyNowImageCaption", label: "Légende du nautile", rows: 2, fallback: homeCaptions.whyNowImageCaption, max: 300 }, ["editorial"])}
           {[0, 1].map(index=><div key={index}>{texts([{name:"label",label:`Chiffre à relier ${index + 1}`,max:120},{name:"href",label:"Adresse HTTPS de la source",type:"url"}],["whyNow","sources",index])}</div>)}
         </Group>
         <Group
@@ -482,10 +506,11 @@ export function ContentForm({
             ["conviction"],
           )}
           {cta(["conviction", "cta"])}
+          {text({ name: "convictionImageCaption", label: "Légende de l’illustration des oiseaux", rows: 2, fallback: homeCaptions.convictionImageCaption, max: 300 }, ["editorial"])}
         </Group>
         <Group
           title="05 · Pourquoi choisir Calas Conseil"
-          description="Le binôme, ses outils et son accompagnement. Les portraits se modifient dans Personnes."
+          description="Le binôme, ses outils et son accompagnement."
         >
           {text({
             name: "reasonsTitle",
@@ -493,6 +518,7 @@ export function ContentForm({
             rows: 2,
           })}
           {items(["reasons"], "Raison", 3)}
+          {teamProfiles()}
         </Group>
         <Group
           title="06 · Chiffres et sources"
@@ -553,6 +579,7 @@ export function ContentForm({
           </Button>
         </Group>
         <Group title="07 · Invitation finale">
+          {text({ name: "closingEyebrow", label: "Surtitre de l’invitation", fallback: homeCaptions.closingEyebrow, max: 140 }, ["editorial"])}
           {text({ name: "closingTitle", label: "Invitation finale", rows: 2 })}
           {cta(["closingCta"], "Lien final", true)}
         </Group>
@@ -563,13 +590,19 @@ export function ContentForm({
           title="Repères et textes secondaires"
           description="Légendes, surtitres et petits textes autour des illustrations."
         >
-          {texts(homeEditorial.filter(field=>["heroAudience","heroArtCaption","heroArtTop","heroArtBottom","domainsEyebrow","convictionEyebrow","reasonsEyebrow","statisticsEyebrow","statisticsDescription","statisticsNote"].includes(field.name)), ["editorial"])}
+          {texts(homeEditorial, ["editorial"])}
           {cta(["editorial", "reasonsLink"], "Rencontre avec l’équipe", true)}
         </Group>
         {seo}
       </>
     );
-  if (kind === "page")
+  if (kind === "page") {
+    const legalPage = value.slug === "mentions-legales" || value.slug === "confidentialite";
+    const editorialFields = pageEditorial.filter(field => {
+      if (field.name === "methodLinkLabel") return value.slug === "diagnostic-rps" && Boolean(value.cta);
+      if (field.name === "artTop" || field.name === "artBottom") return !legalPage;
+      return Boolean(value.cta);
+    });
     return (
       <>
         <Group
@@ -578,24 +611,25 @@ export function ContentForm({
           open
         >
           {texts([
-            { name: "eyebrow", label: "Surtitre", max: 130 },
+            { name: "eyebrow", label: "Surtitre", max: 140 },
             {
               name: "title",
               label: "Titre principal",
               rows: 3,
-              max: 220,
+              max: 250,
               required: true,
             },
             {
               name: "intro",
               label: "Introduction",
               rows: 6,
-              max: 1800,
+              max: 4000,
               required: true,
             },
           ])}
           {image(["image"], "Image éditoriale")}
         </Group>
+        {value.slug === "qui-sommes-nous" && <Group title="Portraits et biographies" open>{teamProfiles()}</Group>}
         {((value.sections as EditorialContent[]) ?? []).map(
           (section, index) => (
             <Group
@@ -681,9 +715,9 @@ export function ContentForm({
         <Group title="Invitation à poursuivre">
           {cta(["cta"], "Appel à l’action", true)}
         </Group>
-        {!["contact", "reflexions"].includes(value.slug) && (
+        {!["contact", "reflexions"].includes(value.slug) && editorialFields.length > 0 && (
           <Group title="Repères et invitation finale">
-            {texts(pageEditorial, ["editorial"])}
+            {texts(editorialFields, ["editorial"])}
           </Group>
         )}
         {value.slug === "reflexions" && (
@@ -706,9 +740,11 @@ export function ContentForm({
         {seo}
       </>
     );
+  }
   if (kind === "article")
     return (
       <>
+        <ArticleReadiness article={value} people={people} categories={categories}/>
         <Group
           title="L’essentiel"
           description="Une accroche claire, une auteure identifiée, une date choisie."
@@ -749,6 +785,7 @@ export function ContentForm({
                 id={id}
                 className="admin-input"
                 type="datetime-local"
+                data-editor-field="date"
                 disabled={disabled}
                 value={toLocalDate(value.date)}
                 onChange={(event) =>
@@ -769,7 +806,7 @@ export function ContentForm({
           open={Boolean(value.externalUrl)}
         >
           <Field label="Lien de l’article LinkedIn" hint="Une adresse HTTPS d’article LinkedIn, contenant /pulse/. Le titre, le résumé, l’auteure et la date restent modifiables ici.">
-            {(id) => <input id={id} className="admin-input" type="url" maxLength={2048} disabled={disabled} value={String(value.externalUrl ?? "")} placeholder="https://www.linkedin.com/pulse/…" onChange={(event) => update(["externalUrl"], event.target.value || undefined)} />}
+            {(id) => <input id={id} data-editor-field="externalUrl" className="admin-input" type="url" maxLength={2048} disabled={disabled} value={String(value.externalUrl ?? "")} placeholder="https://www.linkedin.com/pulse/…" onChange={(event) => update(["externalUrl"], event.target.value || undefined)} />}
           </Field>
         </Group>
         <Group
@@ -825,7 +862,8 @@ export function ContentForm({
               document original dans votre médiathèque.
             </p>
           )}
-          <Button variant="secondary" onClick={() => setPdfOpen(true)}>
+          {value.sourcePdf && !value.pdfImport && <p className="admin-hint">Sélectionnez de nouveau le PDF original pour activer sa relecture.</p>}
+          <Button variant="secondary" data-editor-field={value.pdfImport ? undefined : "pdfImport"} onClick={() => setPdfOpen(true)}>
             {value.sourcePdf
               ? "Choisir un autre PDF"
               : "Joindre un PDF original"}
@@ -880,14 +918,15 @@ export function ContentForm({
         open
       >
         {texts([
-          { name: "name", label: "Nom complet", required: true, max: 100 },
+          { name: "name", label: "Nom complet", required: true, max: 150 },
           {
             name: "role",
             label: "Fonction et qualifications vérifiées",
             rows: 3,
-            max: 400,
+            required: true,
+            max: 600,
           },
-          { name: "bio", label: "Biographie approuvée", rows: 10, max: 4000 },
+          { name: "bio", label: "Biographie approuvée", rows: 10, max: 8000 },
           { name: "rppsNumber", label: "Numéro RPPS", hint: "Les 11 chiffres du numéro d’enregistrement de cette personne, si elle en possède un.", max: 11 },
           { name: "order", label: "Ordre de présentation", type: "number" },
         ])}

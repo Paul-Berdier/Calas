@@ -1,4 +1,4 @@
-# Faire vivre le site — guide pour Sara
+# Faire vivre le site — guide pour Sara et Agnès
 
 L’**Atelier éditorial Calas Conseil** est l’administration privée du site. Vous y modifiez les textes et les images, préparez vos articles et choisissez leur publication. Aucun compte Sanity, terminal ou outil de programmation n’est nécessaire.
 
@@ -16,7 +16,9 @@ Une fois votre adresse vérifiée, passez directement à la connexion lors de vo
 
 ## Retrouver ses contenus
 
-Le tableau de bord donne accès à l’accueil, à Diagnostic, au nouvel article et à la médiathèque. Ses compteurs correspondent aux données enregistrées. L’activité récente indique les personnes et les dates des modifications.
+Dans le tableau de bord, **Travail en cours** rassemble les brouillons et les modifications qui attendent une publication. Cliquez sur une fiche pour reprendre votre travail. **Contenus à vérifier** mène aux PDF dont la relecture reste à confirmer et aux chiffres dont la source reste à vérifier. Les éléments archivés sont consultables depuis leur rubrique.
+
+Pour retrouver les étapes d’une tâche, ouvrez **Guide pratique** dans le menu. [Ouvrir le guide dans l’administration](https://www.calas-conseil.fr/admin/guide/)
 
 Le menu rassemble **Pages du site**, **Réflexions**, **Médiathèque**, **Équipe**, **Chiffres et sources** et **Historique**. Sur téléphone, le bouton de menu ouvre ces rubriques. **Paramètres du site** et **Utilisateurs** sont réservés aux administrateurs.
 
@@ -50,11 +52,11 @@ Dans un champ image, ouvrez la médiathèque et choisissez un fichier existant o
 
 Renseignez le **texte alternatif**, qui décrit le contenu utile aux personnes qui ne voient pas l’image. Ajustez le cadrage et le point d’intérêt, puis vérifiez l’aperçu mobile. Un portrait s’édite dans **Équipe**, sur la fiche de la personne.
 
-Dans **Pages du site → Accueil → Images de l’accueil**, dix champs sont disponibles : les fils dorés, le nautile, les racines, la boussole, l’arbre, le kintsugi, les ondes, les oiseaux, **Visage apaisé — fin de Notre conviction** (`calmFace`) et **Photo de l’invitation finale**. Les huit premiers remplacent les illustrations proposées par Sara ; retirer leur image de remplacement rétablit l’illustration initiale. Les deux derniers accueillent des photographies facultatives : sans image, leur emplacement photographique n’est pas affiché.
+Dans **Accueil → Images de l’accueil**, choisissez l’emplacement par son nom. Les six illustrations sont le nautile, les racines, la boussole, l’arbre, le kintsugi et les oiseaux. « Visage apaisé » et « Photo de l’invitation finale » sont deux emplacements facultatifs.
 
 Deux photographies de banque d’images ont d’abord été sélectionnées et publiées le 2 novembre : un visage apaisé pour la fin de Notre conviction et un échange entre collègues pour l’invitation finale. Paul a ensuite demandé le retrait du visage de la femme rousse : le champ **Visage apaisé — fin de Notre conviction** (`calmFace`) est désormais vide, en local et sur Railway. Son fichier reste privé dans la médiathèque et les versions antérieures ; il n’est plus affiché sur le site. Aucun remplacement n’a été demandé. La photo d’échange est conservée. Leurs sources et licences restent consignées dans [MEDIA.md](MEDIA.md#photographies-dillustration--corrections-du-2-novembre-2026). Ce sont des illustrations, pas des portraits du cabinet ni des témoignages de clientes.
 
-Le portrait réel de Sara, fourni le 2 novembre, est déjà utilisé sur l’accueil et dans Qui sommes-nous. Le portrait d’Agnès reste à fournir ; sa présentation typographique est conservée. Aucun visage de banque d’images ne remplace un portrait de Sara ou d’Agnès. Pour les photographies d’atelier ou de personnes, vérifiez les droits d’utilisation et l’accord des personnes représentées. La provenance et les emplacements des illustrations sont indiqués dans [les évolutions du 1er novembre](EVOLUTIONS-20261101.md#sélection-des-images).
+Les portraits de Sara et d’Agnès s’affichent sur l’accueil et sur « Qui sommes-nous ». Depuis l’éditeur de l’une de ces pages, ouvrez la fiche de la consultante. Modifiez son portrait, sa fonction ou sa biographie, puis publiez la fiche. Le numéro RPPS d’Agnès figure sur sa fiche. Le numéro IPRP de Sara se modifie dans les paramètres du site.
 
 Les médias restent privés tant qu’ils ne sont pas utilisés par un contenu publié. Remplacer le fichier d’une image partagée peut modifier ses différentes utilisations : l’opération est réservée à l’administrateur et demande une confirmation explicite. Pour changer seulement une page, sélectionnez une nouvelle image dans cette page. Un fichier lié à un contenu ou à une version conservée ne peut pas être supprimé.
 
@@ -102,7 +104,7 @@ La catégorie permet de classer les articles. Les cinq liens reçus ne sont pas 
 
 ## Vérifier les chiffres et les informations communes
 
-Dans **Chiffres et sources**, chaque indicateur possède sa valeur, son libellé, sa source, son lien, son millésime et ses précisions de périmètre. Vérifiez la source avant de cocher sa validation puis de publier. L’accueil permet de choisir **six chiffres** et leur ordre. Les indicateurs sont répartis entre « Ce que vivent les équipes » et « Les conséquences pour les organisations ». Consultez [SOURCES.md](SOURCES.md) pour les formulations retenues et l'actualisation WTW 2026.
+Dans **Chiffres et sources**, vérifiez la valeur, la source, la période et le périmètre de chaque indicateur avant de cocher sa validation. L’accueil permet de sélectionner jusqu’à neuf chiffres. Chaque chiffre rejoint le groupe indiqué sur sa fiche. [Sources des indicateurs](SOURCES.md)
 
 Les administrateurs modifient les coordonnées dans **Paramètres du site**. La marque et la signature sont protégées. Le lien vers le profil LinkedIn reste vide tant que son adresse exacte n'est pas confirmée ; cela n'empêche pas les cartes d'articles LinkedIn de fonctionner.
 
@@ -114,7 +116,7 @@ Les **Horaires d’appel confirmés** et le **Délai de réponse annoncé** se r
 
 Le formulaire propose Diagnostic RPS, Atelier et compétences relationnelles, Management, Situation sensible et Autre. L'organisation, la fonction et le téléphone sont facultatifs. Le visiteur doit cocher lui-même son accord pour le traitement de la demande ; cet accord est aussi contrôlé par le serveur. La page de confidentialité présente ces champs.
 
-Le nom de domaine désormais envisagé est **calas-conseil.fr**, avec un tiret. Il n’a pas encore été acheté et aucune boîte professionnelle n’est créée. Plusieurs adresses sont possibles, par exemple **sara@calas-conseil.fr** et **agnes@calas-conseil.fr** ; le nombre de boîtes, leurs noms et l’offre restent à confirmer lors de l’achat par Sara. Ne remplacez pas le courriel public avant que la boîte retenue fonctionne. Le formulaire de recette affiche toujours un message de simulation et n’envoie aucun email. Les étapes de raccordement sont décrites dans [COURRIEL.md](COURRIEL.md).
+Les demandes envoyées depuis le site arrivent dans la boîte partagée **contact@calas-conseil.fr**. Vos comptes personnels d’administration donnent accès aux contenus du site. Vous consultez les messages de contact dans la messagerie OVH ou dans Outlook.
 
 ## Revenir à une version précédente
 
@@ -138,6 +140,6 @@ La liste des sessions nécessite une connexion datant de moins de quinze minutes
 
 À réaliser en préproduction : modifier un paragraphe de l’accueil, vérifier son aperçu mobile ; remplacer une image ; importer un PDF de test clairement identifié ; relire et publier l’article de test ; vérifier dans une fenêtre non connectée que seul le contenu publié est accessible ; restaurer une version en brouillon puis retirer le test.
 
-Le lancement définitif reste conditionné à la validation de l’accueil et de Diagnostic par Sara et Agnès, puis à la relecture finale. La préproduction publique sert à cette relecture. Les nouvelles corrections du 2 novembre restent en cours de contrôle ; l’adresse définitive, les emails et les sauvegardes devront aussi être vérifiés sur l’hébergement retenu.
+Sur le site en production, **Publier** rend immédiatement la nouvelle version visible aux visiteurs. Pour faire relire un changement à votre collègue, enregistrez le brouillon et invitez-la à ouvrir sa fiche dans l’administration.
 
 Le CMS contient les contenus destinés au site. N’y placez pas de dossiers RH, données médicales, demandes reçues par le formulaire, mots de passe ou documents privés de tiers.

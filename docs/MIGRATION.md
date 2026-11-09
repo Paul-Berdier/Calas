@@ -8,6 +8,12 @@ Les deux pages utilisent le portrait et la fonction publiés de chaque personne.
 
 Le numéro RPPS d’Agnès est désormais un champ facultatif de sa fiche, indépendant de l’enregistrement IPRP de Sara dans les paramètres du site. Les anciennes révisions sans ce champ restent lisibles. Une fois la version applicative installée, l’opérateur importe la photo, enregistre et publie les nouvelles versions des deux fiches. Les autres contenus, les biographies longues et le portrait de Sara sont conservés dans cette opération.
 
+## Administration éditoriale — 9 novembre 2026
+
+Le tableau de bord utilise les révisions existantes pour montrer les différences entre brouillon et publication. La visibilité de la médiathèque s’applique aussi au compteur et à l’historique. Les nouveaux libellés facultatifs de l’accueil reprennent les textes déjà visibles tant qu’une éditrice ne les modifie pas. Ce déploiement ne demande ni migration SQL ni republication du contenu.
+
+Le guide pratique est accessible aux deux rôles sur `/admin/guide/`. L’éditeur d’articles et le serveur partagent les contrôles éditoriaux avant publication. Le téléchargement d’un PDF reste soumis à l’autorisation explicite de l’éditrice.
+
 ## Coordonnées et informations légales — 9 novembre 2026
 
 Après sauvegarde PostgreSQL/S3, l’opération explicite `scripts/content-production-contact-20261109.ts` a publié les quatre documents dans une même transaction sur la base Railway. Paramètres v5 → v6, mentions légales v1 → v2, confidentialité v3 → v4 et contact v3 → v4. Le contrôle public a retrouvé la nouvelle boîte partagée sur l’accueil et les trois pages, les deux SIRET et la directrice de publication dans les mentions, le délai de trois ans dans la confidentialité et les zones d’intervention sur Contact. La seconde simulation ne détecte plus de changement.

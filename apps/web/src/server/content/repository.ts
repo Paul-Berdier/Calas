@@ -1,8 +1,10 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, ne, or, sql } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import { getDb, type DatabaseExecutor, type Transaction } from '../db';
 import { articleRevisions, articles, auditLogs, categories, documents, mediaReferences, pageRevisions, pages, people, revisionReferences, revisions, siteSettings, statistics } from '../db/schema';
 import { media } from '../media/schema';
+import { visibleMediaFilter } from '../media/visibility';
 import type { SiteContent } from '../../lib/cms/types';
 import { assertPublishable, ContentError, contentTitle, parseContent, type ArticleDraft, type ContentDetail, type ContentKind, type ContentRevision, type EditorialActor } from './models';
 
@@ -307,13 +309,48 @@ export async function listRevisions(id: string): Promise<ContentRevision[]> {
   const rows = await getDb().select().from(revisions).where(eq(revisions.documentId, id)).orderBy(desc(revisions.version)).limit(100);
   return rows.map(row => ({ ...row, createdAt: row.createdAt.toISOString() }));
 }
-export async function listHistory(limit = 50) { return getDb().select().from(auditLogs).orderBy(desc(auditLogs.createdAt)).limit(Math.min(Math.max(limit, 1), 100)); }
-export async function dashboard() {
-  const rows = await getDb().select({ kind: documents.kind, status: documents.status, draft: revisions.content }).from(documents).leftJoin(revisions, eq(documents.draftRevisionId, revisions.id));
-  const [{ count: mediaCount }] = await getDb().select({ count: sql<number>`count(*)::int` }).from(media);
-  const recent = await listHistory(12);
-  const recentPublications = await getDb().select().from(auditLogs).where(eq(auditLogs.action, 'published')).orderBy(desc(auditLogs.createdAt)).limit(6);
-  return { counts: { pages: rows.filter(row => ['home', 'page'].includes(row.kind)).length, articlesPublished: rows.filter(row => row.kind === 'article' && row.status === 'published').length, articlesDraft: rows.filter(row => row.kind === 'article' && row.status === 'draft').length, media: mediaCount, needsReview: rows.filter(row => row.kind === 'article' && Boolean((row.draft?.pdfImport as { reviewed?: boolean } | undefined) && !(row.draft?.pdfImport as { reviewed?: boolean }).reviewed) || row.kind === 'statistic' && row.draft?.verified !== true).length }, recent, recentPublications };
+export async function listHistory(actor: EditorialActor, limit = 50, action?: 'published') {
+  const mediaAccess = visibleMediaFilter(actor);
+  const editorialEvents = ['page', 'home', 'article', 'person', 'category', 'statistic'];
+  return getDb().select().from(auditLogs).where(and(
+    mediaAccess && or(
+      inArray(auditLogs.resourceType, editorialEvents),
+      and(eq(auditLogs.resourceType, 'media'), sql`exists (
+        select 1 from ${media} where ${media.id}::text = ${auditLogs.resourceId} and ${mediaAccess}
+      )`),
+    ),
+    action ? eq(auditLogs.action, action) : undefined,
+  )).orderBy(desc(auditLogs.createdAt), desc(auditLogs.id)).limit(Math.min(Math.max(limit, 1), 100));
+}
+export async function dashboard(actor: EditorialActor) {
+  const published = alias(revisions, 'published');
+  const rows = await getDb().select({
+    id: documents.id, kind: documents.kind, title: documents.internalTitle, status: documents.status,
+    slug: sql<string | null>`${revisions.content}->>'slug'`,
+    changed: sql<boolean>`${revisions.content} is distinct from ${published.content}`,
+    review: sql<'pdf' | 'source' | null>`case
+      when ${documents.kind} = 'article' and (${revisions.content} ? 'pdfImport' or ${revisions.content} ? 'sourcePdf')
+        and (${revisions.content}->'pdfImport'->>'reviewed') is distinct from 'true' then 'pdf'
+      when ${documents.kind} = 'statistic' and (${revisions.content}->>'verified') is distinct from 'true' then 'source'
+      end`,
+  }).from(documents).innerJoin(revisions, eq(documents.draftRevisionId, revisions.id))
+    .leftJoin(published, eq(documents.publishedRevisionId, published.id))
+    .where(actor.role === 'administrator' ? undefined : ne(documents.kind, 'settings'))
+    .orderBy(desc(documents.updatedAt), asc(documents.id));
+  const pending = rows.filter(row => row.status !== 'archived' && (row.changed || row.review));
+  const pages = rows.filter(row => row.kind === 'home' || row.kind === 'page');
+  const [{ count: mediaCount }] = await getDb().select({ count: sql<number>`count(*)::int` }).from(media).where(visibleMediaFilter(actor));
+  const [recent, recentPublications] = await Promise.all([listHistory(actor, 12), listHistory(actor, 6, 'published')]);
+  return {
+    counts: {
+      pages: pages.length, articlesPublished: rows.filter(row => row.kind === 'article' && row.status === 'published').length,
+      articlesDraft: pending.filter(row => row.kind === 'article' && row.changed).length, media: mediaCount,
+      needsReview: pending.filter(row => row.review).length,
+    },
+    shortcuts: { home: pages.find(row => row.kind === 'home')?.id, diagnostic: pages.find(row => row.slug === 'diagnostic-rps')?.id },
+    pending: pending.map(({ id, kind, title, status, review }) => ({ id, kind, title, status, review })),
+    recent, recentPublications,
+  };
 }
 
 function hydrateMedia(value: unknown, assets: Map<string, typeof media.$inferSelect>): unknown {

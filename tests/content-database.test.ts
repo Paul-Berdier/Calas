@@ -8,7 +8,7 @@ import { closeDatabase, getDb, getPool } from '../apps/web/src/server/db';
 import { migrateDatabase } from '../apps/web/src/server/db/migrate';
 import { ContentError, type EditorialActor } from '../apps/web/src/server/content/models';
 import { prepareSeedPlan } from '../apps/web/src/server/content/seed-plan';
-import { changePublication, createContent, dashboard, getContent, isMediaPublished, listContent, listRevisions, mediaIsReferenced, publishContent, readSiteContent, restoreContent, revisePublishedStructure, saveContent, seedDocuments } from '../apps/web/src/server/content/repository';
+import { changePublication, createContent, dashboard, getContent, isMediaPublished, listContent, listHistory, listRevisions, mediaIsReferenced, publishContent, readSiteContent, restoreContent, revisePublishedStructure, saveContent, seedDocuments } from '../apps/web/src/server/content/repository';
 
 try { loadEnvFile(fileURLToPath(new URL('../apps/web/.env', import.meta.url))); } catch { /* CI supplies its own environment. */ }
 const originalUrl = process.env.DATABASE_URL;
@@ -135,6 +135,7 @@ test('persistance PostgreSQL réelle, publication et isolation des révisions', 
     category = await publishContent(category.id, category.version, admin);
     const pdfId = randomUUID();
     await getPool().query('INSERT INTO media (id,storage_key,upload_key,original_filename,mime_type,size_bytes,metadata,created_by) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)', [pdfId, `tests/${pdfId}.pdf`, `test:${pdfId}`, 'recette.pdf', 'application/pdf', 1000, { checksum: 'test-only' }, admin.id]);
+    await getPool().query('INSERT INTO audit_logs (actor_id,actor_name,action,resource_type,resource_id,title) VALUES ($1,$2,$3,$4,$5,$6)', [admin.id,admin.name,'media.upload','media',pdfId,'recette.pdf']);
     const articleInput = { title: 'Article de recette', slug: 'article-recette', excerpt: 'Extrait de recette', body: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Texte de recette.' }] }] }, authorId: author.id, categoryId: category.id, date: '2020-01-01T00:00:00.000Z', sourcePdf: { mediaId: pdfId }, allowPdfDownload: true, pdfImport: { pageCount: 1, ocrPages: 0, reviewed: false } };
     let article = await createContent('article', articleInput, admin, { id: randomUUID() });
     await suite.test('répéter la création avec le même identifiant reste idempotent', async () => {
@@ -151,18 +152,32 @@ test('persistance PostgreSQL réelle, publication et isolation des révisions', 
       await assert.rejects(publishContent(article.id, article.version, admin), errorCode('PUBLICATION_INCOMPLETE'));
       const unchanged = await getContent(article.id);
       assert.equal(unchanged.version, article.version);
+      const work = await dashboard(editor);
+      assert.equal(work.counts.articlesDraft, 1);
+      assert.equal(work.pending.find(item => item.id === article.id)?.review, 'pdf');
+      assert.equal(work.counts.media, 0);
+      assert(!work.recent.some(event => event.resourceId === pdfId));
+      assert(!(await listHistory(editor)).some(event => event.resourceId === pdfId));
+      assert((await listHistory(admin)).some(event => event.resourceId === pdfId));
     });
     await suite.test('publication du PDF autorisé, édition isolée et révocation à la dépublication', async () => {
       article = await saveContent(article.id, { ...article.content, pdfImport: { pageCount: 1, ocrPages: 0, reviewed: true } }, article.version, admin);
       article = await publishContent(article.id, article.version, admin);
       assert.equal((await readSiteContent()).articles.find(item => item.id === article.id)!.title, 'Article de recette');
       assert.equal(await isMediaPublished(pdfId, { download: true }), true);
+      assert.equal((await dashboard(editor)).counts.media, 1);
+      assert((await listHistory(editor)).some(event => event.resourceId === pdfId));
       article = await saveContent(article.id, { ...article.content, title: 'Article modifié non publié' }, article.version, admin);
       assert.equal((await readSiteContent()).articles.find(item => item.id === article.id)!.title, 'Article de recette');
+      const work = await dashboard(editor);
+      assert.equal(work.counts.articlesPublished, 6);
+      assert.equal(work.counts.articlesDraft, 1);
+      assert.equal(work.pending.find(item => item.id === article.id)?.status, 'published');
       article = await changePublication(article.id, article.version, admin, 'unpublish');
       assert.equal((await readSiteContent()).articles.length, 5);
       assert.equal((await readSiteContent()).articles.some(item => item.id === article.id), false);
       assert.equal(await isMediaPublished(pdfId, { download: true }), false);
+      assert(!(await listHistory(editor)).some(event => event.resourceId === pdfId));
     });
     await suite.test('un PDF non autorisé reste privé même après publication de l’article', async () => {
       article = await saveContent(article.id, { ...article.content, allowPdfDownload: false }, article.version, admin);
@@ -181,12 +196,34 @@ test('persistance PostgreSQL réelle, publication et isolation des révisions', 
       await assert.rejects(createContent('article', { ...articleInput, slug: 'media-prive' }, editor), errorCode('PRIVATE_MEDIA'));
     });
     await suite.test('les métriques du tableau de bord correspondent aux contenus persistés', async () => {
-      const result = await dashboard();
+      const result = await dashboard(admin);
       assert.equal(result.counts.pages, 11);
       assert.equal(result.counts.articlesPublished, 6);
       assert.equal(result.counts.media, 1);
       assert(result.recent.length > 0);
       assert(result.recentPublications.length > 0);
+      assert.equal(result.shortcuts.home, home.id);
+      assert(!result.pending.some(item => item.id === article.id));
+    });
+    await suite.test('le travail à reprendre respecte le rôle et écarte les archives et les révisions identiques', async () => {
+      const settings = await getContent(plan.entries.find(entry => entry.kind === 'settings')!.id);
+      await saveContent(settings.id, { ...settings.content, contactText: 'Informations à relire' }, settings.version, admin);
+      const adminDashboard = await dashboard(admin);
+      assert(adminDashboard.pending.some(item => item.id === settings.id));
+      assert(adminDashboard.recent.some(event => event.resourceType === 'settings'));
+      const editorDashboard = await dashboard(editor);
+      assert(!editorDashboard.pending.some(item => item.id === settings.id));
+      assert(!editorDashboard.recent.some(event => event.resourceType === 'settings'));
+      assert(!(await listHistory(editor)).some(event => event.resourceType === 'settings'));
+      assert((await listHistory(admin)).some(event => event.resourceType === 'settings'));
+      article = await saveContent(article.id, article.content, article.version, admin);
+      assert(!(await dashboard(editor)).pending.some(item => item.id === article.id));
+      const abandoned = await createContent('statistic', { ...plan.entries.find(entry => entry.kind === 'statistic')!.content, verified: false }, admin);
+      assert.equal((await dashboard(editor)).pending.find(item => item.id === abandoned.id)?.review, 'source');
+      await changePublication(abandoned.id, abandoned.version, admin, 'archive');
+      assert(!(await dashboard(editor)).pending.some(item => item.id === abandoned.id));
+      const oldPdf = await createContent('article', { ...articleInput, slug: 'ancien-pdf', pdfImport: undefined }, admin);
+      assert.equal((await dashboard(editor)).pending.find(item => item.id === oldPdf.id)?.review, 'pdf');
     });
   } finally {
     await closeDatabase();

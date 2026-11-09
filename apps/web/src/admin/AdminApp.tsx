@@ -18,7 +18,6 @@ import {
   History,
   ShieldCheck,
   ArrowUpRight,
-  ArrowRight,
   Plus,
   Search,
   Menu,
@@ -35,12 +34,14 @@ import {
 import {
   request,
   contentApi,
+  collectionForKind,
   formatDate,
   actionLabels,
   type AdminUser,
   type AuditEvent,
   type Collection,
   type ContentSummary,
+  type ContentKind,
   type DashboardData,
 } from "./api";
 import {
@@ -54,6 +55,7 @@ import {
   TextLink,
 } from "./ui";
 import "./admin.css";
+import { EditorialGuide } from "./EditorialGuide";
 
 const DocumentEditor = lazy(() =>
   import("./DocumentEditor").then((module) => ({
@@ -85,6 +87,7 @@ const navigation = [
     admin: true,
   },
   { slug: "history", label: "Historique", Icon: History },
+  { slug: "guide", label: "Guide pratique", Icon: BookOpen },
   { slug: "security", label: "Compte et sécurité", Icon: ShieldCheck },
   { slug: "users", label: "Utilisateurs", Icon: Users, admin: true },
 ];
@@ -158,6 +161,7 @@ export default function AdminApp({
   const [path, setPath] = useState(initialPath),
     [mobileNav, setMobileNav] = useState(false),
     [pendingPath, setPendingPath] = useState<string | null>(null),
+    [importSaving, setImportSaving] = useState(false),
     [signoutError, setSignoutError] = useState("");
   const dirty = useRef(false),
     pathRef = useRef(path);
@@ -189,6 +193,11 @@ export default function AdminApp({
   const changeDirty = useCallback((value: boolean) => {
     dirty.current = value;
   }, []);
+  const changeImportWork = useCallback((pending: boolean, saving: boolean) => {
+    dirty.current = pending;
+    setImportSaving(saving);
+    if (!pending) setPendingPath(null);
+  }, []);
   useEffect(() => {
     const pop = () => {
       const next = window.location.pathname;
@@ -201,7 +210,17 @@ export default function AdminApp({
       }
     };
     window.addEventListener("popstate", pop);
-    return () => window.removeEventListener("popstate", pop);
+    const warnBeforeLeavingImport = (event: BeforeUnloadEvent) => {
+      if (dirty.current && pathRef.current.replace(/\/$/, "") === "/admin/articles/import") {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", warnBeforeLeavingImport);
+    return () => {
+      window.removeEventListener("popstate", pop);
+      window.removeEventListener("beforeunload", warnBeforeLeavingImport);
+    };
   }, []);
   const link = (event: MouseEvent<HTMLAnchorElement>, next: string) => {
     if (
@@ -282,6 +301,7 @@ export default function AdminApp({
         />
         <Suspense fallback={<Loading label="Préparation de l’import PDF…" />}>
           <PdfImport
+            onWorkChange={changeImportWork}
             onCreated={(articleId) =>
               navigate(`/admin/articles/${articleId}/`, true)
             }
@@ -290,7 +310,8 @@ export default function AdminApp({
         </Suspense>
       </>
     );
-  else if (section === "history") panel = <HistoryView onNavigate={navigate} />;
+  else if (section === "guide" && !id) panel = <EditorialGuide />;
+  else if (section === "history") panel = <HistoryView role={user.role} onNavigate={navigate} />;
   else if (section === "settings")
     panel =
       user.role === "administrator" ? (
@@ -322,7 +343,7 @@ export default function AdminApp({
         onDirtyChange={changeDirty}
       />
     ) : (
-      <CollectionView collection={collection} onNavigate={navigate} />
+      <CollectionView key={collection} collection={collection} onNavigate={navigate} />
     );
   } else if (!section) panel = <Dashboard user={user} onNavigate={navigate} />;
   else
@@ -443,13 +464,23 @@ export default function AdminApp({
           </a>
         </div>
       </Modal>
+      <Modal
+        open={Boolean(pendingPath) && importSaving}
+        onOpenChange={(open) => { if (!open) setPendingPath(null); }}
+        title="Création du brouillon en cours"
+        description="Vous pourrez quitter cet écran dès que la création du brouillon sera confirmée, ou réessayer si l’enregistrement échoue."
+      >
+        <Button variant="secondary" onClick={() => setPendingPath(null)}>Rester sur l’import</Button>
+      </Modal>
       <ConfirmDialog
-        open={Boolean(pendingPath)}
+        open={Boolean(pendingPath) && !importSaving}
         onOpenChange={(open) => {
           if (!open) setPendingPath(null);
         }}
         title="Quitter sans enregistrer ?"
-        description="Des modifications n’ont pas encore été confirmées par le serveur. Restez sur cette page pour les enregistrer, ou quittez en les abandonnant."
+        description={section === "articles" && id === "import"
+          ? "L’analyse et les corrections de ce PDF seront perdues si vous quittez l’import avant de créer le brouillon."
+          : "Des modifications n’ont pas encore été confirmées par le serveur. Restez sur cette page pour les enregistrer, ou quittez en les abandonnant."}
         confirmLabel="Quitter cette page"
         destructive
         onConfirm={() => {
@@ -472,20 +503,17 @@ function Dashboard({
   onNavigate: (path: string) => void;
 }) {
   const [data, setData] = useState<DashboardData | null>(null),
-    [pages, setPages] = useState<ContentSummary[]>([]),
+    [reviewOnly, setReviewOnly] = useState(false),
     [error, setError] = useState(""),
     [retry, setRetry] = useState(0);
+  const workHeading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     const controller = new AbortController();
-    Promise.all([
-      request<DashboardData>("/api/admin/content/dashboard/", {
-        signal: controller.signal,
-      }),
-      contentApi.list("pages", controller.signal),
-    ])
-      .then(([dashboard, pageList]) => {
+    request<DashboardData>("/api/admin/content/dashboard/", {
+      signal: controller.signal,
+    })
+      .then((dashboard) => {
         setData(dashboard);
-        setPages(pageList.items);
         setError("");
       })
       .catch((cause) => {
@@ -493,11 +521,8 @@ function Dashboard({
       });
     return () => controller.abort();
   }, [retry]);
-  const openPage = (slug: string) => {
-    const page = pages.find(
-      (item) => item.slug === slug || (slug === "" && item.kind === "home"),
-    );
-    onNavigate(page ? `/admin/pages/${page.id}/` : "/admin/pages/");
+  const openPage = (id?: string) => {
+    onNavigate(id ? `/admin/pages/${id}/` : "/admin/pages/");
   };
   if (error)
     return (
@@ -512,17 +537,21 @@ function Dashboard({
       </>
     );
   if (!data) return <Loading label="Chargement de votre espace…" />;
+  const pending = reviewOnly ? data.pending.filter(item => item.review) : data.pending;
   return (
     <>
       <SectionHeading
         eyebrow="L’atelier Calas Conseil"
         title={`Bonjour ${user.name.split(" ")[0]}.`}
-        description="Un espace pour faire vivre vos idées et prendre soin de chaque mot."
         actions={
-          <Button onClick={() => onNavigate("/admin/articles/new/")}>
-            <Plus size={16} />
-            Nouvelle réflexion
-          </Button>
+          <>
+            <Button onClick={() => onNavigate("/admin/articles/new/")}>
+              <Plus size={16} /> Écrire un article
+            </Button>
+            <Button variant="secondary" onClick={() => onNavigate("/admin/articles/import/")}>
+              <Upload size={16} /> Importer un PDF
+            </Button>
+          </>
         }
       />
       <div className="admin-metrics">
@@ -530,62 +559,74 @@ function Dashboard({
           {
             label: "Pages du site",
             value: data.counts.pages,
-            note: "Votre socle éditorial",
+            href: "/admin/pages/",
+            note: "Modifier une page",
             Icon: Files,
           },
           {
             label: "Articles publiés",
             value: data.counts.articlesPublished,
+            href: "/admin/articles/?etat=published",
             note: "À découvrir dans Réflexions",
             Icon: BookOpen,
           },
           {
-            label: "Articles en brouillon",
+            label: "Articles avec un brouillon",
             value: data.counts.articlesDraft,
-            note: "Des idées en préparation",
+            href: "/admin/articles/?etat=draft",
+            note: "Reprendre les textes en cours",
             Icon: PenLine,
           },
           {
             label: "Contenus à vérifier",
             value: data.counts.needsReview,
-            note: "Une relecture reste nécessaire",
+            href: "#travail-editorial",
+            note: "PDF à relire et sources à vérifier",
             Icon: CheckCheck,
           },
-        ].map(({ label, value, note, Icon }) => (
-          <div className="admin-metric" key={label}>
+        ].map(({ label, value, note, href, Icon }) => (
+          <a
+            className="admin-metric"
+            key={label}
+            href={href}
+            onClick={href === "#travail-editorial" ? () => {
+              setReviewOnly(true);
+              workHeading.current?.focus();
+            } : undefined}
+          >
             <Icon aria-hidden />
             <span>{label}</span>
             <strong>{value}</strong>
             <small>{note}</small>
-          </div>
+          </a>
         ))}
       </div>
-      <section className="admin-welcome">
-        <div>
-          <p className="admin-eyebrow" style={{ color: "#d0ad7c" }}>
-            Écrire, relire, partager
-          </p>
-          <h2>
-            Votre expertise mérite
-            <br />
-            des mots qui lui ressemblent.
-          </h2>
-          <p>
-            Transformez un document en article, retrouvez un brouillon ou
-            apportez une nouvelle nuance à votre site.
-          </p>
-          <Button
-            variant="secondary"
-            onClick={() => onNavigate("/admin/articles/import/")}
-          >
-            <Upload size={15} />
-            Importer un PDF
-            <ArrowRight size={15} />
-          </Button>
-        </div>
-        <img className="admin-welcome-art" src="/brand/symbol.png" alt="" />
-      </section>
       <div className="admin-dashboard-grid">
+        <section className="admin-card admin-pending">
+          <div className="admin-card-header">
+            <h2 ref={workHeading} id="travail-editorial" tabIndex={-1}>Travail en cours</h2>
+            <div className="admin-filters" aria-label="Filtrer le travail en cours">
+              <button className="admin-filter" aria-pressed={!reviewOnly} onClick={() => setReviewOnly(false)}>Tout</button>
+              <button className="admin-filter" aria-pressed={reviewOnly} onClick={() => setReviewOnly(true)}>À vérifier</button>
+            </div>
+          </div>
+          <div className="admin-card-body">
+            {pending.length > 0 ? (
+              <ul className="admin-work-list">
+                {pending.map(item => (
+                  <li key={item.id}>
+                    <a href={contentPath(item.kind, item.id, user.role)}>
+                      <span><strong>{item.title}</strong><small>{resourceLabel(item.kind)}</small></span>
+                      <Badge status={item.review ? "review" : item.status === "published" ? "modified" : "draft"}>
+                        {item.review === "source" ? "Vérifier la source" : item.review === "pdf" ? "Relire le PDF" : undefined}
+                      </Badge>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : <p className="admin-hint">{reviewOnly ? "Aucun PDF ni aucune source en attente de vérification." : "Aucun brouillon ni contenu à vérifier pour le moment."}</p>}
+          </div>
+        </section>
         <section className="admin-card">
           <div className="admin-card-header">
             <div>
@@ -597,7 +638,7 @@ function Dashboard({
             </TextLink>
           </div>
           <div className="admin-card-body">
-            <Activity events={data.recent.slice(0, 5)} />
+            <Activity events={data.recent.slice(0, 5)} role={user.role} />
           </div>
         </section>
         <div>
@@ -610,21 +651,21 @@ function Dashboard({
                 {[
                   {
                     title: "Accueil",
-                    text: "Le premier regard",
+                    text: "Modifier la page d’accueil",
                     Icon: LayoutDashboard,
-                    action: () => openPage(""),
+                    action: () => openPage(data.shortcuts.home),
                   },
                   {
                     title: "Diagnostic RPS",
-                    text: "Votre offre centrale",
+                    text: "Modifier la page Diagnostic",
                     Icon: Files,
-                    action: () => openPage("diagnostic-rps"),
+                    action: () => openPage(data.shortcuts.diagnostic),
                   },
                   {
-                    title: "Nouvel article",
-                    text: "Une idée à partager",
-                    Icon: Feather,
-                    action: () => onNavigate("/admin/articles/new/"),
+                    title: "Équipe",
+                    text: "Modifier les portraits et les biographies",
+                    Icon: Users,
+                    action: () => onNavigate("/admin/people/"),
                   },
                   {
                     title: "Ajouter une image",
@@ -655,6 +696,7 @@ function Dashboard({
             <div className="admin-card-body">
               <Activity
                 events={data.recentPublications.slice(0, 4)}
+                role={user.role}
                 empty="Les prochaines publications apparaîtront ici."
               />
             </div>
@@ -678,7 +720,10 @@ function CollectionView({
   const [items, setItems] = useState<ContentSummary[] | null>(null),
     [error, setError] = useState(""),
     [query, setQuery] = useState(""),
-    [status, setStatus] = useState("all"),
+    [status, setStatus] = useState(() => {
+      const filter = new URLSearchParams(window.location.search).get("etat");
+      return filter && ["published", "draft", "archived"].includes(filter) ? filter : "all";
+    }),
     [retry, setRetry] = useState(0);
   const meta = listMeta[collection];
   useEffect(() => {
@@ -694,13 +739,19 @@ function CollectionView({
       });
     return () => controller.abort();
   }, [collection, retry]);
-  const filtered = (items ?? []).filter(
-    (item) =>
-      (status === "all" || item.status === status) &&
-      (item.title ?? "")
-        .toLocaleLowerCase("fr")
-        .includes(query.toLocaleLowerCase("fr")),
-  );
+  function selectStatus(value: string) {
+    const url = new URL(window.location.href);
+    if (value === "all") url.searchParams.delete("etat");
+    else url.searchParams.set("etat", value);
+    window.history.replaceState(window.history.state, "", url);
+    setStatus(value);
+  }
+  const filtered = (items ?? []).filter(item => {
+    const matchesStatus = status === "draft"
+      ? item.status === "draft" || (item.status === "published" && item.hasUnpublishedChanges)
+      : status === "all" || item.status === status;
+    return matchesStatus && item.title.toLocaleLowerCase("fr").includes(query.trim().toLocaleLowerCase("fr"));
+  });
   const create = meta.newLabel ? (
     <Button onClick={() => onNavigate(`/admin/${collection}/new/`)}>
       <Plus size={15} />
@@ -789,7 +840,7 @@ function CollectionView({
                   className="admin-filter"
                   key={filter.value}
                   aria-pressed={status === filter.value}
-                  onClick={() => setStatus(filter.value)}
+                  onClick={() => selectStatus(filter.value)}
                 >
                   {filter.label}
                 </button>
@@ -851,7 +902,7 @@ function CollectionView({
                   variant="secondary"
                   onClick={() => {
                     setQuery("");
-                    setStatus("all");
+                    selectStatus("all");
                   }}
                 >
                   Réinitialiser les filtres
@@ -866,36 +917,42 @@ function CollectionView({
 }
 function Activity({
   events,
+  role,
   empty = "Les modifications apparaîtront ici au fil de votre travail.",
 }: {
   events: AuditEvent[];
+  role: AdminUser["role"];
   empty?: string;
 }) {
   return events.length ? (
     <ul className="admin-activity">
-      {events.map((event) => (
-        <li key={event.id}>
-          <span className="admin-activity-icon">
-            {event.action === "publish" ? <CheckCheck /> : <Clock />}
-          </span>
-          <div>
-            <strong>{event.title ?? resourceLabel(event.resourceType)}</strong>
-            <p>
-              {actionLabels[event.action] ?? "Modification"}
-              {event.actorName ? ` · ${event.actorName}` : ""}
-            </p>
-            <time dateTime={event.createdAt}>
-              {formatDate(event.createdAt)}
-            </time>
-          </div>
-        </li>
-      ))}
+      {events.map((event) => {
+        const path = contentPath(event.resourceType, event.resourceId, role);
+        const title = event.title || resourceLabel(event.resourceType);
+        return (
+          <li key={event.id}>
+            <span className="admin-activity-icon">
+              {["published", "publish"].includes(event.action) ? <CheckCheck /> : <Clock />}
+            </span>
+            <div>
+              <strong>{path ? <a href={path}>{title}</a> : title}</strong>
+              <p>
+                {actionLabels[event.action] ?? "Modification"}
+                {event.actorName ? ` · ${event.actorName}` : ""}
+              </p>
+              <time dateTime={event.createdAt}>
+                {formatDate(event.createdAt)}
+              </time>
+            </div>
+          </li>
+        );
+      })}
     </ul>
   ) : (
     <p className="admin-hint">{empty}</p>
   );
 }
-function HistoryView({ onNavigate }: { onNavigate: (path: string) => void }) {
+function HistoryView({ role, onNavigate }: { role: AdminUser["role"]; onNavigate: (path: string) => void }) {
   const [events, setEvents] = useState<AuditEvent[] | null>(null),
     [error, setError] = useState(""),
     [query, setQuery] = useState(""),
@@ -966,6 +1023,7 @@ function HistoryView({ onNavigate }: { onNavigate: (path: string) => void }) {
             <div className="admin-card-body">
               <Activity
                 events={visible}
+                role={role}
                 empty="Aucun événement ne correspond à cette recherche."
               />
             </div>
@@ -974,6 +1032,11 @@ function HistoryView({ onNavigate }: { onNavigate: (path: string) => void }) {
       )}
     </>
   );
+}
+function contentPath(kind: string, id: string, role: AdminUser["role"]) {
+  if (kind === "settings") return role === "administrator" ? "/admin/settings/" : undefined;
+  if (!Object.hasOwn(collectionForKind, kind)) return undefined;
+  return `/admin/${collectionForKind[kind as ContentKind]}/${encodeURIComponent(id)}/`;
 }
 function resourceLabel(kind: string) {
   return (

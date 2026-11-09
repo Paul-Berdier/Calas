@@ -121,6 +121,7 @@ export function DocumentEditor({
   snapshotRef.current = snapshot;
   const kind = detail?.kind ?? newKinds[collection] ?? "page";
   const dirty = !loading && JSON.stringify(content) !== snapshot;
+  const formLocked = actionBusy || (isNew && saving);
   useEffect(() => {
     onDirtyChange(dirty || saving);
     return () => onDirtyChange(false);
@@ -565,6 +566,11 @@ export function DocumentEditor({
       {message && (
         <div className="admin-success" role="status">
           {message}
+          {kind === "article" && detail?.status === "published" && !detail.hasUnpublishedChanges && !dirty && (
+            <a className="admin-text-link" href={detail.content.externalUrl ? "/reflexions/" : `/reflexions/${encodeURIComponent(detail.slug)}/`} target="_blank" rel="noopener noreferrer">
+              Voir sur le site <ExternalLink size={14} aria-hidden/>
+            </a>
+          )}
         </div>
       )}
       <div className="admin-savebar">
@@ -613,7 +619,7 @@ export function DocumentEditor({
       <div className="admin-editor-layout" data-preview={preview}>
         <div className="admin-editor-content">
           <fieldset
-            disabled={actionBusy}
+            disabled={formLocked}
             style={{ padding: 0, border: 0, margin: 0, minWidth: 0 }}
           >
             <ContentForm
@@ -623,8 +629,8 @@ export function DocumentEditor({
               people={people}
               categories={categories}
               statistics={statistics}
-              onNavigate={(next) => onNavigate(`/admin/${next}/`)}
-              disabled={actionBusy}
+              onNavigate={(next, documentId) => onNavigate(documentId ? `/admin/${next}/${documentId}/` : `/admin/${next}/`)}
+              disabled={formLocked}
               autoSlug={isNew}
             />
           </fieldset>

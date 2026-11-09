@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { isLinkedInArticleUrl } from '../../lib/article-links';
+import { articlePublicationIssues, articleSlugPattern } from '../../lib/article-publication';
 
 export const CONTENT_KINDS = ['home', 'page', 'article', 'person', 'statistic', 'category', 'settings'] as const;
 export type ContentKind = typeof CONTENT_KINDS[number];
@@ -21,7 +22,7 @@ const required = (maximum = 220) => short(maximum).min(1, 'Ce champ est nécessa
 const uuid = z.string().uuid();
 const optionalId = uuid.optional();
 const optionalText = (maximum = 220) => short(maximum).optional();
-export const slugSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Utilisez des minuscules, chiffres et tirets.').max(96);
+export const slugSchema = z.string().regex(articleSlugPattern, 'Utilisez des minuscules, chiffres et tirets.').max(96);
 
 export function safeEditorialUrl(value: string): boolean {
   if (/[\u0000-\u0020\u007f\\]/.test(value) || value.startsWith('//')) return false;
@@ -124,6 +125,7 @@ export const settingsSchema = z.object({
   footerText: optionalText(700), contactText: optionalText(1200), contactHours: optionalText(300), responseTime: optionalText(300),
 }).strict();
 const homeEditorial = z.object({
+  whyNowEyebrow: optionalText(140), whyNowImageCaption: optionalText(300), convictionImageCaption: optionalText(300), closingEyebrow: optionalText(140),
   heroAudience: optionalText(300), heroDisciplines: z.array(short(100)).max(8).optional(), heroArtTop: optionalText(180), heroArtBottom: optionalText(180), heroArtCaption: optionalText(300), exploreLabel: optionalText(120),
   statisticsEyebrow: optionalText(140), statisticsDescription: optionalText(1200), statisticsNote: optionalText(2000),
   diagnosticEyebrow: optionalText(140), diagnosticArtEyebrow: optionalText(140), diagnosticArtLegend: z.array(short(180)).max(8).optional(), diagnosticArtTitle: optionalText(220), diagnosticNote: optionalText(1000),
@@ -176,18 +178,10 @@ export function parseContent(kind: ContentKind, input: unknown): Record<string, 
 export function assertPublishable(kind: ContentKind, content: Record<string, unknown>): void {
   parseContent(kind, content);
   if (kind === 'article') {
-    const article = content as ArticleDraft;
-    const fields: Record<string, string> = {};
-    if (!article.authorId) fields.authorId = 'Choisissez une auteure.';
-    if (!article.categoryId) fields.categoryId = 'Choisissez une catégorie.';
-    if (!article.date || new Date(article.date).getTime() > Date.now()) fields.date = 'Indiquez une date de publication qui ne soit pas dans le futur.';
-    if (!article.excerpt.trim()) fields.excerpt = 'Ajoutez un résumé.';
-    if (!article.externalUrl && !hasRichContent(article.body)) fields.body = 'L’article ne contient pas encore de texte.';
-    if ((article.pdfImport || article.sourcePdf) && !article.pdfImport?.reviewed) fields.pdfImport = 'Confirmez la relecture du document importé.';
+    const fields = articlePublicationIssues(content as ArticleDraft);
     if (Object.keys(fields).length) throw new ContentError(422, 'PUBLICATION_INCOMPLETE', 'Complétez la relecture avant publication.', fields);
   }
   if (kind === 'statistic' && content.verified !== true) throw new ContentError(422, 'SOURCE_UNVERIFIED', 'Vérifiez la source avant de publier ce chiffre.');
 }
 
-export function hasRichContent(node: RichNode): boolean { return Boolean(node.text?.trim()) || node.type === 'image' || Boolean(node.content?.some(hasRichContent)); }
 export function contentTitle(kind: ContentKind, content: Record<string, unknown>): string { return kind === 'settings' ? 'Paramètres du site' : kind === 'home' ? 'Accueil' : String(content.title || content.name || content.value || 'Sans titre').slice(0, 250); }

@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 
 const origin = process.env.ADMIN_QA_ORIGIN || "http://localhost:4336";
 const authenticated = process.argv.includes("--authenticated");
-const output = resolve("artifacts/custom-cms/admin");
+const output = resolve(process.env.ADMIN_QA_OUTPUT || "artifacts/custom-cms/admin");
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 const report = {
@@ -101,7 +101,7 @@ try {
   await context.close();
   if (authenticated) {
     const state = JSON.parse(
-      await readFile(resolve(".cache/admin-state.json"), "utf8"),
+      await readFile(resolve(process.env.ADMIN_QA_STATE || ".cache/admin-state.json"), "utf8"),
     );
     const context = await browser.newContext({ storageState: state });
     const page = await context.newPage();
@@ -130,7 +130,19 @@ try {
     if (!trapped) throw new Error("Le focus ne reste pas dans le menu mobile.");
     await inspect(page, "mobile-menu", 390);
     await page.keyboard.press("Escape");
+    await page.getByRole("link", { name: /Contenus à vérifier/ }).click();
+    await page.getByRole("button", { name: "À vérifier", pressed: true }).waitFor();
+    await page.getByRole("link", { name: /Articles avec un brouillon/ }).click();
+    await page.getByRole("button", { name: "Brouillons", pressed: true }).waitFor();
+    await page.getByRole("searchbox", { name: "Rechercher un contenu" }).fill("absent-test-navigation");
+    await page.setViewportSize({ width: 1440, height: 960 });
+    await page.getByRole("link", { name: "Pages du site", exact: true }).click();
+    await page.getByRole("button", { name: "Tous", pressed: true }).waitFor();
+    if (await page.getByRole("searchbox", { name: "Rechercher un contenu" }).inputValue())
+      throw new Error("La recherche d’une autre rubrique a été conservée.");
+    await page.getByRole("button", { name: /Accueil/ }).first().waitFor();
     const routes = [
+      { path: "/admin/guide/", name: "guide", heading: "Guide de l’administration" },
       { path: "/admin/pages/", name: "pages", heading: "Les pages du site" },
       {
         path: `/admin/pages/${home.id}/`,
@@ -169,7 +181,14 @@ try {
         })
         .first()
         .waitFor();
-      if (route.name === "tiptap") await page.locator(".tiptap").waitFor();
+      if (route.name === "tiptap") {
+        await page.locator(".tiptap").waitFor();
+        const checklist = page.locator(".admin-readiness");
+        await checklist.locator("summary").click();
+        await checklist.getByRole("button", { name: "Ajoutez le titre de l’article." }).click();
+        if (!await page.getByLabel("Titre de l’article").evaluate(input => input === document.activeElement))
+          throw new Error("Le point à compléter ne donne pas le focus au champ titre.");
+      }
       for (const width of [360, 390, 768, 1280, 1440])
         await inspect(page, route.name, width);
       if (route.name === "home-editor") {
@@ -189,6 +208,19 @@ try {
         await inspect(page, "revisions", 1440);
         await page.keyboard.press("Escape");
       }
+    }
+    const teamPage = pages.find(item => item.slug === "qui-sommes-nous");
+    const teamResponse = await context.request.get(`${origin}/api/admin/content/people/`);
+    if (!teamPage || !teamResponse.ok()) throw new Error("Les fiches de l’équipe de recette sont indisponibles.");
+    const members = (await teamResponse.json()).items.filter(person => person.status === "published");
+    if (members.length === 0) throw new Error("La recette nécessite une fiche de personne publiée.");
+    for (const source of [home, teamPage]) {
+      await page.goto(`${origin}/admin/pages/${source.id}/`);
+      if (source.kind === "home") await page.locator("summary").filter({hasText:"Pourquoi choisir Calas Conseil"}).click();
+      const member = members[0];
+      await page.getByRole("button", {name: member.title, exact: true}).click();
+      await page.waitForURL(`${origin}/admin/people/${member.id}/`);
+      await page.getByLabel("Nom complet").waitFor();
     }
     await context.close();
   }

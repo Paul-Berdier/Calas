@@ -8,11 +8,21 @@ import assert from 'node:assert/strict';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),web=resolve(root,'apps/web');
 const require=createRequire(resolve(web,'package.json')),astroRequire=createRequire(require.resolve('astro/package.json'));
 const {createServer}=await import(pathToFileURL(astroRequire.resolve('vite')).href);
-const folder=resolve(web,'.cache/pdf-cms-ui-check'),artifacts=resolve(root,'artifacts/custom-cms/pdf-import');
+const folder=resolve(web,'.cache/pdf-cms-ui-check'),artifacts=resolve(root,process.env.PDF_UI_ARTIFACTS??'artifacts/custom-cms/pdf-import');
 await mkdir(folder,{recursive:true});await mkdir(artifacts,{recursive:true});
 await writeFile(resolve(folder,'index.html'),`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recette PDF — réponses HTTP simulées</title></head><body style="margin:0;background:#f7f2ea;font:15px/1.5 Arial,sans-serif"><p style="background:#14213a;color:white;text-align:center;padding:12px;margin:0">Recette locale : réponses HTTP simulées pour vérifier les reprises après incident</p><main id="root" class="admin-auth" style="display:block;min-height:auto;max-width:1060px;margin:0 auto;padding:32px 18px"></main><script type="module" src="./main.tsx"></script></body></html>`);
-await writeFile(resolve(folder,'main.tsx'),`import {createRoot} from 'react-dom/client';import {PdfImport} from '/src/admin/components/PdfImport.tsx';import '/src/admin/admin.css';window.__opened=[];createRoot(document.getElementById('root')).render(<PdfImport onCreated={id=>window.__opened.push(id)}/>);`);
-const server=await createServer({configFile:false,root:web,publicDir:resolve(web,'public'),worker:{format:'es'},server:{host:'127.0.0.1',port:4335,strictPort:true},logLevel:'error'});
+await writeFile(resolve(folder,'main.tsx'),`import {createRoot} from 'react-dom/client';
+import AdminApp from '/src/admin/AdminApp.tsx';import {PdfImport} from '/src/admin/components/PdfImport.tsx';
+import '/src/admin/admin.css';window.__opened=[];
+const root=createRoot(document.getElementById('root'));
+if(location.search==='?navigation'){
+  history.replaceState({},'', '/admin/articles/');
+  history.pushState({},'', '/admin/articles/import/');
+  root.render(<AdminApp user={{id:'fixture',name:'Éditrice de recette',email:'editor@example.test',role:'editor'}} initialPath={location.pathname}/>);
+}else root.render(<PdfImport onCreated={id=>window.__opened.push(id)}/>);`);
+const server=await createServer({configFile:false,root:web,publicDir:resolve(web,'public'),cacheDir:resolve(folder,'vite-cache'),
+  optimizeDeps:{entries:['.cache/pdf-cms-ui-check/index.html'],include:['pdfjs-dist']},
+  worker:{format:'es'},server:{host:'127.0.0.1',port:4335,strictPort:true},logLevel:'error'});
 let browser;const reports=[],external=[],errors=[],payloads=[],documents=new Map();let uploads=0,releaseUpload;
 try{
   await server.listen();browser=await chromium.launch({headless:true});
@@ -65,6 +75,39 @@ try{
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth),false,`Overflow at ${width}`);
   }
   reports.push({check:'Aucun débordement aux largeurs 360/390/768/1280/1440',result:'passed'});
+  // Mount the real shell to exercise its history and unsaved-work handling. All HTTP writes stay mocked.
+  await page.goto('http://127.0.0.1:4335/.cache/pdf-cms-ui-check/?navigation');
+  await page.locator('#pdf-import-file').setInputFiles(resolve(root,'artifacts/pdf-import/fixtures/texte.pdf'));
+  const bodyField=page.getByLabel('Texte extrait',{exact:true});
+  await expect(bodyField).toHaveValue(/relations/i,{timeout:60000});
+  await bodyField.fill('Mes corrections doivent être conservées.');
+  const warnsOnClose=()=>page.evaluate(()=>{
+    const event=new Event('beforeunload',{cancelable:true});
+    return !window.dispatchEvent(event);
+  });
+  assert.equal(await warnsOnClose(),true);
+  await page.getByRole('link',{name:'Équipe',exact:true}).click();
+  await expect(page.getByRole('alertdialog',{name:'Quitter sans enregistrer ?'})).toBeVisible();
+  await page.getByRole('button',{name:'Annuler',exact:true}).click();
+  await page.evaluate(()=>history.back());
+  await expect(page.getByRole('alertdialog',{name:'Quitter sans enregistrer ?'})).toBeVisible();
+  await page.getByRole('button',{name:'Annuler',exact:true}).click();
+  for(const action of ['Refaire avec reconnaissance complète','Choisir un autre document']){
+    await page.getByRole('button',{name:action,exact:true}).click();
+    await expect(page.getByRole('alertdialog')).toBeVisible();
+    await page.getByRole('button',{name:'Annuler',exact:true}).click();
+    await expect(bodyField).toHaveValue('Mes corrections doivent être conservées.');
+  }
+  await page.getByRole('button',{name:'Créer le brouillon',exact:true}).click();
+  await expect.poll(()=>uploads).toBe(2);
+  await page.getByRole('link',{name:'Équipe',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:'Création du brouillon en cours'})).toBeVisible();
+  await page.getByRole('button',{name:'Rester sur l’import'}).click();
+  assert.equal(await warnsOnClose(),true);
+  releaseUpload();
+  await expect(page.getByRole('heading',{name:'Votre article est prêt à relire.'})).toBeVisible();
+  assert.equal(await warnsOnClose(),false);
+  reports.push({check:'Changements de rubrique, précédent, fermeture, reprise OCR et navigation pendant la création du brouillon protégés',result:'passed'});
   assert.deepEqual(external,[]);assert.deepEqual(errors,[]);
   const report={label:'Recette du composant réel, réponses HTTP simulées uniquement pour l’incident réseau',browser:'Chromium',externalRequests:0,browserErrors:errors,reports};
   await writeFile(resolve(artifacts,'cms-ui-report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
