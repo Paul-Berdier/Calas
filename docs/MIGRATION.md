@@ -2,6 +2,12 @@
 
 **État au 2 novembre 2026 :** le cahier des charges du 31 octobre, les photos fournies pour Sara et une première livraison des corrections du document « CORRECTIONS SITE AU 02-11.pdf » sont appliqués en recette locale et sur la préproduction Railway. La photo de la femme rousse a ensuite été retirée à la demande de Paul. La reprise du lettrage `a49a2fd` est déployée, mais Paul en rejette les contours irréguliers ; sa CI échoue au seuil de performance. Une nouvelle version à courbes lisses est intégrée et vérifiée localement ; son déploiement, sa mesure de performance et sa CI complète restent à confirmer. Le portrait d’Agnès reste attendu. Le journal ci-dessous conserve les opérations antérieures. Voir [la matrice du nouveau brief](EVOLUTIONS-20261101.md) et [les décisions de validation](VALIDATION.md).
 
+## Portrait d’Agnès et fiches de l’équipe — 9 novembre 2026
+
+Les deux pages utilisent le portrait et la fonction publiés de chaque personne. La photo « Portrait chaleureux au jardin fleuri.png », transmise par Paul pour Agnès, passe par la médiathèque privée du CMS. Les cadrages et le texte alternatif restent modifiables sur sa fiche.
+
+Le numéro RPPS d’Agnès est désormais un champ facultatif de sa fiche, indépendant de l’enregistrement IPRP de Sara dans les paramètres du site. Les anciennes révisions sans ce champ restent lisibles. Une fois la version applicative installée, l’opérateur importe la photo, enregistre et publie les nouvelles versions des deux fiches. Les autres contenus, les biographies longues et le portrait de Sara sont conservés dans cette opération.
+
 ## Coordonnées et informations légales — 9 novembre 2026
 
 Après sauvegarde PostgreSQL/S3, l’opération explicite `scripts/content-production-contact-20261109.ts` a publié les quatre documents dans une même transaction sur la base Railway. Paramètres v5 → v6, mentions légales v1 → v2, confidentialité v3 → v4 et contact v3 → v4. Le contrôle public a retrouvé la nouvelle boîte partagée sur l’accueil et les trois pages, les deux SIRET et la directrice de publication dans les mentions, le délai de trois ans dans la confidentialité et les zones d’intervention sur Contact. La seconde simulation ne détecte plus de changement.

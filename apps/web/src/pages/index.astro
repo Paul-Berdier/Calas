@@ -81,7 +81,30 @@ const titleMatch=home.title.match(/^(.*?)\s+(par la qualité du lien)$/i);
     </div>
   </section>
 
-  <section class="section home-reasons dark" aria-labelledby="reasons-title"><div class="wrap"><p class="eyebrow">04 / {editorial.reasonsEyebrow??'Nos expertises'}</p><div class="reasons-grid"><div class="reasons-heading"><h2 id="reasons-title" data-reveal>{home.reasonsTitle}</h2><div class="home-people">{people.map(person=><article>{person.portrait&&<CmsImage image={person.portrait} width={500} height={625} sizes="(max-width:599px) 42vw, 20vw"/>}<h3>{person.name}</h3><p>{person.role}</p></article>)}</div><Registration settings={settings} person={people.find(person=>person.id===settings.qualification.personId)}/></div><div class="reasons">{home.reasons.map(reason=><article class="reason" data-reveal>{reason.title&&<h3>{reason.title}</h3>}<p>{reason.text}</p></article>)}<CTA cta={editorial.reasonsLink??{label:'Rencontrer Sara et Agnès',href:'/qui-sommes-nous/'}} variant="link"/></div></div></div></section>
+  <section class="section home-reasons dark" aria-labelledby="reasons-title">
+    <div class="wrap">
+      <p class="eyebrow">04 / {editorial.reasonsEyebrow??'Nos expertises'}</p>
+      <div class="reasons-grid">
+        <div class="reasons-heading">
+          <h2 id="reasons-title" data-reveal>{home.reasonsTitle}</h2>
+          <div class="home-people">
+            {people.map(person =>
+              <article>
+                {person.portrait && <CmsImage class="home-portrait" image={person.portrait} width={480} height={600} sizes="(max-width:599px) 42vw, 192px"/>}
+                <h3>{person.name}</h3>
+                <p>{person.role}</p>
+                <Registration settings={settings} person={person} profile/>
+              </article>
+            )}
+          </div>
+        </div>
+        <div class="reasons">
+          {home.reasons.map(reason=><article class="reason" data-reveal>{reason.title&&<h3>{reason.title}</h3>}<p>{reason.text}</p></article>)}
+          <CTA cta={editorial.reasonsLink??{label:'Rencontrer Sara et Agnès',href:'/qui-sommes-nous/'}} variant="link"/>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section class="section home-stats" id="chiffres" aria-labelledby="stats-title"><div class="wrap"><div class="section-heading"><p class="eyebrow">05 / {editorial.statisticsEyebrow??'Le travail en chiffres'}</p><div><h2 id="stats-title" data-reveal>{home.statisticsTitle??'Quelques repères'}</h2>{editorial.statisticsDescription&&<p class="section-description">{editorial.statisticsDescription}</p>}</div></div>{groups.filter(group=>group.items.length).map(group=><div class="statistics-group"><h3>{group.title}</h3><div class="stats" data-reveal="group">{group.items.map(stat=><article class="stat"><p class="stat-value">{stat.value}</p><p class="stat-label">{stat.label}</p><div class="stat-source"><a href={safeHref(stat.sourceUrl)} target="_blank" rel="noopener noreferrer">{stat.source} <span aria-hidden="true">↗</span><span class="sr-only"> (nouvel onglet)</span></a><p>{stat.note}</p><span>Publication : {stat.year}</span></div></article>)}</div></div>)}<p class="stats-note">{editorial.statisticsNote}</p><div class="stats-transition"><span aria-hidden="true">↳</span><p>{home.statisticsTransition}</p></div></div></section>
 

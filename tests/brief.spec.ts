@@ -14,10 +14,15 @@ test('le nouveau chemin et le numéro IPRP sont visibles sans JavaScript',async(
  await expect(page.locator('.home-now a')).toHaveText(['8 %','un sur deux']);
  await expect(page.locator('#conviction-title')).toContainText('professionnaliser le lien.');
  await expect(page.locator('.stat')).toHaveCount(9);
- await expect(page.locator('.registration')).toContainText('2026.16.004');
- await expect(page.locator('.registration')).toContainText('Sara Serrano Cabeza');
- await expect(page.locator('.registration')).toContainText('DREETS Nouvelle-Aquitaine');
- await expect(page.locator('.registration')).not.toContainText('Agnès');
+ const sara=page.locator('.home-people article').filter({has:page.getByRole('heading',{name:'Sara Serrano Cabeza'})});
+ const agnes=page.locator('.home-people article').filter({has:page.getByRole('heading',{name:'Agnès Loupias'})});
+ await expect(sara.locator('p')).toHaveText('Fondatrice de Calas Conseil, consultante en relations humaines et stratégie RH, ancienne DRH. IPRP et praticienne en analyse transactionnelle.');
+ await expect(agnes.locator('p')).toHaveText('Associée, psychologue clinicienne');
+ await expect(sara.getByRole('complementary',{name:/IPRP/})).toContainText('2026.16.004');
+ await expect(sara.getByRole('complementary',{name:/IPRP/})).toContainText('DREETS Nouvelle-Aquitaine');
+ await expect(agnes.getByRole('complementary',{name:/RPPS/})).toContainText('10009722090');
+ await expect(sara.locator('.registration')).toHaveCount(1);
+ await expect(agnes.locator('.registration')).toHaveCount(1);
  await page.locator('.sensitive-link').click();
  await expect(page.locator('h1')).toHaveText('Quand la relation se tend, agir vite et juste');
  await expect(page.locator('#section-cadre')).toContainText('jamais sur les confidences individuelles');
@@ -49,5 +54,7 @@ test('les illustrations chargent et les nouvelles pages restent lisibles',async(
   }
  }
  await page.goto('/qui-sommes-nous/');
+ await expect(page.getByRole('complementary',{name:'Enregistrement IPRP – Sara Serrano Cabeza'})).toContainText('2026.16.004');
+ await expect(page.getByRole('complementary',{name:'Enregistrement RPPS – Agnès Loupias'})).toContainText('10009722090');
  const schema=await page.locator('script[type="application/ld+json"]').allTextContents();expect(schema.some(text=>JSON.parse(text)['@graph']?.filter((node:Record<string,string>)=>node['@type']==='Person').length===2)).toBe(true);
 });

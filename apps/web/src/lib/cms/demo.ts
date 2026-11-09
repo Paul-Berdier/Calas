@@ -883,13 +883,14 @@ export const demoContent: SiteContent = {
     {
       "id": "person-sara",
       "name": "Sara Serrano Cabeza",
-      "role": "Consultante en relations humaines et stratégie RH, ancienne DRH. IPRP, praticienne en analyse transactionnelle.",
+      "role": "Fondatrice de Calas Conseil, consultante en relations humaines et stratégie RH, ancienne DRH. IPRP et praticienne en analyse transactionnelle.",
       "bio": "Licences de psychologie et d’éducation sociale, Master DRH.\n\nMon parcours croise deux mondes. D’un côté, dix ans d’accompagnement des personnes en institution, qui m’ont appris à observer et comprendre les comportements humains et les interactions sociales dans ce qu’elles ont de plus complexe. Auprès des situations les plus difficiles, j’ai appris ce qui se joue au-delà des comportements visibles. De l’autre, des postes de direction en entreprise, jusqu’à DRH : je connais les exigences, les contraintes et l’objectif de résultat. C’est ce double ancrage qui me permet de relier performance et qualité relationnelle, de la stratégie à la conception des outils, jusqu’à l’animation sur le terrain."
     },
     {
       "id": "person-agnes",
       "name": "Agnès Loupias",
-      "role": "Psychologue clinicienne. Enregistrement RPPS n° 10009722090.",
+      "role": "Associée, psychologue clinicienne",
+      "rppsNumber": "10009722090",
       "bio": "Master en psychologie clinique et psychopathologie.\n\nEnregistrée au Répertoire partagé des professionnels intervenant dans le système de santé (RPPS), sous le numéro 10009722090.\n\nAprès vingt ans d’expérience en entreprise, j’ai choisi une reconversion professionnelle pour devenir psychologue clinicienne. Ce parcours singulier me permet aujourd’hui de conjuguer une connaissance concrète du monde de l’entreprise avec une compréhension fine du fonctionnement humain et des dynamiques relationnelles.\n\nJ’interviens auprès des salariés, notamment dans le cadre d’entretiens individuels et de situations de crise en entreprise. Je conduis également des actions de prévention en santé au travail, en particulier auprès des salariés en fin de carrière. Ces expériences m’ont permis de mieux appréhender les réalités humaines du monde professionnel, les difficultés rencontrées par les personnes et leurs répercussions sur le travail et les collectifs.\n\nAu sein de Calas Conseil, je contribue à éclairer les situations de travail et les relations humaines. Mon approche consiste à dépasser les comportements visibles pour comprendre ce qui se joue, tant au niveau individuel que collectif : les tensions, les difficultés relationnelles, les fragilités et les facteurs qui influencent la santé et la coopération au travail. Cette compréhension nourrit notre approche des risques psychosociaux et notre accompagnement des organisations."
     }
   ],

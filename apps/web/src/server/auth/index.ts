@@ -20,12 +20,15 @@ export function createAuth(database:DatabaseExecutor=getDb(),allowRegistration=f
       sendVerificationEmail:async({user,url})=>sendAuthMail(user.email,'Vérifier votre adresse — Calas Conseil',`Confirmez votre adresse en ouvrant ce lien personnel valable une heure :\n${url}`)},
     user:{additionalFields:{role:{type:'string',defaultValue:'editor',input:false},disabled:{type:'boolean',defaultValue:false,input:false}}},
     session:{expiresIn:8*60*60,updateAge:15*60,freshAge:SESSION_FRESH_AGE_SECONDS,cookieCache:{enabled:false},additionalFields:{mfaVerified:{type:'boolean',defaultValue:false,input:false}}},
-    databaseHooks:{session:{create:{before:async session=>{
+    databaseHooks:{session:{create:{before:async (session,context)=>{
       const [person]=await database.select().from(schema.user).where(eq(schema.user.id,session.userId));
       if(!person||person.disabled)return false;
-      // Better Auth deletes the provisional password session before its MFA challenge response.
-      // Enrollment rotates the session after enabling TOTP; earlier sessions remain restricted.
-      return {data:{...session,mfaVerified:person.twoFactorEnabled}};
+      // These handlers create the session only after checking the TOTP or consuming a backup code.
+      const verifiedFactor=context?.path==='/two-factor/verify-totp'||context?.path==='/two-factor/verify-backup-code';
+      const current=context?.context.session;
+      const rotatesVerifiedSession=context?.path==='/change-password'&&current?.user.id===person.id
+        &&current.session.mfaVerified===true;
+      return {data:{...session,mfaVerified:person.twoFactorEnabled&&(verifiedFactor||rotatesVerifiedSession)}};
     }}}},
     advanced:{useSecureCookies:new URL(origin).protocol==='https:',defaultCookieAttributes:{httpOnly:true,sameSite:'lax'},ipAddress:{ipAddressHeaders:['x-calas-client-ip']}},
     rateLimit:{enabled:true,storage:'database',window:60,max:60,customRules:{'/sign-in/email':{window:60,max:8},'/request-password-reset':{window:300,max:4},'/two-factor/*':{window:60,max:8}}},

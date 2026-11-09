@@ -103,7 +103,8 @@ details[open]>summary .disclosure-icon::after{transform:rotate(0)}
 .editorial-profile-role{font:13px/1.6 var(--editorial-ui);color:var(--editorial-accent);margin-top:18px;max-width:360px}
 .editorial-profile-bio{font-size:21px;line-height:1.55;margin-top:26px;color:#454d5a;white-space:pre-line}
 .editorial-profile-qualification{font:13px/1.5 var(--editorial-ui);margin-top:24px}
-.editorial-portrait{width:100%;aspect-ratio:4/5;object-fit:cover;margin:28px 0}
+.editorial-portrait{display:block;width:100%;max-width:min(100%,216px);aspect-ratio:4/5;object-fit:cover;margin:22px 0}
+@media(max-width:599px){.editorial-portrait{max-width:min(100%,48vw,216px)}}
 .editorial-page-image{margin-block:0 56px}
 .editorial-page-image img{width:100%;object-fit:cover}
 .editorial-format{padding-block:55px;border-top:1px solid var(--editorial-rule)}

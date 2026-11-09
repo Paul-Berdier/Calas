@@ -6,6 +6,7 @@ import {loadEnvFile} from 'node:process';
 import {test} from 'node:test';
 import {fileURLToPath} from 'node:url';
 import {ALL as authRoute} from '../apps/web/src/pages/api/auth/[...all]';
+import {getAuth} from '../apps/web/src/server/auth';
 import {getActor, getSession, requireAdministrator} from '../apps/web/src/server/auth/permissions';
 import {getPool, closeDatabase} from '../apps/web/src/server/db';
 import {migrateDatabase} from '../apps/web/src/server/db/migrate';
@@ -106,7 +107,19 @@ test('named production users sign in with verified email and password, including
     const backupAttempt=await post('two-factor/verify-backup-code',{code:enrolled.backupCode},challengeCookie);
     assert(!backupAttempt.ok,'The old MFA challenge cannot open a new session');
     assert.equal((await getActor(privateRequest(protectedOther.cookie)))?.id,other.id,'Unrelated sessions survive');
-    assert.equal((await (await login(other)).json()).twoFactorRedirect,true,'Other enrolled accounts still receive a challenge');
+    const otherLogin=await login(other);
+    assert.equal((await otherLogin.json()).twoFactorRedirect,true,'Other enrolled accounts still receive a challenge');
+    const adapter=(await getAuth().$context).internalAdapter;
+    const provisional=await adapter.createSession(other.id);
+    const {rows:[stored]}=await getPool().query('SELECT mfa_verified FROM auth_session WHERE token=$1',[provisional.token]);
+    assert.equal(stored.mfa_verified,false,'Enrollment alone must never mark a new session as MFA-verified');
+    await adapter.deleteSession(provisional.token);
+    const recovered=await post('two-factor/verify-backup-code',{code:protectedOther.backupCode},cookies(otherLogin));
+    assert.equal(recovered.status,200);
+    assert.equal((await getActor(privateRequest(cookies(recovered))))?.id,other.id,'A valid backup code completes the challenge');
+    const changed=await post('change-password',{currentPassword:other.password,newPassword:randomBytes(24).toString('base64url'),revokeOtherSessions:true},cookies(recovered));
+    assert.equal(changed.status,200);
+    assert.equal((await getActor(privateRequest(cookies(changed))))?.id,other.id,'Password rotation preserves the already verified factor');
 
     const wrong=await post('sign-in/email',{email:paul.email,password:'incorrect'});
     assert(!wrong.ok,'Unknown password rejected');

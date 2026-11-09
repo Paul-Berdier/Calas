@@ -11,6 +11,9 @@
 @media(max-width:599px){.conviction-calm{margin-top:32px}.conviction-calm>img{aspect-ratio:4/5}}
 
 .hero-art {color:#14213a;}
+.home-people article {display:flex;flex-direction:column;align-items:flex-start;min-width:0;}
+.home-people .home-portrait {display:block;width:100%;max-width:192px;aspect-ratio:4/5;object-fit:cover;margin-bottom:20px;}
+.home-people article>p {margin-bottom:auto;}
 .hero-art .hero-identity {font:400 30px/1.12 var(--display);margin:18px auto 0;}
 .hero-identity em {display:block;color:inherit;}
 .hero-art .hero-specialty {font:500 clamp(11px,.95vw,14px)/1.65 var(--display);letter-spacing:.13em;text-transform:uppercase;margin:14px auto 0;text-wrap:balance;}

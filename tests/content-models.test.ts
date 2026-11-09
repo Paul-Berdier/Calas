@@ -31,6 +31,15 @@ test('la marque et la qualification sont validées côté serveur', () => {
   assert.throws(() => parseContent('settings', { ...demoContent.settings, brand: 'Calass' }), ContentError);
   assert.throws(() => parseContent('settings', { ...demoContent.settings, qualification: { status: 'verified' } }), ContentError);
 });
+test('le RPPS reste facultatif et conserve les onze chiffres de sa titulaire', () => {
+  const people = prepareSeedPlan(demoContent).entries.filter(entry => entry.kind === 'person');
+  const agnes = people.find(entry => entry.id === stableContentId('person', 'person-agnes'))!.content;
+  const sara = people.find(entry => entry.id === stableContentId('person', 'person-sara'))!.content;
+  assert.equal(agnes.rppsNumber, '10009722090');
+  assert.equal(sara.rppsNumber, undefined);
+  assert.doesNotThrow(() => parseContent('person', { ...agnes, rppsNumber: '' }));
+  assert.throws(() => parseContent('person', { ...agnes, rppsNumber: '2026.16.004' }), ContentError);
+});
 test('les liens actifs et attributs arbitraires sont refusés', () => {
   for (const href of ['javascript:alert(1)', 'data:text/html,x', '//evil.test/', 'https://user:password@example.test/', '/\\evil', 'https://example.test/a\n']) assert.equal(safeEditorialUrl(href), false, href);
   for (const href of ['/contact/?objet=diagnostic', '#chiffres', 'https://example.test/', 'mailto:contact@example.test', 'tel:+33600000000']) assert.equal(safeEditorialUrl(href), true, href);

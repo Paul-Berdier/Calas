@@ -960,6 +960,7 @@ const fieldLabels: Record<string, string> = {
   seriesCta: "Lien de lancement",
   image: "Image",
   portrait: "Portrait",
+  rppsNumber: "Numéro RPPS",
   sourcePdf: "PDF original",
   qualification: "Qualification IPRP",
   pdfImport: "Relecture du PDF",

@@ -112,7 +112,11 @@ export const pageSchema = z.object({
   if (page.slug === 'diagnostic-rps' && ['signaux', 'etapes', 'regards', 'livrables', 'confiance', 'questions', 'prevention'].some(key => !page.sections.some(section => section.key === key))) context.addIssue({ code: 'custom', path: ['sections'], message: 'Les sections essentielles du Diagnostic sont protégées ; leurs textes restent modifiables.' });
 });
 export const statisticSchema = z.object({ id: optionalId, value: required(80), label: required(800), source: required(300), sourceUrl: httpsUrl, year: required(150), note: required(2000), verified: z.boolean(), group: z.enum(['people', 'cost', 'financial']).optional(), observationPeriod: optionalText(150), publicationYear: z.number().int().min(1900).max(2200).optional(), order: z.number().int().min(0).max(1000).optional() }).strict();
-export const personSchema = z.object({ id: optionalId, name: required(150), role: required(600), bio: optionalText(8000), portrait: imageSchema.optional(), order: z.number().int().min(0).max(1000).optional() }).strict();
+export const personSchema = z.object({
+  id: optionalId, name: required(150), role: required(600), bio: optionalText(8000), portrait: imageSchema.optional(),
+  rppsNumber: z.string().trim().regex(/^(?:\d{11})?$/, 'Le numéro RPPS comporte 11 chiffres.').optional(),
+  order: z.number().int().min(0).max(1000).optional(),
+}).strict();
 export const categorySchema = z.object({ id: optionalId, title: required(100), slug: slugSchema, description: optionalText(1000) }).strict();
 export const settingsSchema = z.object({
   brand: z.literal('Calas Conseil'), tagline: z.literal('La voie de la qualité relationnelle.'), phone: z.string().regex(/^[+\d\s().-]{10,25}$/), email: z.string().email().max(254), linkedin: z.union([z.literal(''), httpsUrl.refine(value => /^https:\/\/(www\.)?linkedin\.com\//.test(value))]).optional(),

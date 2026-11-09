@@ -888,6 +888,7 @@ export function ContentForm({
             max: 400,
           },
           { name: "bio", label: "Biographie approuvée", rows: 10, max: 4000 },
+          { name: "rppsNumber", label: "Numéro RPPS", hint: "Les 11 chiffres du numéro d’enregistrement de cette personne, si elle en possède un.", max: 11 },
           { name: "order", label: "Ordre de présentation", type: "number" },
         ])}
         {image(["portrait"], "Portrait authentique")}
