@@ -118,3 +118,17 @@ Le champ `calmFace` porte à dix le nombre de visuels éditables de l’accueil.
 Les deux photographies ont d’abord été importées dans les médiathèques locale et Railway puis publiées avec l’accueil v9. Leur accès anonyme était refusé avant cette publication et autorisé après ; les autres médias et l’historique ont été conservés. La photo apaisée utilisait un cadre portrait 4/5 de 440 pixels au maximum ; la scène finale conserve son ratio 3/2 et une largeur maximale de 960 pixels pour ne couper aucun visage. Les rapports et la provenance de cette première livraison sont dans `artifacts/corrections-20261102/`.
 
 Paul a ensuite demandé explicitement de retirer la photo de la femme rousse. Seule la référence `home.visuals.calmFace` a été retirée puis publiée le 2 novembre, en local et sur Railway : accueil v9 → v11. Le fichier reste dans la médiathèque privée et dans les révisions antérieures, sans être accessible aux visiteurs (HTTP 404 vérifié). La photo d’échange entre collègues reste publique (HTTP 200), ainsi que le portrait authentique de Sara ; tous les autres champs et les anciennes révisions sont identiques. Le champ facultatif `calmFace` est désormais vide : aucun cadre ni espace photographique vide n’est rendu. Aucun remplacement n’a été demandé ou ajouté. Preuves : `artifacts/revision-brand-20261102/photo-removal/`.
+
+## Illustrations photographiques du 9 novembre 2026
+
+Les deux documents transmis pour la mise en ligne demandent des photos proches des symboles et un trait doré en remplacement du tissage. Les cinq illustrations ci-dessous ont été créées avec ImageGen pour Calas Conseil. Elles représentent des sujets symboliques. La boussole proposée dans l’archive de Sara porte un filigrane de boutique. La version créée pour le site évite d’utiliser cette photographie commerciale.
+
+| Sujet | Fichier WebP dans `apps/web/public/images/photographies/` | Utilisation |
+| --- | --- | --- |
+| Nautile en coupe | `nautilus.webp` | Pourquoi maintenant, Qui sommes-nous |
+| Racines d’un hêtre | `roots.webp` | Diagnostic |
+| Boussole en laiton | `compass.webp` | Compétences relationnelles |
+| Chêne dans une prairie | `tree.webp` | Managers et dirigeants |
+| Vol d’étourneaux | `murmuration.webp` | Notre parti pris, Notre approche |
+
+Les originaux PNG sont conservés dans le dossier local de génération `01a1be73-5ad0-7cb2-85d4-3ac260d3fe97`. Les WebP (960 × 640) sont inclus dans les sources du site. La médiathèque contient également les cinq images, avec leur texte alternatif. Les champs **Images de l’accueil** permettent de les remplacer, et une page offre peut toujours choisir son propre visuel. La version publiée v15 de l’accueil conserve les médias existants de Sara et les neuf références statistiques. Le portrait de Sara et le bol kintsugi proviennent toujours de son archive.

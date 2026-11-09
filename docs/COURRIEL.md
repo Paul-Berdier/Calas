@@ -8,6 +8,8 @@ Le site affiche cette adresse sur la page Contact, en pied de page et dans les i
 
 Les demandes sont supprimées de la messagerie au plus tard trois ans après le dernier échange, hors pièces à conserver au titre des obligations contractuelles. Sara et Agnès assurent cette suppression dans la boîte. Les identifiants SMTP restent dans les variables privées du service Railway. La zone DNS OVH publie MX, SPF, DKIM et DMARC.
 
+Le 9 novembre, la demande de recette envoyée depuis le formulaire public a été retrouvée dans la boîte de réception, avec l’adresse du visiteur comme adresse de réponse.
+
 Les sections datées ci-dessous conservent l’historique des offres envisagées avant la création de la boîte.
 
 ## Domaine et adresses envisagés — état au 2 novembre 2026

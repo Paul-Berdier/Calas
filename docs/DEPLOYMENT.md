@@ -2,6 +2,16 @@
 
 Le projet Railway **Calas** héberge l’application Astro SSR, PostgreSQL et le bucket privé. Le service web historique `Calas-Web-Test` porte la production sous `www.calas-conseil.fr`. Le domaine est géré chez OVH, qui héberge également la boîte de contact. Les étapes de recette datées ci-dessous documentent les versions précédentes.
 
+## Mise en production du 9 novembre 2026
+
+Le déploiement `5831b6e2-6fb1-463f-aaad-e78c274181fc` utilise le commit applicatif `0c54166311cfa2827f322adbcace6032cc4d9770`. Le certificat TLS et la propriété du domaine **www.calas-conseil.fr** sont validés par Railway. L’ancienne adresse Railway redirige les pages publiques vers le même chemin sur le domaine canonique. Seul le domaine avec www fait partie de ce lancement.
+
+Le serveur utilise `SITE_ENV=production`, le CMS PostgreSQL, le stockage privé et le transport SMTP authentifié OVH. Les deux éditrices et l’administrateur disposent de comptes nominatifs. Les identités de recette sont suspendues. Les accès personnels sont remis dans un fichier privé hors Git.
+
+Les routes publiques, les mentions légales, l’administration, le sitemap, le contact et la disponibilité des services ont répondu sur le domaine HTTPS. Une seule demande de recette autorisée a été soumise par le formulaire public le 9 novembre. Sa présence dans **INBOX** a été vérifiée par IMAP avec les bons champs destinataire et Reply-To. [Résultats HTTP](../artifacts/lancement-20261109/controle-public.json).
+
+La sauvegarde chiffrée prise avant modification a été restaurée dans des services isolés (29 documents, 83 révisions et 28 objets S3 contrôlés par empreinte). Les accès au fichier de remise et aux sauvegardes sont restreints à l’opérateur.
+
 ## Démarrage local
 
 Utiliser Node **24.19.0**, pnpm **11.25.0** et Docker Desktop. Depuis la racine du dépôt :

@@ -66,3 +66,17 @@ Ces observations portent sur les contenus et la structure des pages consultées,
 8. Le consentement n'est pas une case obligatoire universelle. Le responsable du traitement doit valider la base légale appropriée, la conservation, les destinataires et l'information. [CNIL, consentement](https://www.cnil.fr/fr/les-bases-legales/consentement). La [CNIL, site vitrine](https://www.cnil.fr/fr/rgpd-en-pratique-communiquer-en-ligne) demande une information au formulaire, un moyen électronique d'exercer les droits et l'identification de l'éditeur.
 
 Ces corrections encadrent une préparation éditoriale ; elles ne constituent pas une validation juridique ni une attestation des qualifications du cabinet.
+## Repères publiés le 9 novembre 2026
+
+Le tableau du 7 novembre répartit neuf indicateurs en trois groupes. Le contexte « Pourquoi maintenant » renvoie séparément aux enquêtes Gallup (8 % engagés) et Empreinte Humaine / Ipsos bva (un salarié sur deux). Ces deux données ne sont plus répétées dans les cartes.
+
+| Donnée | Source et périmètre |
+| --- | --- |
+| 39 % | Salariés interrogés en France ayant ressenti beaucoup de stress une grande partie de la veille, moyenne 2023–2025. [Gallup, données France](https://www.gallup.com/workplace/705338/state-global-workplace-france-country-level-data.aspx) |
+| 62 % | Intensité et temps de travail parmi les motifs professionnels cités par les salariés déclarant une santé mentale fragile. Baromètre 2023, enquête menée en mars–avril. [Malakoff Humanis](https://www.malakoffhumanis.com/groupe/lecomptoir/barometre-sante-salaries/) |
+| 25 % | Salariés déclarant être en mauvaise santé mentale, enquête décembre 2024 publiée en 2025. [Ipsos pour Qualisocial](https://www.ipsos.com/fr-fr/travail-les-salaries-francais-face-une-sante-mentale-degradee) |
+| Plus de 120 Md€ | Estimation annuelle globale des coûts directs et indirects de l’absentéisme des entreprises françaises. [WTW, édition 2025](https://www.wtwco.com/fr-fr/news/2025/09/hausse-del-absenteisme-en-2024-un-signal-dalerte-pour-les-entreprises) |
+| 7,6 Md€ | Part des employeurs dans le coût des troubles psychiques des actifs en 2022. [Asterès / MGEN, communiqué publié en 2025](https://presse.mgen.fr/download-pdf/69280aac0b038913c508a437) |
+| 9 % du PIB mondial | Estimation des pertes mondiales de productivité liées au faible engagement. [Gallup, rapport 2026](https://www.gallup.com/workplace/349484/state-of-the-global-workplace.aspx) |
+| 4,95 % et 38 jours | Taux d’absentéisme et durée moyenne d’absence dans le secteur privé observé en 2025. [WTW, édition 2026](https://www.wtwco.com/fr-fr/news/2026/10/barometre-absenteisme-prive-2026) |
+| 36 % | Arrêts longs liés aux risques psychosociaux dans les données 2024. Le millésime 2025 est conservé car le communiqué 2026 ne donne pas de valeur actualisée. [WTW, édition 2025](https://www.wtwco.com/fr-fr/news/2025/09/hausse-del-absenteisme-en-2024-un-signal-dalerte-pour-les-entreprises) |
