@@ -6,9 +6,11 @@ import {createAuth} from './index';
 import {sendAuthMail} from './mail';
 import {HttpError} from '../http';
 import type {Actor} from './permissions';
+import {usesProductionPasswordOnly,usesTestPasswordOnly} from './access-policy';
 
 export async function listUsers(){
-  return getDb().select({id:user.id,name:user.name,email:user.email,role:user.role,disabled:user.disabled,emailVerified:user.emailVerified,twoFactorEnabled:user.twoFactorEnabled,createdAt:user.createdAt}).from(user).orderBy(user.createdAt);
+  const members=await getDb().select({id:user.id,name:user.name,email:user.email,role:user.role,disabled:user.disabled,emailVerified:user.emailVerified,twoFactorEnabled:user.twoFactorEnabled,createdAt:user.createdAt}).from(user).orderBy(user.createdAt);
+  return members.map(member=>({...member,passwordOnly:usesProductionPasswordOnly(member)||usesTestPasswordOnly(member)}));
 }
 export async function inviteUser(actor:Actor,input:{name:string;email:string;role:'administrator'|'editor'}){
   if(actor.role!=='administrator')throw new HttpError(403,'FORBIDDEN','Accès réservé aux administrateurs.');

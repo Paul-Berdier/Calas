@@ -22,11 +22,13 @@ Le compte utilisé dans les tests automatisés est une identité de recette loca
 
 ## Sessions et récupération
 
+En production, Sara, Agnès et Paul peuvent se connecter par e-mail et mot de passe après une vérification unique de leur adresse. Ces trois comptes personnels sont désignés par `AUTH_PASSWORD_ONLY_USER_IDS` et les adresses nominatives validées. Les autres comptes exigent l’activation puis la vérification d’un TOTP selon la procédure ci-dessus. Le contrôle de session récente se fait avec le mode de connexion de la personne.
+
 Le mot de passe oublié envoie un lien Better Auth valable une heure ; le message affiché reste générique. Le lien est à usage limité et la réinitialisation révoque les sessions antérieures. Elle ne supprime pas le second facteur. Les codes de secours ne servent qu’une fois ; leur régénération depuis Sécurité remplace le jeu précédent.
 
 L’utilisateur peut consulter et révoquer ses sessions. Un administrateur peut suspendre un autre compte, changer ses droits et révoquer ses sessions. Le dernier administrateur actif est protégé. Prévoir au moins deux responsables autorisés et des codes de secours conservés séparément. En cas de perte simultanée du mot de passe, du TOTP et des secours, faire vérifier l’identité et organiser une récupération par l’exploitant selon la procédure Better Auth ; aucun bouton de contournement public ni « mot de passe maître » n’est ajouté.
 
-Better Auth exige une connexion de moins de quinze minutes pour consulter la liste des sessions. L’écran explique cette limite et propose une déconnexion vérifiée suivie du mot de passe et du TOTP, puis revient à la rubrique Sécurité. L’activité ne renouvelle pas cette fenêtre ; l’accès éditorial ordinaire conserve sa durée de session de huit heures.
+Better Auth exige une connexion de moins de quinze minutes pour consulter la liste des sessions. L’écran propose de se reconnecter avec le mode d’identification du compte, puis revient à la rubrique Sécurité. L’activité ne renouvelle pas cette fenêtre ; l’accès éditorial ordinaire conserve sa durée de session de huit heures.
 
 ## Édition et publication
 

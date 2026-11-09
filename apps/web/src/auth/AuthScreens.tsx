@@ -21,6 +21,7 @@ type AuthResult = {
   error?: { message?: string; code?: string } | null;
   data?: unknown;
 };
+type PasswordOnlyMode = "production" | "staging";
 function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="auth-app">
@@ -59,16 +60,16 @@ export default function AuthScreens({
   user,
   securityFreshUntil = 0,
   serverTime = Date.now(),
-  testPasswordOnly = false,
+  passwordOnlyMode,
 }: {
   mode: "login" | "security" | "reset" | "invitation" | "users";
   user?: User;
   securityFreshUntil?: number;
   serverTime?: number;
-  testPasswordOnly?: boolean;
+  passwordOnlyMode?: PasswordOnlyMode;
 }) {
   if (mode === "security" && user)
-    return <Security user={user} initialFreshUntil={securityFreshUntil} serverTime={serverTime} testPasswordOnly={testPasswordOnly} />;
+    return <Security user={user} initialFreshUntil={securityFreshUntil} serverTime={serverTime} passwordOnlyMode={passwordOnlyMode} />;
   if (mode === "users" && user) return <Users />;
   return (
     <Login mode={mode === "reset" || mode === "invitation" ? mode : "login"} />
@@ -119,7 +120,7 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
         setPassword("");
         setComplete(true);
         setMessage(
-          "Votre compte est créé. Ouvrez l’email de vérification, puis connectez-vous pour activer la double authentification.",
+          "Votre compte est créé. Confirmez votre adresse dans l’email reçu, puis connectez-vous.",
         );
         return;
       }
@@ -247,8 +248,7 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
             rythme.
           </p>
           <p>
-            <ShieldCheck size={20} aria-hidden /> Accès privé, protégé par
-            double authentification.
+            <ShieldCheck size={20} aria-hidden /> Utilisez votre adresse email personnelle.
           </p>
         </section>
         <section className="auth-card">
@@ -390,11 +390,11 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
     </Shell>
   );
 }
-function Security({ user, initialFreshUntil, serverTime, testPasswordOnly }: {
+function Security({ user, initialFreshUntil, serverTime, passwordOnlyMode }: {
   user: User;
   initialFreshUntil: number;
   serverTime: number;
-  testPasswordOnly: boolean;
+  passwordOnlyMode?: PasswordOnlyMode;
 }) {
   const [password, setPassword] = useState(""),
     [newPassword, setNewPassword] = useState(""),
@@ -405,7 +405,7 @@ function Security({ user, initialFreshUntil, serverTime, testPasswordOnly }: {
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [error, setError] = useState(false);
-  const canManageSecurity = enabled || testPasswordOnly;
+  const canManageSecurity = enabled || Boolean(passwordOnlyMode);
   const [sessions, setSessions] = useState<
     Array<{
       id: string;
@@ -558,9 +558,9 @@ function Security({ user, initialFreshUntil, serverTime, testPasswordOnly }: {
         <Notice message={message} error={error} />
         <div className="auth-security-grid">
           <section className="auth-card">
-            {testPasswordOnly ? <>
-              <h2><KeyRound size={25} aria-hidden /> Accès au site de test</h2>
-              <p>Votre identifiant et votre mot de passe suffisent pour ce compte de recette.</p>
+            {passwordOnlyMode ? <>
+              <h2><KeyRound size={25} aria-hidden /> {passwordOnlyMode === "staging" ? "Accès au site de test" : "Votre connexion"}</h2>
+              <p>{passwordOnlyMode === "staging" ? "Votre identifiant et votre mot de passe suffisent pour ce compte de recette." : <>Vous vous connectez avec <strong>{user.email}</strong> et votre mot de passe.</>}</p>
               <a className="auth-button" href="/admin/">Accéder à mes contenus</a>
             </> : <>
             <h2>
@@ -715,7 +715,7 @@ function Security({ user, initialFreshUntil, serverTime, testPasswordOnly }: {
                 <button className="auth-button" disabled={busy}>
                   Modifier mon mot de passe
                 </button>
-                {enabled && <button
+                {enabled && !passwordOnlyMode && <button
                   type="button"
                   className="auth-button secondary"
                   disabled={busy || !password}
@@ -749,7 +749,7 @@ function Security({ user, initialFreshUntil, serverTime, testPasswordOnly }: {
             <p>Fermez une session sur un appareil que vous n’utilisez plus.</p>
             {sessionsState === "stale" && (
               <>
-                <Notice message={`Pour consulter vos sessions ouvertes, reconnectez-vous avec votre mot de passe${testPasswordOnly ? '' : ' et votre code de sécurité'}. Cette vérification est valable ${SESSION_FRESH_AGE_SECONDS / 60} minutes.`} />
+                <Notice message={`Pour consulter vos sessions ouvertes, reconnectez-vous avec votre mot de passe${passwordOnlyMode ? '' : ' et votre code de sécurité'}. Cette vérification est valable ${SESSION_FRESH_AGE_SECONDS / 60} minutes.`} />
                 <button className="auth-button" disabled={busy} onClick={() => void disconnect(true)}>
                   Se reconnecter
                 </button>
@@ -809,7 +809,13 @@ function Security({ user, initialFreshUntil, serverTime, testPasswordOnly }: {
     </Shell>
   );
 }
-type Member = User & { disabled: boolean; emailVerified: boolean };
+type Member = User & { disabled: boolean; emailVerified: boolean; passwordOnly: boolean };
+function memberAccessStatus(member: Member) {
+  if (member.disabled) return "Accès suspendu";
+  if (!member.emailVerified) return "Adresse à vérifier";
+  if (member.passwordOnly) return "Accès par mot de passe";
+  return member.twoFactorEnabled ? "Double authentification active" : "Activation en attente";
+}
 function Users() {
   const [users, setUsers] = useState<Member[]>([]),
     [name, setName] = useState(""),
@@ -867,8 +873,7 @@ function Users() {
         <p className="auth-eyebrow">Accès et responsabilités</p>
         <h1>Les personnes autorisées.</h1>
         <p>
-          Chaque personne utilise son propre compte et sa double
-          authentification.
+          Gérez les invitations, les rôles et les accès de votre équipe.
         </p>
         <Notice message={message} error={error} />
         <div className="auth-users-top">
@@ -882,11 +887,7 @@ function Users() {
                     ? "Administrateur"
                     : "Éditeur"}{" "}
                   ·{" "}
-                  {person.disabled
-                    ? "Accès suspendu"
-                    : person.twoFactorEnabled
-                      ? "Double authentification active"
-                      : "Activation en attente"}
+                  {memberAccessStatus(person)}
                 </p>
                 <div className="auth-actions">
                   <button

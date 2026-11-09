@@ -11,12 +11,8 @@ import {eq, inArray, sql} from '../apps/web/node_modules/drizzle-orm/index.js';
 import {getDb, closeDatabase} from '../apps/web/src/server/db/index';
 import {user, securityEvents} from '../apps/web/src/server/db/auth-schema';
 import {createAuth} from '../apps/web/src/server/auth/index';
-
-export const productionIdentities = [
-  {name:'Sara Serrano Cabeza', email:'saraserranocabeza@gmail.com', role:'editor'},
-  {name:'Agnès Loupias', email:'a.loupias@live.fr', role:'editor'},
-  {name:'Paul', email:'paul.berdo@hotmail.com', role:'administrator'},
-] as const;
+import {productionIdentities} from '../apps/web/src/server/auth/production-identities';
+export {productionIdentities} from '../apps/web/src/server/auth/production-identities';
 
 export interface ProvisionOptions {
   apply: boolean;
@@ -57,7 +53,7 @@ export async function provisionProductionAccounts(options: ProvisionOptions) {
       if (!operator || operator.disabled || !operator.emailVerified || operator.role !== 'administrator') throw new Error('Opérateur administrateur actif attendu.');
       const existing = await tx.select({id:user.id}).from(user).where(inArray(user.email,productionIdentities.map(identity => identity.email)));
       if (existing.length) throw new Error('Un compte cible existe déjà ; aucun remplacement autorisé.');
-      const plan = {origin:options.expectedOrigin,database:options.expectedDatabase,accounts:productionIdentities.length,editors:2,administrators:1,externalEmailsSent:0,emailVerificationRequired:true,mfaRequired:true};
+      const plan = {origin:options.expectedOrigin,database:options.expectedDatabase,accounts:productionIdentities.length,editors:2,administrators:1,externalEmailsSent:0,emailVerificationRequired:true};
       if (!options.apply) return {...plan,applied:false};
 
       const output = resolve(options.outputFile!);
@@ -70,7 +66,7 @@ export async function provisionProductionAccounts(options: ProvisionOptions) {
         loginUrl:`${options.expectedOrigin}/admin/login/`,
         createdAt:new Date().toISOString(),
         status:'prepared',
-        instructions:'Comptes personnels. Adresse email à vérifier puis application d’authentification à activer. Les mots de passe seuls ne donnent pas accès aux contenus. Les emails initiaux sont capturés localement ; demander les vrais liens d’activation après raccordement SMTP.',
+        instructions:'Comptes personnels. Vérifiez votre adresse une première fois, puis connectez-vous par e-mail et mot de passe. Les liens de vérification se demandent sur la page de connexion du site.',
         accounts:credentials,
       };
       await accessFile.writeFile(JSON.stringify(handoff,null,2)+'\n','utf8');

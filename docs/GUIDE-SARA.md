@@ -2,25 +2,17 @@
 
 L’**Atelier éditorial Calas Conseil** est l’administration privée du site. Vous y modifiez les textes et les images, préparez vos articles et choisissez leur publication. Aucun compte Sanity, terminal ou outil de programmation n’est nécessaire.
 
-L’administration se trouve à l’adresse du site suivie de `/admin/`. Les évolutions du cahier des charges du 31 octobre, les photos fournies pour Sara et les nouveaux champs éditoriaux du 2 novembre sont disponibles sur l’[adresse Railway de préproduction](https://calas-web-test-production.up.railway.app/admin/). La photo de la femme rousse, initialement publiée, a ensuite été retirée à la demande de Paul. La reprise du lettrage du bandeau est en cours de vérification. Les captures ci-dessous montrent la version du 25 octobre : le compte « Recette Calas » et les articles « Recette » sont des tests, sans signature de Sara ou d’Agnès.
+Ouvrez [l’administration de Calas Conseil](https://www.calas-conseil.fr/admin/login/) pour accéder au site en production. Les captures d’écran du guide illustrent une version de recette avec des contenus de démonstration.
 
 ## Se connecter la première fois
 
-1. Ouvrez le lien d’invitation envoyé par votre administrateur. Il est personnel et valable 24 heures.
-2. Choisissez un mot de passe unique d’au moins 12 caractères, puis cliquez sur **Créer mon compte**.
-3. Ouvrez le message de vérification d’adresse email et validez votre adresse.
-4. Connectez-vous avec votre email et votre mot de passe. Dans **Compte et sécurité**, confirmez votre mot de passe puis cliquez sur **Configurer mon application**.
-5. Scannez le QR code dans votre application d’authentification, saisissez les six chiffres affichés et cliquez sur **Activer la protection**.
-6. Conservez vos **codes de secours** dans votre gestionnaire de mots de passe. Chaque code s’utilise une seule fois. **Enregistrer mes codes** permet aussi de les télécharger ; gardez ce fichier dans un endroit privé.
-7. Cliquez sur **Accéder à mes contenus**.
+Les comptes personnels de Sara, d’Agnès et de Paul sont déjà créés. Pour ces trois comptes, la connexion se fait avec l’adresse email personnelle et le mot de passe.
 
-Lors des connexions suivantes, le site demande votre mot de passe puis le code temporaire de votre application. Ne partagez jamais le QR code, le mot de passe ou les codes de secours.
+1. Ouvrez [l’écran de connexion](https://www.calas-conseil.fr/admin/login/). Saisissez l’adresse de votre compte et le mot de passe remis par Paul, puis cliquez sur **Continuer**.
+2. Si l’écran **Activer votre accès** apparaît, cliquez sur **Recevoir un lien**. Dans votre boîte personnelle, ouvrez le message de Calas Conseil et suivez le lien pour confirmer votre adresse. Pensez aux courriers indésirables si le message tarde à apparaître.
+3. Reconnectez-vous avec la même adresse et le même mot de passe. Le tableau de bord s’ouvre et vous pouvez choisir **Réflexions**.
 
-Le compte de recette réservé à Paul bénéficie d'une exception avec identifiant et mot de passe, uniquement sur la préproduction. Cela ne remplace pas la création de votre accès personnel et ne modifie pas la protection prévue pour les autres comptes.
-
-![L’écran de connexion](../artifacts/custom-cms/admin/login-1440.png)
-
-Les invitations et messages de vérification doivent être raccordés au service email avant la première utilisation réelle. La recette locale les reçoit dans une boîte de test ; aucun message de recette n’a été envoyé à Sara.
+Une fois votre adresse vérifiée, passez directement à la connexion lors de vos prochaines visites. Sara et Agnès peuvent publier les contenus. Paul dispose également de la gestion des utilisateurs.
 
 ## Retrouver ses contenus
 
@@ -136,11 +128,11 @@ Les versions facilitent les retours éditoriaux. Les sauvegardes de l’ensemble
 
 ## Retrouver son accès et se déconnecter
 
-**Mot de passe oublié ?** permet de demander un lien personnel. Changer le mot de passe ne supprime pas la double authentification. Si votre téléphone est indisponible, choisissez **Utiliser un code de secours**. Si vous n’avez plus ni application ni code, contactez votre administrateur pour la récupération.
+Sur l’écran de connexion, **Mot de passe oublié ?** permet de recevoir un lien dans votre boîte personnelle. Ouvrez-le, choisissez votre nouveau mot de passe, puis reconnectez-vous.
 
-Dans **Compte et sécurité**, vous pouvez changer votre mot de passe, renouveler les codes de secours et fermer des sessions ouvertes. Les anciens codes deviennent inutilisables après leur renouvellement. Terminez avec **Se déconnecter**, surtout sur un ordinateur partagé.
+Dans **Compte et sécurité**, vous pouvez modifier votre mot de passe et fermer des sessions ouvertes sur d’autres appareils. Terminez avec **Se déconnecter**, surtout sur un ordinateur partagé.
 
-La liste des sessions nécessite une connexion datant de moins de quinze minutes. Si le bouton **Se reconnecter** apparaît, cliquez dessus puis saisissez votre mot de passe et votre code de sécurité : vous reviendrez directement à **Compte et sécurité**. Vous pouvez continuer à travailler sur vos contenus.
+La liste des sessions nécessite une connexion datant de moins de quinze minutes. Si le bouton **Se reconnecter** apparaît, cliquez dessus puis saisissez votre adresse email et votre mot de passe. Vous reviendrez directement à **Compte et sécurité**.
 
 ## Première prise en main accompagnée
 

@@ -31,7 +31,7 @@ test('only the exact verified reserved recipe identity may omit MFA in staging',
   });
 });
 
-test('production, missing configuration and other environments require completed MFA',async()=>{
+test('the reserved recipe identity requires MFA outside its configured staging environment',async()=>{
   for(const environment of ['production','development','test','staging ',undefined])await withEnvironment({SITE_ENV:environment},()=>assert.equal(hasRequiredAuthentication(session),false));
   for(const target of ['',undefined,'another-account'])await withEnvironment({AUTH_TEST_PASSWORD_ONLY_USER_ID:target},()=>assert.equal(hasRequiredAuthentication(session),false));
   await withEnvironment({SITE_ENV:'production'},()=>{
@@ -39,6 +39,20 @@ test('production, missing configuration and other environments require completed
     assert.equal(hasRequiredAuthentication({...session,user:{...session.user,twoFactorEnabled:true},session:{mfaVerified:true}}),true);
     assert(configurationProblems().includes('AUTH_TEST_PASSWORD_ONLY_USER_ID interdit en production'));
   });
+});
+
+test('production password access checks both the named identity and a complete operator selection',async()=>{
+  const user={...identity,id:'sara-id',email:'saraserranocabeza@gmail.com',role:'editor'};
+  const allowed={SITE_ENV:'production',AUTH_PASSWORD_ONLY_USER_IDS:'sara-id, agnes-id, paul-id'};
+  const canAccess=(changes:Partial<typeof user>={})=>hasRequiredAuthentication({user:{...user,...changes},session:{mfaVerified:false}});
+  await withEnvironment(allowed,()=>{
+    assert(canAccess());
+    for(const changed of [{id:'unexpected-id'},{email:'outsider@example.test'},{role:'viewer'},{disabled:true},{emailVerified:false},{twoFactorEnabled:true}])assert.equal(canAccess(changed),false);
+  });
+  for(const selection of [undefined,'sara-id','sara-id,agnes-id,sara-id','sara-id,agnes-id,','sara-id,agnes-id,paul-id,another-id']){
+    await withEnvironment({...allowed,AUTH_PASSWORD_ONLY_USER_IDS:selection},()=>assert.equal(canAccess(),false));
+  }
+  await withEnvironment({...allowed,SITE_ENV:'staging'},()=>assert.equal(canAccess(),false));
 });
 
 test('server permission guards preserve anonymous, verification, suspension, role and production restrictions',async t=>{
