@@ -31,9 +31,33 @@ pnpm content:export
 pnpm content:export backups/calas-avant-migration.calas-backup
 ```
 
-La commande refuse d’écraser un fichier existant. Elle n’initialise ni ne publie de contenu. Une archive terminée doit être copiée, toujours chiffrée, dans un stockage privé indépendant de l’application et de son fournisseur principal. Garder la clé ailleurs. Aucun stockage distant de sauvegarde, coût ou planning automatique n’a été activé par cette livraison.
+La commande refuse d’écraser un fichier existant. Elle n’initialise ni ne publie de contenu. Une archive terminée doit être copiée, toujours chiffrée, dans un stockage privé indépendant de l’application et de son fournisseur principal. Garder la clé de récupération séparément des archives.
 
 Politique de rétention proposée à valider par l’exploitant : trente sauvegardes quotidiennes, douze hebdomadaires et douze mensuelles, plus une archive avant migration ou intervention sensible. Adapter cette conservation aux données privées et à la politique du cabinet. Supprimer les copies arrivées à échéance dans tous leurs emplacements.
+
+## Sauvegarde quotidienne hors Railway
+
+Le lanceur Windows fournit à `scripts/daily-backup.ts` un tunnel privé vers le PostgreSQL du projet Calas. Il transmet les identifiants de lecture S3, la clé `BACKUP_ENCRYPTION_KEY` utilisée pour la restauration, le nom du bucket attendu, les paramètres SSH et le chemin absolu `CALAS_BACKUP_DIR`. Ce répertoire dédié, avec droits restreints à l’opérateur, se trouve hors du code. Son sous-dossier `.work` peut contenir un dump et des octets en clair pendant l’écriture et la relecture ; il requiert les mêmes protections. Le PC, son disque et la connexion réseau doivent être disponibles pour exécuter la tâche.
+
+Chaque réussite produit `calas-daily-AAAA-MM-JJ.calas-backup` à la date de Paris. Avant de publier l’archive, le programme relit son contenu chiffré, vérifie son authenticité AES-GCM, la signature du format PostgreSQL et les empreintes de tous les fichiers. Un deuxième lancement le même jour contrôle de nouveau la copie existante. Une erreur ne supprime aucune copie de la veille. Un verrou PostgreSQL sérialise les tentatives concurrentes.
+
+Après validation, la rotation conserve les 30 dernières dates sauvegardées, la dernière copie de chacune des 12 dernières semaines représentées et celle de chacun des 12 derniers mois représentés. Une même archive peut remplir plusieurs de ces fonctions. Les archives de migration et celles dont le nom ne suit pas le format quotidien restent indépendantes. Pour restaurer, copier l’archive chiffrée sélectionnée dans le dossier privé `backups/`, fournir sa clé et utiliser la procédure de restauration isolée ci-dessous.
+
+Après un arrêt brutal, l’exécution suivante nettoie sous verrou ses propres fichiers temporaires identifiables. Elle laisse en place les exports manuels, les liens et les dossiers contenant un fichier inattendu. Le résultat du dernier essai est écrit dans `latest.json` (`running`, `ok` ou `failed`). Il contient des dates, une étape en cas d’échec et, en cas de succès, le nom, la taille, l’empreinte et le nombre d’objets. Un état bloqué sur `running` ou une date trop ancienne exige un contrôle de l’ordinateur et de sa tâche. L’exécuteur ne contacte aucun destinataire d’alerte.
+
+### Installer ou mettre à jour le programme Windows
+
+Sur le poste de Paul, depuis un checkout validé avec les dépendances verrouillées, exécuter `node scripts/backup-windows/build.mjs`. La commande affiche le répertoire du programme autonome. L’installateur en vérifie les empreintes et en installe une version privée indépendante des modifications du dépôt. Il s’utilise dans Windows PowerShell sous le compte qui détient la session CLI Railway et la clé SSH.
+
+```powershell
+.\scripts\backup-windows\install.ps1 -Bundle $dossierDuProgramme -RegisterTask
+```
+
+Pour une première installation ou un changement d’identifiants, fournir au processus les paramètres privés de la section précédente, `CALAS_BACKUP_PRIVATE_DATABASE_URL` (DSN interne), `CALAS_RAILWAY_BIN`, `CALAS_BACKUP_SSH_BIN`, `CALAS_BACKUP_SSH_KEY` et `NODE_BIN` (chemins absolus), puis ajouter `-Configure`. L’installateur protège ces valeurs avec Windows DPAPI pour l’utilisateur courant. Conserver séparément une copie de récupération de la clé d’archive : DPAPI est lié à la session Windows de ce poste.
+
+La tâche **Calas Conseil - sauvegarde quotidienne** est prévue à **09 h 00**, heure locale du poste réglé sur Paris, et à l’ouverture de la session de Paul. Elle relit la copie si la journée est déjà couverte et retente en cas d’échec. Un PC éteint ne produit pas d’archive ; la tâche peut reprendre à la prochaine ouverture de session avec Internet. Le fichier `%LOCALAPPDATA%\CalasConseil\archives\latest.json` donne l’état du dernier passage. Les notifications externes sont à convenir séparément.
+
+Le 9 novembre 2026, la première archive quotidienne (6 159 712 octets) a été restaurée dans PostgreSQL et MinIO isolés. Elle contenait 32 documents, 123 révisions, 6 comptes dont les 3 comptes nominatifs actifs, 12 médias et 48 objets. Les 48 empreintes et les références de publication ont été vérifiées. Le lancement de la tâche par le Planificateur Windows sous le compte de Paul a ensuite relu cette archive avec succès.
 
 ## Restaurer sans écraser un site
 

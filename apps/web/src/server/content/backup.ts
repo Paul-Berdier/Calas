@@ -1,30 +1,36 @@
 import { createHash } from 'node:crypto';
 import { spawn, execFile } from 'node:child_process';
 import { createReadStream, createWriteStream } from 'node:fs';
-import { mkdir, mkdtemp, readFile, readdir, rmdir, stat, unlink, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, open, readFile, readdir, rmdir, stat, unlink, writeFile } from 'node:fs/promises';
 import { basename, dirname, join, resolve, sep } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
+import type { PoolClient } from 'pg';
 import { getPool } from '../db';
 import { S3MediaStorage, type MediaStorage } from '../media/storage';
 import { backupKey, decryptArchive, encryptArchive, hashFile, inspectArchive, type ArchiveRecord, type BackupManifest } from './backup-archive';
 
 const root = fileURLToPath(new URL('../../../../../', import.meta.url));
+const defaultDirectory = resolve(root, 'backups');
 const exec = promisify(execFile);
 const checksum = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
 const mimeType = (key: string) => key.endsWith('.pdf') ? 'application/pdf' : key.endsWith('.jpg') ? 'image/jpeg' : key.endsWith('.png') ? 'image/png' : 'image/webp';
 const storageFromEnvironment = () => new S3MediaStorage({ endpoint: process.env.S3_ENDPOINT || '', region: process.env.S3_REGION || 'auto', bucket: process.env.S3_BUCKET || '', accessKeyId: process.env.S3_ACCESS_KEY_ID || '', secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '', forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true' });
 
-export function backupPath(path: string): string {
-  const directory = resolve(root, 'backups');
+export function backupPath(path: string, directory = defaultDirectory): string {
   const destination = resolve(root, path);
   if (!destination.startsWith(directory + sep) || !destination.endsWith('.calas-backup')) throw new Error('Choisissez un fichier .calas-backup dans le dossier privé backups/.');
   return destination;
 }
-async function workDirectory() { const parent = resolve(root, 'backups', '.work'); await mkdir(parent, { recursive: true, mode: 0o700 }); return mkdtemp(join(parent, 'backup-')); }
-async function cleanup(directory: string) {
-  const expected = resolve(root, 'backups', '.work') + sep;
+async function workDirectory(base = defaultDirectory) {
+  const parent = resolve(base, '.work');
+  await mkdir(parent, { recursive: true, mode: 0o700 });
+  // Keep scheduled work identifiable after a power loss, distinct from manual exports or restores.
+  return mkdtemp(join(parent, base === defaultDirectory ? 'backup-' : 'daily-work-'));
+}
+async function cleanup(directory: string, base = defaultDirectory) {
+  const expected = resolve(base, '.work') + sep;
   if (!directory.startsWith(expected)) throw new Error('Répertoire temporaire inattendu.');
   for (const name of await readdir(directory)) { const path = join(directory, name); if ((await stat(path)).isFile()) await unlink(path); else throw new Error('Sous-dossier temporaire inattendu.'); }
   await rmdir(directory);
@@ -65,12 +71,18 @@ async function postgresTool(tool: 'pg_dump' | 'pg_restore', args: string[], opti
   } finally { clearTimeout(timeout); if (child.exitCode === null) child.kill(); }
 }
 
-export async function createBackup(path: string, storage: MediaStorage = storageFromEnvironment()): Promise<BackupManifest> {
-  const target = backupPath(path);
+interface BackupOptions {
+  directory?: string;
+  client?: PoolClient;
+  dumpSnapshot?: (snapshot: string, output: string) => Promise<void>;
+}
+
+export async function createBackup(path: string, storage: MediaStorage = storageFromEnvironment(), options: BackupOptions = {}): Promise<BackupManifest> {
+  const target = backupPath(path, options.directory);
   const key = backupKey();
   await mkdir(dirname(target), { recursive: true, mode: 0o700 });
-  const directory = await workDirectory();
-  const client = await getPool().connect();
+  const client = options.client ?? await getPool().connect();
+  const directory = await workDirectory(options.directory).catch(error => { if (!options.client) client.release(); throw error; });
   try {
     await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ');
     // Prevent deletion/replacement of metadata while pg_dump and the object inventory are captured.
@@ -78,7 +90,8 @@ export async function createBackup(path: string, storage: MediaStorage = storage
     const { rows: snapshot } = await client.query<{ snapshot: string }>('SELECT pg_export_snapshot() AS snapshot');
     const { rows: version } = await client.query<{ server_version: string }>('SHOW server_version');
     const dump = join(directory, 'postgres.dump');
-    await postgresTool('pg_dump', ['--format=custom', '--no-owner', '--no-privileges', `--snapshot=${snapshot[0]!.snapshot}`], { output: dump });
+    if (options.dumpSnapshot) await options.dumpSnapshot(snapshot[0]!.snapshot, dump);
+    else await postgresTool('pg_dump', ['--format=custom', '--no-owner', '--no-privileges', `--snapshot=${snapshot[0]!.snapshot}`], { output: dump });
     const objects = await storage.list();
     if ((await stat(dump)).size > 2 * 1024 ** 3 || objects.reduce((size, object) => size + object.size + 16_384, (await stat(dump)).size) > 5 * 1024 ** 3) throw new Error('Le volume dépasse la limite du format de sauvegarde ; aucune archive complète ne sera annoncée.');
     const { rows: mediaRows } = await client.query<{ storage_key: string; metadata: { variants?: Array<{ key: string }>; retiredKeys?: string[] } }>('SELECT storage_key, metadata FROM media');
@@ -105,7 +118,25 @@ export async function createBackup(path: string, storage: MediaStorage = storage
     ], key);
     return manifest;
   } catch (error) { await client.query('ROLLBACK').catch(() => undefined); throw error; }
-  finally { client.release(); await cleanup(directory); }
+  finally { if (!options.client) client.release(); await cleanup(directory, options.directory); }
+}
+
+/** Reopen the encrypted bytes on disk, authenticate, and hash every embedded record. */
+export async function verifyBackup(path: string, base = defaultDirectory): Promise<BackupManifest> {
+  const archive = backupPath(path, base);
+  const directory = await workDirectory(base);
+  try {
+    const plain = join(directory, 'verified.records');
+    await decryptArchive(archive, plain);
+    const { manifest, records } = await inspectArchive(plain, index => join(directory, `checked-${index}.bin`));
+    const dump = await open(records[1]!.path, 'r');
+    try {
+      const signature = Buffer.alloc(5);
+      await dump.read(signature, 0, signature.length, 0);
+      if (signature.toString('ascii') !== 'PGDMP') throw new Error('Format du dump PostgreSQL invalide.');
+    } finally { await dump.close(); }
+    return manifest;
+  } finally { await cleanup(directory, base); }
 }
 
 export async function restoreBackup(path: string, storage: MediaStorage = storageFromEnvironment()): Promise<BackupManifest> {

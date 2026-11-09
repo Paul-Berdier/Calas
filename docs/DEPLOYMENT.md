@@ -12,6 +12,12 @@ Les routes publiques, les mentions légales, l’administration, le sitemap, le 
 
 La sauvegarde chiffrée prise avant modification a été restaurée dans des services isolés (29 documents, 83 révisions et 28 objets S3 contrôlés par empreinte). Les accès au fichier de remise et aux sauvegardes sont restreints à l’opérateur.
 
+### Correctif du 9 novembre
+
+Le commit `54012f1911f3a5a49dfb9e403455a6119e7a0a96` est déployé sur Railway (`43bf0c39-a5dd-4431-bf80-6e18d8f4e3fd`). Diagnostic utilise `/diagnostic-rps/` comme adresse publique. Les requêtes GET et HEAD sans barre finale renvoient une redirection permanente 308 ; les paramètres sont conservés. La page canonique et le contrôle de disponibilité ont répondu 200 sur le domaine public.
+
+Le chargeur historique de Drizzle utilise esbuild 0.25.12. L’installation avec le verrou figé et `pnpm audit --prod` sont vérifiés. Les sauvegardes quotidiennes sont gérées depuis le poste de l’opérateur : voir [la procédure de sauvegarde](BACKUP.md#sauvegarde-quotidienne-hors-railway).
+
 ## Démarrage local
 
 Utiliser Node **24.19.0**, pnpm **11.25.0** et Docker Desktop. Depuis la racine du dépôt :
