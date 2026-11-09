@@ -1,2 +1,3 @@
 # Preserve PDF byte offsets when checking out on Windows.
 *.pdf binary
+infra/monitor/entrypoint.sh text eol=lf

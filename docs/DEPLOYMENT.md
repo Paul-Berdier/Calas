@@ -13,6 +13,12 @@ Le projet Railway et sa facturation restent sur le compte de Paul pendant cette 
 5. **Basculer www et vérifier depuis Internet.** Relever la cible et le TTL actuels chez OVH. Remplacer l'enregistrement web de `www` par la destination OVH retenue, en évitant tout conflit entre CNAME et A/AAAA. Conserver les enregistrements MX, SPF, DKIM et DMARC et le périmètre actuel du domaine racine. Contrôler HTTPS, pages, médias, canonicals, sitemap, connexion et formulaires depuis l'extérieur. Un envoi réel de recette nécessite son autorisation. Actualiser les informations d'hébergement et de confidentialité au moment où l'hébergeur effectif change.
 6. **Prévoir le retour.** Garder l'ancienne origine en lecture seule pendant la propagation et conserver l'export de bascule. Si OVH a accepté des écritures, les récupérer et les vérifier avant de rediriger les visiteurs vers Railway. Après validation par le cabinet et contrôle d'une sauvegarde récente côté OVH, Paul peut organiser la fermeture des services Railway et vérifier la fin de leur facturation.
 
+## Exploitation sur Railway pendant la transition vers OVH
+
+Le déploiement de l’application, le job de sauvegarde et la sonde utilisent des services et des commandes distincts. Lors du transfert vers OVH, vérifier une sauvegarde et son alerte sur la nouvelle infrastructure avant d’arrêter les jobs Railway. [Exploitation des sauvegardes et des alertes](BACKUP.md#sauvegarde-hébergée-et-alertes)
+
+Pour vérifier le paquet d’un job, utiliser `node scripts/deploy-railway-job.mjs backup <SHA-Git-complet> --check`, ou remplacer `backup` par `monitor`. Pour publier cette version sur le service correspondant, utiliser `--deploy` avec une CLI Railway connectée au projet Calas. Le paquet contient les fichiers suivis du commit et place la configuration du job à sa racine. Le nom du déploiement reprend le SHA. Après publication, contrôler l’horaire, l’exécution et les journaux du service choisi.
+
 ## Mise en production du 9 novembre 2026
 
 Le déploiement `5831b6e2-6fb1-463f-aaad-e78c274181fc` utilise le commit applicatif `0c54166311cfa2827f322adbcace6032cc4d9770`. Le certificat TLS et la propriété du domaine **www.calas-conseil.fr** sont validés par Railway. L’ancienne adresse Railway redirige les pages publiques vers le même chemin sur le domaine canonique. Seul le domaine avec www fait partie de ce lancement.

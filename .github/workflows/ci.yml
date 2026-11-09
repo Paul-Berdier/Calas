@@ -42,6 +42,7 @@ jobs:
       - run: pnpm test:domain
       - run: pnpm test:integration
       - run: node --test tests/database-role.test.mjs
+      - run: node --test tests/monitor.test.mjs
       - run: pnpm --filter @calas/web exec tsx --test ../../tests/proxy-origin.test.ts
       - run: pnpm --filter @calas/web exec tsx --test ../../tests/auth-test-access.test.ts ../../tests/auth-password-only-production.test.ts
       - run: pnpm --filter @calas/web exec tsx --test ../../tests/home-correction.test.ts ../../tests/brief-correction.test.ts ../../tests/editorial-correction.test.ts ../../tests/brief-database.test.ts ../../tests/home-visuals.test.ts

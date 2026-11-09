@@ -70,7 +70,7 @@ Le contact conserve validation, contrôle d’origine, honeypot, simulation et S
 - [Architecture et sécurité](docs/ARCHITECTURE.md)
 - [CMS et accès](docs/CMS.md)
 - [Médias et PDF](docs/MEDIA.md)
-- [Sauvegarde/restauration](docs/BACKUP.md)
+- [Sauvegarde quotidienne hébergée, alertes par e-mail et restauration](docs/BACKUP.md#sauvegarde-hébergée-et-alertes)
 - [Déploiement Railway préparé](docs/DEPLOYMENT.md)
 - [Guide de Sara](docs/GUIDE-SARA.md)
 - [Migration et référence conservée](docs/MIGRATION.md)

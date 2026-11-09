@@ -23,6 +23,14 @@ Le mode Docker de développement emploie `BACKUP_POSTGRES_CONTAINER=calas-develo
 
 ## Exporter
 
+### Reprendre une archive depuis un autre poste
+
+L’opérateur a besoin de l’archive chiffrée, de sa clé `BACKUP_ENCRYPTION_KEY`, du dépôt à la révision indiquée dans le manifeste et de deux destinations de restauration vides (PostgreSQL et stockage S3). Pour remettre les comptes en service, reprendre également les secrets d’application selon la procédure de déploiement. Conserver la clé de récupération dans un coffre auquel le cabinet ou son opérateur peut accéder même si l’ordinateur habituel est indisponible.
+
+Télécharger l’archive depuis le stockage privé dans le dossier local `backups/` avec une session d’exploitation autorisée, puis suivre la procédure « Restaurer » ci-dessous. Le contrôle d’intégrité porte sur le fichier téléchargé. Valider les documents, les comptes et les empreintes des médias en environnement isolé avant de basculer le site.
+
+### Export manuel
+
 Depuis la racine du dépôt, après configuration de PostgreSQL et S3 :
 
 ```powershell
@@ -35,7 +43,23 @@ La commande refuse d’écraser un fichier existant. Elle n’initialise ni ne p
 
 Politique de rétention proposée à valider par l’exploitant : trente sauvegardes quotidiennes, douze hebdomadaires et douze mensuelles, plus une archive avant migration ou intervention sensible. Adapter cette conservation aux données privées et à la politique du cabinet. Supprimer les copies arrivées à échéance dans tous leurs emplacements.
 
-## Sauvegarde quotidienne hors Railway
+## Sauvegarde hébergée et alertes
+
+`Calas-Backup` est un job Railway privé. Sa planification quotidienne est `0 6 * * *`, soit **7 h en hiver, 8 h en été** en France métropolitaine. Le processus exporte PostgreSQL et les objets du stockage des médias, chiffre l’archive et la dépose dans un deuxième bucket privé. Il relit ensuite l’objet distant, vérifie les empreintes et l’intégrité du dump. La rotation intervient après cette vérification et conserve les 30 dernières dates ainsi que les dernières captures de 12 semaines et de 12 mois. Une nouvelle exécution le même jour UTC vérifie et réutilise une copie du jour déjà valide.
+
+Le bucket des archives contient les objets `daily/calas-daily-AAAA-MM-JJ.calas-backup` et le dernier état vérifié dans `status/latest.json`. Le service web n’a pas besoin des accès à ce bucket. Pour restaurer sur un autre hébergement, télécharger l’archive en privé et suivre la procédure de restauration plus bas. Le manifeste utilise les fichiers de migration de la version installée. Si la révision du site n’a pas été fournie au job, retrouver le commit du **service web** à l’heure de la capture dans l’historique Railway.
+
+Un stockage privé distinct des archives reçoit les signaux techniques `backup/success.json` et `backup/failure.json`. `Calas-Monitor` consulte ces signaux toutes les cinq minutes depuis une autre région Railway. Il contrôle aussi le contenu de l’accueil HTTPS et la réponse de `/api/ready/`, qui vérifie PostgreSQL et le stockage des médias. Deux contrôles consécutifs en échec ouvrent un incident pour le site. Un échec explicite de sauvegarde est signalé au passage suivant. Si la confirmation de l’archive du jour manque à **07 h UTC** (8 h en hiver, 9 h en été à Paris), la sonde peut ainsi signaler un job qui n’a pas démarré.
+
+La sonde utilise la messagerie OVH et le destinataire opérateur `MONITOR_ALERT_EMAIL`. Un rétablissement déclenche une notification. Son volume persistant mémorise les incidents et les messages acceptés par le serveur SMTP. En cas de refus ou de coupure SMTP, le message reste en attente pour le prochain passage. En cas de perte de la réponse SMTP après envoi, une nouvelle remise reste possible.
+
+Si le site est signalé en panne, ouvrir le domaine puis consulter l’état du service web, de PostgreSQL et du stockage sur Railway. En cas d’alerte de sauvegarde, comparer la dernière exécution de `Calas-Backup` avec le marqueur et l’archive distante, puis relancer le job après correction. La sonde et les archives dépendent du même fournisseur que le site. Une indisponibilité de tout Railway peut aussi empêcher l’envoi des alertes. Le transfert vers OVH devra prévoir une nouvelle destination de sauvegarde et un nouveau point d’exécution pour la sonde.
+
+<a id="sauvegarde-quotidienne-hors-railway"></a>
+
+## Copie supplémentaire sur Windows
+
+La tâche historique peut continuer à produire une copie hors du compte Railway lorsque le poste est disponible. L’archive hébergée et son contrôle par e-mail fonctionnent indépendamment de cette copie supplémentaire. Garder au moins une clé de récupération et une copie valide hors du projet Railway.
 
 Le lanceur Windows fournit à `scripts/daily-backup.ts` un tunnel privé vers le PostgreSQL du projet Calas. Il transmet les identifiants de lecture S3, la clé `BACKUP_ENCRYPTION_KEY` utilisée pour la restauration, le nom du bucket attendu, les paramètres SSH et le chemin absolu `CALAS_BACKUP_DIR`. Ce répertoire dédié, avec droits restreints à l’opérateur, se trouve hors du code. Son sous-dossier `.work` peut contenir un dump et des octets en clair pendant l’écriture et la relecture ; il requiert les mêmes protections. Le PC, son disque et la connexion réseau doivent être disponibles pour exécuter la tâche.
 
