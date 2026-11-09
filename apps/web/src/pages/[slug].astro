@@ -9,6 +9,9 @@ import EditorialSymbol from '../components/EditorialSymbol.astro';
 import Registration from '../components/Registration.astro';
 import {getSiteContent} from '../lib/cms/client';
 import '../styles/editorial.css';
+if (Astro.url.pathname === '/diagnostic-rps' && ['GET', 'HEAD'].includes(Astro.request.method)) {
+  return Astro.redirect('/diagnostic-rps/' + Astro.url.search, 308);
+}
 const {settings,pages,people,home}=await getSiteContent(Astro);
 const page=pages.find(p=>p.slug===Astro.params.slug);
 if(!page) return Astro.rewrite('/404/');

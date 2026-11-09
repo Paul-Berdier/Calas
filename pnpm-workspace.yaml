@@ -7,3 +7,5 @@ allowBuilds:
   tesseract.js: false
 overrides:
   '@opentelemetry/api': 1.9.0
+  # Drizzle's legacy TypeScript loader still requests the vulnerable esbuild 0.18.
+  '@esbuild-kit/core-utils@3.3.2>esbuild': 0.25.12

@@ -2,6 +2,16 @@ import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 const paths=['/','/diagnostic-rps/','/equipes/','/managers/','/situations-sensibles/','/notre-approche/','/qui-sommes-nous/','/reflexions/','/contact/','/mentions-legales/','/confidentialite/'];
+test('Diagnostic has one public URL and preserves the query when redirecting', async ({request}) => {
+  const search = '?utm_source=lettre%20Calas&tag=1&tag=2';
+  for (const method of ['GET', 'HEAD']) {
+    const response = await request.fetch('/diagnostic-rps' + search, {method, maxRedirects: 0});
+    expect(response.status()).toBe(308);
+    const location = new URL(response.headers().location, response.url());
+    expect(location.href).toBe(new URL('/diagnostic-rps/' + search, response.url()).href);
+    expect((await request.fetch(location.href, {method, maxRedirects: 0})).status()).toBe(200);
+  }
+});
 test('all editorial routes render, one H1, internal links and clean runtime',async({page,request})=>{
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));page.on('response',response=>{if(response.status()>=400)errors.push(`${response.status()} ${response.url()}`);});
   const links=new Set<string>();
