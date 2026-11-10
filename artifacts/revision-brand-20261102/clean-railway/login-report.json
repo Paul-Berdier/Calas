@@ -1,0 +1,90 @@
+{
+  "checkedAt": "2026-11-02T21:28:44.902Z",
+  "anonymous": true,
+  "authenticationPerformed": false,
+  "results": [
+    {
+      "width": 390,
+      "status": 200,
+      "title": "Administration — Calas Conseil",
+      "url": "https://calas-web-test-production.up.railway.app/admin/login/",
+      "viewport": {
+        "width": 390,
+        "height": 900,
+        "scrollWidth": 390
+      },
+      "images": [
+        {
+          "src": "https://calas-web-test-production.up.railway.app/brand/wordmark.svg?v=clean-curves-20261102",
+          "alt": "Calas Conseil",
+          "widthAttr": "680",
+          "heightAttr": "91",
+          "naturalWidth": 680,
+          "naturalHeight": 91,
+          "complete": true,
+          "box": {
+            "x": 20,
+            "y": 20,
+            "width": 160,
+            "height": 21.328125
+          },
+          "overflow": false
+        }
+      ],
+      "forms": 1,
+      "headings": [
+        "Vos idées.Votre voix.Votre site.",
+        "Se connecter"
+      ],
+      "pageErrors": [],
+      "requestFailures": [],
+      "httpErrors": []
+    },
+    {
+      "width": 1440,
+      "status": 200,
+      "title": "Administration — Calas Conseil",
+      "url": "https://calas-web-test-production.up.railway.app/admin/login/",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "scrollWidth": 1440
+      },
+      "images": [
+        {
+          "src": "https://calas-web-test-production.up.railway.app/brand/wordmark.svg?v=clean-curves-20261102",
+          "alt": "Calas Conseil",
+          "widthAttr": "680",
+          "heightAttr": "91",
+          "naturalWidth": 680,
+          "naturalHeight": 91,
+          "complete": true,
+          "box": {
+            "x": 72,
+            "y": 24,
+            "width": 240,
+            "height": 32
+          },
+          "overflow": false
+        }
+      ],
+      "forms": 1,
+      "headings": [
+        "Vos idées.Votre voix.Votre site.",
+        "Se connecter"
+      ],
+      "pageErrors": [],
+      "requestFailures": [],
+      "httpErrors": []
+    }
+  ],
+  "visualReview": {
+    "passed": true,
+    "notes": [
+      "Logo clair examiné aux tailles affichées : 160 × 21.33 px sur mobile et 240 × 32 px sur ordinateur.",
+      "Courbes régulières et nom lisible ; aucun caractère coupé ni débordement horizontal.",
+      "Couleurs bleu marine et or sur fond clair conformes à la variante claire.",
+      "Formulaire laissé vide ; aucune authentification ni soumission."
+    ]
+  }
+}

@@ -59,6 +59,13 @@
 .contact-sheet .form-submit[aria-busy=true]{cursor:wait}
 .contact-sheet .form-privacy{font:12px/1.7 Arial,sans-serif;margin:15px 0 0;color:var(--muted)}
 .contact-sheet .form-status{font:14px/1.6 Arial,sans-serif;margin-bottom:25px;padding:17px 18px}
+.contact-hours{font:13px/1.6 Arial,sans-serif;color:var(--muted);margin-top:12px}
+.contact-sheet .contact-consent{margin:0 0 24px}
+.contact-sheet .contact-consent label{display:flex;align-items:flex-start;gap:13px;font:13px/1.65 Arial,sans-serif;cursor:pointer}
+.contact-sheet .contact-consent input[type=checkbox]{flex:0 0 22px;width:22px;height:22px;min-height:22px;padding:0;margin-top:3px;accent-color:var(--navy)}
+.contact-sheet .contact-consent label>span{min-width:0}
+.contact-sheet .contact-consent a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.contact-sheet .form-response-time{font:13px/1.6 Arial,sans-serif;margin-top:17px;color:var(--muted)}
 
 /* Réflexions: a small journal, honest about what is ready to be read. */
 .journal-opening{padding-top:36px}

@@ -1,0 +1,112 @@
+{
+  "base": "http://localhost:4336",
+  "at": "2026-10-25T09:23:22.590Z",
+  "cases": [
+    {
+      "width": 360,
+      "device": "ordinateur",
+      "viewport": 1280,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 360,
+      "device": "tablette",
+      "viewport": 768,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 360,
+      "device": "mobile",
+      "viewport": 390,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "device": "ordinateur",
+      "viewport": 1280,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "device": "tablette",
+      "viewport": 768,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "device": "mobile",
+      "viewport": 390,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "device": "ordinateur",
+      "viewport": 1280,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "device": "tablette",
+      "viewport": 768,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "device": "mobile",
+      "viewport": 390,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 1280,
+      "device": "ordinateur",
+      "viewport": 1280,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 1280,
+      "device": "tablette",
+      "viewport": 768,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 1280,
+      "device": "mobile",
+      "viewport": 390,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "device": "ordinateur",
+      "viewport": 1280,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "device": "tablette",
+      "viewport": 768,
+      "insideContainer": true,
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "device": "mobile",
+      "viewport": 390,
+      "insideContainer": true,
+      "violations": []
+    }
+  ],
+  "errors": []
+}

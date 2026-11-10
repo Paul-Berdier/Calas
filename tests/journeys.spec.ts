@@ -1,7 +1,23 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import {linkedinArticles} from '../apps/web/src/lib/cms/linkedin-articles';
 
-const paths=['/','/diagnostic-rps/','/equipes/','/managers/','/notre-approche/','/qui-sommes-nous/','/reflexions/','/contact/','/mentions-legales/','/confidentialite/'];
+const paths=['/','/diagnostic-rps/','/equipes/','/managers/','/situations-sensibles/','/notre-approche/','/qui-sommes-nous/','/reflexions/','/contact/','/mentions-legales/','/confidentialite/'];
+test('public pages redirect GET and HEAD to their canonical slash with the original query', async ({request}) => {
+  const search = '?utm_source=lettre%20Calas&tag=1&tag=2';
+  const routes = [...paths.slice(1), `/reflexions/${linkedinArticles[0]!.slug}/`];
+  for (const path of routes) {
+    for (const method of ['GET', 'HEAD']) {
+      const response = await request.fetch(path.slice(0,-1) + search, {method, maxRedirects: 0});
+      expect(response.status(), `${method} ${path}`).toBe(308);
+      const location = new URL(response.headers().location, response.url());
+      expect(location.href).toBe(new URL(path + search, response.url()).href);
+      expect((await request.fetch(location.href, {method, maxRedirects: 0})).status()).toBe(200);
+    }
+  }
+  expect((await request.get('/page-absente-audit', {maxRedirects:0})).status()).toBe(404);
+  expect((await request.get('/sitemap.xml', {maxRedirects:0})).status()).not.toBe(308);
+});
 test('all editorial routes render, one H1, internal links and clean runtime',async({page,request})=>{
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));page.on('response',response=>{if(response.status()>=400)errors.push(`${response.status()} ${response.url()}`);});
   const links=new Set<string>();
@@ -10,7 +26,7 @@ test('all editorial routes render, one H1, internal links and clean runtime',asy
   expect(errors).toEqual([]);
 });
 test('all offer contact subjects survive reload and new tab',async({page,context})=>{
-  for(const [path,subject]of [['/diagnostic-rps/','diagnostic'],['/equipes/','equipes'],['/managers/','managers']]){
+  for(const [path,subject]of [['/diagnostic-rps/','diagnostic'],['/equipes/','equipes'],['/managers/','managers'],['/situations-sensibles/','sensible']]){
     await page.goto(path);const href=await page.locator(`a[href="/contact/?objet=${subject}"]`).first().getAttribute('href');expect(href).toBeTruthy();await page.locator(`a[href="/contact/?objet=${subject}"]`).first().click();await expect(page.locator('#subject')).toHaveValue(subject);await page.reload();await expect(page.locator('#subject')).toHaveValue(subject);const other=await context.newPage();await other.goto(href!);await expect(other.locator('#subject')).toHaveValue(subject);await other.close();
   }
 });
@@ -18,19 +34,37 @@ test('mobile keyboard menu, skip link and escape',async({page})=>{
   await page.setViewportSize({width:390,height:844});await page.goto('/');await page.keyboard.press('Tab');await expect(page.getByRole('link',{name:'Aller au contenu'})).toBeFocused();await page.keyboard.press('Enter');await expect(page.locator('#contenu')).toBeFocused();const summary=page.locator('#mobile-menu summary');await summary.focus();await page.keyboard.press('Enter');await expect(summary).toHaveAttribute('aria-expanded','true');await page.keyboard.press('Tab');await expect(page.locator('#mobile-panel a').first()).toBeFocused();await page.keyboard.press('Escape');await expect(summary).toBeFocused();await expect(summary).toHaveAttribute('aria-expanded','false');
 });
 test('server errors are associated; corrected form has actual simulated success',async({page})=>{
-  await page.goto('/contact/?objet=diagnostic');await page.getByRole('button',{name:'Envoyer ma demande'}).click();await expect(page.locator('#name')).toHaveAttribute('aria-invalid','true');await expect(page.locator('#error-email')).toContainText('valide');await expect(page.locator('#name')).toBeFocused();await page.locator('#name').fill('Recette Calas');await page.locator('#email').fill('recette@example.test');await page.locator('#message').fill('Demande de recette du diagnostic, sans donnée réelle.');await page.getByRole('button',{name:'Réessayer l’envoi'}).click();await expect(page.locator('#form-status')).toContainText('Aucun courriel');await expect(page.locator('.form-submit')).toBeDisabled();await expect(page.locator('#subject')).toHaveValue('diagnostic');
+  await page.goto('/contact/?objet=diagnostic');await page.getByRole('button',{name:'Envoyer ma demande'}).click();await expect(page.locator('#name')).toHaveAttribute('aria-invalid','true');await expect(page.locator('#error-email')).toContainText('valide');await expect(page.locator('#error-consent')).not.toBeEmpty();await expect(page.locator('#name')).toBeFocused();await page.locator('#name').fill('Recette Calas');await page.locator('#email').fill('recette@example.test');await page.locator('#consent').check();await page.locator('#message').fill('Demande de recette du diagnostic, sans donnée réelle.');await page.getByRole('button',{name:'Réessayer l’envoi'}).click();await expect(page.locator('#form-status')).toContainText('Aucun courriel');await expect(page.locator('.form-submit')).toBeDisabled();await expect(page.locator('#subject')).toHaveValue('diagnostic');
+});
+test('sensitive contact requires a fresh agreement and accepts optional professional details',async({page})=>{
+  await page.goto('/contact/?objet=situations-sensibles');
+  await expect(page.locator('#subject')).toHaveValue('sensible');
+  await expect(page.locator('#consent')).not.toBeChecked();
+  await page.locator('#name').fill('Recette Calas');
+  await page.locator('#email').fill('recette@example.test');
+  await page.locator('#jobTitle').fill('Responsable RH');
+  await page.locator('#phone').fill('06 43 16 83 81');
+  await page.locator('#message').fill('Demande de recette pour une situation sensible, sans donnée réelle.');
+  await page.locator('.form-submit').click();
+  await expect(page.locator('#error-consent')).not.toBeEmpty();
+  await expect(page.locator('#consent')).toBeFocused();
+  await expect(page.locator('#jobTitle')).toHaveValue('Responsable RH');
+  await expect(page.locator('#phone')).toHaveValue('06 43 16 83 81');
+  await page.locator('#consent').check();
+  await page.locator('.form-submit').click();
+  await expect(page.locator('#form-status')).toContainText('Aucun courriel');
 });
 test('transport outage keeps fields and permits retry without false success',async({page})=>{
-  await page.goto('http://127.0.0.1:4325/contact/?objet=equipes');await page.locator('#name').fill('Recette Calas');await page.locator('#email').fill('recette@example.test');await page.locator('#message').fill('Un message de recette sans information personnelle.');await page.locator('.form-submit').click();await expect(page.locator('#form-status')).toContainText('indisponible');await expect(page.locator('#message')).toHaveValue('Un message de recette sans information personnelle.');await expect(page.locator('#subject')).toHaveValue('equipes');await expect(page.locator('.form-submit')).toBeEnabled();await expect(page.locator('#form-status')).not.toHaveClass(/success/);
+  await page.goto('http://127.0.0.1:4325/contact/?objet=equipes');await page.locator('#name').fill('Recette Calas');await page.locator('#email').fill('recette@example.test');await page.locator('#consent').check();await page.locator('#message').fill('Un message de recette sans information personnelle.');await page.locator('.form-submit').click();await expect(page.locator('#form-status')).toContainText('indisponible');await expect(page.locator('#message')).toHaveValue('Un message de recette sans information personnelle.');await expect(page.locator('#subject')).toHaveValue('equipes');await expect(page.locator('.form-submit')).toBeEnabled();await expect(page.locator('#form-status')).not.toHaveClass(/success/);
 });
 test('double click produces one request; timeout and network preserve input',async({page})=>{
-  await page.goto('/contact/');await page.locator('#name').fill('Recette Calas');await page.locator('#email').fill('recette@example.test');await page.locator('#message').fill('Demande test conservée après une coupure de réseau.');let calls=0;await page.route('**/contact/',async route=>{if(route.request().method()==='POST'){calls++;await route.abort('failed');}else await route.continue();});await page.locator('.form-submit').dblclick({force:true});await expect(page.locator('#form-status')).toContainText('interrompue');expect(calls).toBe(1);await expect(page.locator('#message')).toHaveValue('Demande test conservée après une coupure de réseau.');
+  await page.goto('/contact/');await page.locator('#name').fill('Recette Calas');await page.locator('#email').fill('recette@example.test');await page.locator('#consent').check();await page.locator('#message').fill('Demande test conservée après une coupure de réseau.');let calls=0;await page.route('**/contact/',async route=>{if(route.request().method()==='POST'){calls++;await route.abort('failed');}else await route.continue();});await page.locator('.form-submit').dblclick({force:true});await expect(page.locator('#form-status')).toContainText('interrompue');expect(calls).toBe(1);await expect(page.locator('#message')).toHaveValue('Demande test conservée après une coupure de réseau.');
 });
 test('site and form remain usable without javascript',async({browser})=>{
-  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const page=await context.newPage();await page.goto('http://127.0.0.1:4322/');await expect(page.locator('h1')).toBeVisible();await page.locator('#mobile-menu summary').click();await expect(page.locator('#mobile-panel')).toBeVisible();await page.goto('http://127.0.0.1:4322/contact/?objet=managers');await page.locator('#name').fill('Recette sans script');await page.locator('#message').fill('Une demande sans JavaScript doit conserver les valeurs.');await page.locator('.form-submit').click();await expect(page.locator('#subject')).toHaveValue('managers');await expect(page.locator('#name')).toHaveValue('Recette sans script');await expect(page.locator('#error-email')).toContainText('valide');await page.locator('#email').fill('recette@example.test');await page.locator('.form-submit').click();await expect(page.locator('#form-status')).toContainText('Aucun courriel');await context.close();
+  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const page=await context.newPage();await page.goto('http://127.0.0.1:4322/');await expect(page.locator('h1')).toBeVisible();await page.locator('#mobile-menu summary').click();await expect(page.locator('#mobile-panel')).toBeVisible();await page.goto('http://127.0.0.1:4322/contact/?objet=managers');await page.locator('#name').fill('Recette sans script');await page.locator('#message').fill('Une demande sans JavaScript doit conserver les valeurs.');await page.locator('.form-submit').click();await expect(page.locator('#subject')).toHaveValue('managers');await expect(page.locator('#name')).toHaveValue('Recette sans script');await expect(page.locator('#error-email')).toContainText('valide');await page.locator('#email').fill('recette@example.test');await page.locator('#consent').check();await page.locator('.form-submit').click();await expect(page.locator('#form-status')).toContainText('Aucun courriel');await context.close();
 });
 test('timeout preserves input and exposes a retry action',async({page})=>{
-  await page.clock.install();await page.goto('/contact/?objet=managers');await page.locator('#name').fill('Recette Calas');await page.locator('#email').fill('recette@example.test');await page.locator('#message').fill('Une réponse trop lente doit laisser ce message intact.');
+  await page.clock.install();await page.goto('/contact/?objet=managers');await page.locator('#name').fill('Recette Calas');await page.locator('#email').fill('recette@example.test');await page.locator('#consent').check();await page.locator('#message').fill('Une réponse trop lente doit laisser ce message intact.');
   await page.route('**/contact/',async route=>{if(route.request().method()!=='POST')await route.continue();});
   await page.locator('.form-submit').click();await expect(page.locator('.form-submit')).toBeDisabled();await page.clock.fastForward(15001);await expect(page.locator('#form-status')).toContainText('délai de réponse est dépassé');await expect(page.locator('#subject')).toHaveValue('managers');await expect(page.locator('#message')).toHaveValue('Une réponse trop lente doit laisser ce message intact.');await expect(page.locator('.form-submit')).toBeEnabled();
 });
@@ -40,7 +74,7 @@ test('404, private headers, unknown draft and controlled CMS outage',async({page
 test('axe on priority pages, menu and contact errors',async({page})=>{
   for(const width of [1280,390]){
     await page.setViewportSize({width,height:900});
-    for(const path of ['/','/diagnostic-rps/','/contact/']){await page.goto(path);const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();expect(result.violations,JSON.stringify(result.violations,null,2)).toEqual([]);}
+    for(const path of ['/','/diagnostic-rps/','/contact/']){await page.goto(path);const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();expect(result.violations,JSON.stringify(result.violations,null,2)).toEqual([]);}
   }
-  await page.locator('.form-submit').click();await expect(page.locator('#error-name')).not.toBeEmpty();expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);
+  await page.locator('.form-submit').click();await expect(page.locator('#error-name')).not.toBeEmpty();expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);
 });

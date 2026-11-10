@@ -1,0 +1,1 @@
+ALTER TABLE "media" ADD CONSTRAINT "media_created_by_auth_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."auth_user"("id") ON DELETE restrict ON UPDATE no action;

@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-11-02",
+  "sourceBrief": "CORRECTIONS SITE AU 02-11.pdf",
+  "assets": [
+    {
+      "key": "calmFace",
+      "placement": "home.visuals.calmFace",
+      "photographer": "Anna Blake",
+      "provider": "Unsplash",
+      "sourceUrl": "https://unsplash.com/photos/serene-woman-with-closed-eyes-embracing-herself-in-sunlight-hMn55KZIoiY",
+      "license": "Unsplash License",
+      "licenseUrl": "https://unsplash.com/license",
+      "licenseVerifiedAt": "2026-11-02",
+      "alt": "Une femme, les yeux fermés, profite de la lumière naturelle en extérieur.",
+      "hotspot": {
+        "x": 0.56,
+        "y": 0.36
+      },
+      "width": 1800,
+      "height": 2400,
+      "sha256": "ce0e651cea7f40dad061bd468111f849e919e5100d9e1a620a781e91d43e4538",
+      "illustrative": true
+    },
+    {
+      "key": "closing",
+      "placement": "home.visuals.closing",
+      "photographer": "Christina Morillo",
+      "provider": "Pexels",
+      "sourceUrl": "https://www.pexels.com/photo/photography-of-women-talking-to-each-other-1181717/",
+      "license": "Pexels License",
+      "licenseUrl": "https://www.pexels.com/license/",
+      "licenseVerifiedAt": "2026-11-02",
+      "alt": "Deux collègues échangent en souriant autour d’une table, dans un bureau lumineux.",
+      "hotspot": {
+        "x": 0.5,
+        "y": 0.4
+      },
+      "width": 1800,
+      "height": 1200,
+      "sha256": "52586836cbc364590cbc7273919841863708068d92900ba52d25545e11dcc7be",
+      "illustrative": true
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "environment": "http://localhost:4336",
+  "realServices": [
+    "Astro",
+    "Better Auth session + MFA",
+    "PostgreSQL",
+    "S3 compatible MinIO",
+    "PDF.js",
+    "Tiptap"
+  ],
+  "mockedResponses": false,
+  "reports": [
+    {
+      "check": "1–2 · Session Better Auth avec MFA reconnue ; ouverture de Réflexions",
+      "result": "passed"
+    },
+    {
+      "check": "3–6 · PDF analysé localement ; texte réel présenté avant import",
+      "result": "passed"
+    },
+    {
+      "check": "7–11 · Brouillon privé créé en base, affiché et corrigé dans Tiptap, auteur et catégorie sélectionnés",
+      "result": "passed"
+    },
+    {
+      "check": "12–13 · Aperçu privé réel, relecture obligatoire et aucune fuite vers le public",
+      "result": "passed"
+    },
+    {
+      "check": "Médias · Import S3 privé, sélection, texte alternatif et point d’intérêt conservés",
+      "result": "passed"
+    },
+    {
+      "check": "14–16 · Article visible dans Réflexions ; image publiée ; PDF téléchargeable seulement après autorisation explicite",
+      "result": "passed"
+    },
+    {
+      "check": "17–19 · Modifications privées puis seconde publication, sans reconstruction",
+      "result": "passed"
+    },
+    {
+      "check": "20 · Version antérieure restaurée dans un nouveau brouillon, historique et version publique préservés",
+      "result": "passed"
+    },
+    {
+      "check": "Médias · Modification des métadonnées, remplacement avec identifiant stable et refus de suppression référencée",
+      "result": "passed"
+    },
+    {
+      "check": "Médias · Fichier sans référence supprimé dans l’interface et inaccessible ensuite",
+      "result": "passed"
+    }
+  ],
+  "browserErrors": [],
+  "externalRequests": [],
+  "cleanup": [
+    {
+      "collection": "articles",
+      "id": "87d40c50-8cbb-4cbc-8052-a9060c215c6e",
+      "archived": true
+    },
+    {
+      "collection": "people",
+      "id": "76202379-1d4c-46e7-bb38-a3f252a03081",
+      "archived": true
+    },
+    {
+      "collection": "categories",
+      "id": "c12baaa4-a518-4f30-a1de-368051f4247b",
+      "archived": true
+    }
+  ],
+  "pdfRevokedAfterCleanup": true
+}

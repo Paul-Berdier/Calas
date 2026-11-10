@@ -4,7 +4,7 @@ import {resolve} from 'node:path';
 import assert from 'node:assert/strict';
 import {ribbonPaths} from '../assets/brand/geometry.mjs';
 
-const output=resolve('artifacts');
+const output=resolve(process.env.CALAS_BRAND_OUTPUT_DIR??'artifacts');
 await mkdir(output,{recursive:true});
 const base=process.env.BASE_URL??'http://127.0.0.1:4321';
 const reports=[];
@@ -47,16 +47,14 @@ for(const [name,type]of [['chromium',chromium],['firefox',firefox]].filter(([nam
  await page.waitForTimeout(200);
  assert.deepEqual(await finalPaths(page),ribbonPaths,`${name}: preference change stops the timeline`);
 
- // Verify the redesign's real scroll effects, then their reduced-motion state.
+ // Verify the current homepage's actual card reveal. The supplied illustrations
+ // replaced the old line-art section; they keep their complete static image.
  await page.emulateMedia({reducedMotion:'no-preference'});
- const artwork=page.locator('.diagnostic-visual [data-link-art]');
- await artwork.scrollIntoViewIfNeeded();
- await page.waitForFunction(()=>Array.from(document.querySelectorAll('.diagnostic-visual [data-line]')).some(line=>parseFloat(getComputedStyle(line).strokeDashoffset)>1));
- if(name==='chromium')await artwork.screenshot({path:resolve(output,'logo-link-art-start.png')});
- await page.waitForFunction(()=>Array.from(document.querySelectorAll('.diagnostic-visual [data-line]')).every(line=>!line.style.strokeDasharray));
- if(name==='chromium')await artwork.screenshot({path:resolve(output,'logo-link-art-end.png')});
+ // A reveal is intentionally one-shot. Isolate its first entry from the
+  // preceding preference changes and screenshots, which may scroll the page.
+  await page.goto(base,{waitUntil:'networkidle'});
  const revealObserved=await page.evaluate(()=>new Promise(resolve=>{
-  const offer=document.querySelector('.offer-row');
+  const offer=document.querySelector('.journey-card');
   if(!offer){resolve(false);return;}
   const target=offer.getBoundingClientRect().top+window.scrollY-window.innerHeight*.7;
   let observed=false;
@@ -69,6 +67,11 @@ for(const [name,type]of [['chromium',chromium],['firefox',firefox]].filter(([nam
   requestAnimationFrame(sample);
  }));
  assert.equal(revealObserved,true,`${name}: actual content reveal`);
+ const artwork=page.locator('.journey-card .editorial-symbol').first();
+ await artwork.scrollIntoViewIfNeeded();
+ await artwork.evaluate(image=>image.decode());
+ assert(await artwork.evaluate(image=>image.complete&&image.naturalWidth>0),`${name}: supplied illustration remains complete during reveal`);
+ if(name==='chromium')await page.locator('.journey-cards').screenshot({path:resolve(output,'logo-journey-reveal.png')});
  const readingProgress=await page.locator('.reading-progress').evaluate(bar=>new DOMMatrixReadOnly(getComputedStyle(bar).transform).a);
  assert(readingProgress>0&&readingProgress<=1,`${name}: reading progress follows the scroll`);
  await page.goto(new URL('/diagnostic-rps/',base).href,{waitUntil:'networkidle'});
@@ -99,7 +102,7 @@ for(const [name,type]of [['chromium',chromium],['firefox',firefox]].filter(([nam
  assert.equal(await staticMethod.locator('details').nth(3).getAttribute('open'),'',`${name}: native method disclosures without JavaScript`);
  await nojs.close();
  await browser.close();
- reports.push({browser:name,tests:['deformation effective','progression','pose finale exacte','mouvement réduit au chargement','changement de préférence pendant la timeline','absence de rejeu','fallback sans JavaScript','dessin des trajectoires au scroll','révélation des contenus au scroll','progression de lecture','progression méthode après ouverture','nettoyage méthode mouvement réduit','accordéon natif sans JavaScript'],pageErrors:errors,result:'passed'});
+ reports.push({browser:name,tests:['deformation effective','progression','pose finale exacte','mouvement réduit au chargement','changement de préférence pendant la timeline','absence de rejeu','fallback sans JavaScript','illustration fournie complète','révélation des contenus au scroll','progression de lecture','progression méthode après ouverture','nettoyage méthode mouvement réduit','accordéon natif sans JavaScript'],pageErrors:errors,result:'passed'});
  await writeFile(resolve(output,`logo-browser-${name}.json`),JSON.stringify(reports.at(-1),null,2)+'\n');
  console.log(`${name}: all logo checks passed.`);
 }

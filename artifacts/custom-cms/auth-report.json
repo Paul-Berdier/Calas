@@ -1,0 +1,14 @@
+{
+  "environment": "Real local PostgreSQL + Better Auth + Mailpit; no external mail",
+  "reports": [
+    {
+      "name": "Anonymous admin and API denied",
+      "passed": true
+    },
+    {
+      "name": "Authenticated content available; public registration, MFA disable and cross-origin write refused",
+      "passed": true
+    }
+  ],
+  "pageErrors": []
+}

@@ -1,0 +1,32 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "mode": "verify",
+  "startedAt": "2026-11-02T20:27:53.336Z",
+  "contentMutated": false,
+  "mediaUploaded": 0,
+  "documentsPublished": 0,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "publishedMedia": [
+    {
+      "key": "calmFace",
+      "mediaId": "b888a668-aba4-49fd-9300-8dd8fbef1592",
+      "status": 200,
+      "uses": [
+        "home.visuals.calmFace"
+      ]
+    },
+    {
+      "key": "closing",
+      "mediaId": "fb9c1f35-c6d4-423d-877e-846c31eff8bc",
+      "status": 200,
+      "uses": [
+        "home.visuals.closing"
+      ]
+    }
+  ],
+  "privateReserves": [],
+  "onlyReviewedCorrectionFieldsChanged": true,
+  "previousRevisionsUnchanged": true,
+  "completedAt": "2026-11-02T20:27:54.814Z"
+}

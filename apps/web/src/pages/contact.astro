@@ -13,7 +13,8 @@ const {settings,pages}=await getSiteContent(Astro);
 const content=pages.find(page=>page.slug==='contact');
 const contact=content?.contact??{};
 Astro.response.headers.set('Cache-Control','private, no-store');
-let fields={...emptyFields,subject:Object.hasOwn(subjects,Astro.url.searchParams.get('objet')||'')?Astro.url.searchParams.get('objet')!:'autre'};
+const requestedSubject=Astro.url.searchParams.get('objet')==='situations-sensibles'?'sensible':Astro.url.searchParams.get('objet')||'';
+let fields={...emptyFields,subject:Object.hasOwn(subjects,requestedSubject)?requestedSubject:'autre'};
 let result:ContactResult|undefined;
 let token=createFormToken();
 if(Astro.request.method==='POST'){
@@ -22,6 +23,7 @@ if(Astro.request.method==='POST'){
   else {
     try{const form=await readBoundedForm(Astro.request);fields=readFields(form);token=String(form.get('token')||token);result=await submitContact(Astro.request,form,Astro.clientAddress);}catch(error){result=error instanceof RangeError?{ok:false,status:413,message:'Votre message dépasse la taille autorisée.'}:{ok:false,status:400,message:'La demande n’a pas pu être lue. Votre courriel et notre téléphone restent disponibles.'};}
   }
+  if(result?.ok&&!result.simulation&&settings.responseTime)result={...result,message:`${result.message} Délai de réponse indicatif : ${settings.responseTime}`};
   if(Astro.request.headers.get('accept')?.includes('application/json'))return new Response(JSON.stringify(result),{status:result?.status||400,headers:{'Content-Type':'application/json','Cache-Control':'private, no-store',...(result?.status===429?{'Retry-After':'900'}:{})}});
   Astro.response.status=result?.status||400;
 }
@@ -43,6 +45,7 @@ const simulated=!isProductionSite()&&env('MAIL_TRANSPORT','simulation')==='simul
             <span class="contact-channel-label">Par téléphone</span>
             <span class="contact-channel-value">{settings.phone}<span aria-hidden="true">↗</span></span>
           </a>
+          {settings.contactHours&&<p class="contact-hours">Horaires d’appel : {settings.contactHours}</p>}
           <a class="contact-channel" href={`mailto:${settings.email}`}>
             <span class="contact-channel-label">Par courriel</span>
             <span class="contact-channel-value contact-channel-email">{settings.email}<span aria-hidden="true">↗</span></span>
@@ -63,7 +66,7 @@ const simulated=!isProductionSite()&&env('MAIL_TRANSPORT','simulation')==='simul
         <div class:list={['form-status',{success:result?.ok}]} id="form-status" role="status" tabindex="-1" aria-live="polite">{result?.message}</div>
         {simulated&&<p class="contact-test-note"><strong>Envoi de test.</strong> Aucun courriel n’est envoyé, aucune copie du message n’est conservée.</p>}
         <input type="hidden" name="token" value={token} />
-        <div class="form-trap" aria-hidden="true"><label for="website">Votre site web</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
+        <div class="form-trap" hidden aria-hidden="true"><label for="website">Votre site web</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
 
         <fieldset class="contact-fieldset">
           <legend><span aria-hidden="true">01</span> Votre demande</legend>
@@ -74,9 +77,13 @@ const simulated=!isProductionSite()&&env('MAIL_TRANSPORT','simulation')==='simul
           <legend><span aria-hidden="true">02</span> Pour vous répondre</legend>
           <div class="form-row">
             <div class="field"><label for="name">Votre nom *</label><input id="name" name="name" required minlength="2" maxlength="100" autocomplete="name" value={fields.name} aria-invalid={errors.name?'true':undefined} aria-describedby="error-name" /><p class="field-error" id="error-name">{errors.name}</p></div>
-            <div class="field"><label for="company">Votre entreprise <small>(facultatif)</small></label><input id="company" name="company" maxlength="160" autocomplete="organization" value={fields.company} aria-invalid={errors.company?'true':undefined} aria-describedby="error-company" /><p class="field-error" id="error-company">{errors.company}</p></div>
+            <div class="field"><label for="company">Votre organisation <small>(facultatif)</small></label><input id="company" name="company" maxlength="160" autocomplete="organization" value={fields.company} aria-invalid={errors.company?'true':undefined} aria-describedby="error-company" /><p class="field-error" id="error-company">{errors.company}</p></div>
           </div>
+          <div class="field"><label for="jobTitle">Votre fonction <small>(facultatif)</small></label><input id="jobTitle" name="jobTitle" maxlength="120" autocomplete="organization-title" value={fields.jobTitle} aria-invalid={errors.jobTitle?'true':undefined} aria-describedby="error-jobTitle" /><p class="field-error" id="error-jobTitle">{errors.jobTitle}</p></div>
+          <div class="form-row">
           <div class="field"><label for="email">Votre courriel *</label><input id="email" name="email" type="email" required maxlength="254" autocomplete="email" value={fields.email} aria-invalid={errors.email?'true':undefined} aria-describedby="error-email" /><p class="field-error" id="error-email">{errors.email}</p></div>
+          <div class="field"><label for="phone">Votre téléphone <small>(facultatif)</small></label><input id="phone" name="phone" type="tel" maxlength="40" autocomplete="tel" value={fields.phone} aria-invalid={errors.phone?'true':undefined} aria-describedby="error-phone" /><p class="field-error" id="error-phone">{errors.phone}</p></div>
+          </div>
         </fieldset>
 
         <fieldset class="contact-fieldset contact-message-group">
@@ -84,8 +91,10 @@ const simulated=!isProductionSite()&&env('MAIL_TRANSPORT','simulation')==='simul
           <div class="field"><label for="message">Votre message *</label><textarea id="message" name="message" required minlength="10" maxlength="5000" rows="5" aria-invalid={errors.message?'true':undefined} aria-describedby="message-hint error-message">{fields.message}</textarea><p class="field-hint" id="message-hint">Merci de ne pas transmettre d'informations médicales ni de données concernant un tiers.</p><p class="field-error" id="error-message">{errors.message}</p></div>
         </fieldset>
 
+        <div class="field contact-consent"><label for="consent"><input id="consent" name="consent" type="checkbox" value="yes" required checked={fields.consent==='yes'} aria-invalid={errors.consent?'true':undefined} aria-describedby="error-consent" /><span>J’accepte que les informations saisies soient utilisées pour répondre à ma demande, conformément à la <a href="/confidentialite/">politique de confidentialité</a>. *</span></label><p class="field-error" id="error-consent">{errors.consent}</p></div>
         <button class="button form-submit" type="submit" disabled={result?.ok}>Envoyer ma demande <span aria-hidden="true">↗</span></button>
-        <p class="form-privacy">Ces informations servent à traiter votre demande. Consultez notre <a href="/confidentialite/">page de confidentialité</a> pour connaître leur traitement et vos droits.</p>
+        {settings.responseTime&&<p class="form-response-time">Délai de réponse indicatif : {settings.responseTime}</p>}
+        <p class="form-privacy">Votre message est envoyé à Sara Serrano Cabeza et Agnès Loupias pour répondre à votre demande. Consultez notre <a href="/confidentialite/">politique de confidentialité</a> pour connaître la durée de conservation et exercer vos droits.</p>
       </form>
     </div>
   </section>

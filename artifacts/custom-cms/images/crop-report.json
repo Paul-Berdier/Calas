@@ -1,0 +1,8 @@
+{
+  "environment": "http://localhost:4336",
+  "actualAstroComponent": true,
+  "privateDraftOnly": true,
+  "asymmetricCrop": "left 70%; only right blue region visible",
+  "pixelSamples": 9,
+  "result": "passed"
+}

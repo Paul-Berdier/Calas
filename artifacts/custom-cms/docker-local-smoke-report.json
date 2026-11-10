@@ -1,0 +1,43 @@
+{
+  "image": "calas-cms:local-check",
+  "checks": [
+    {
+      "name": "Linux HTTP liveness",
+      "status": 200
+    },
+    {
+      "name": "Unconfigured readiness fails closed",
+      "status": 503
+    },
+    {
+      "name": "Explicit demo renders without private services",
+      "status": 200
+    },
+    {
+      "name": "Non-root Node and native Sharp; no source or environment file",
+      "uid": 1000,
+      "node": "v24.19.0",
+      "webp": "webp",
+      "width": 4,
+      "height": 3,
+      "envPresent": false,
+      "sourcePresent": false
+    },
+    {
+      "name": "Official Astro runtime logger loaded",
+      "jsonStartup": true
+    }
+  ],
+  "stopped": true,
+  "imageId": "sha256:86d85fc310a04c154de8391801fbcdddd8ffac0836763c35b241b600aeff73a9",
+  "status": "passed",
+  "verifiedSourceHashes": {
+    "apps/web/src/lib/cms/preview.ts": "e9a7e5edaf6d7e346dfd24ff75353385b8338d0c3f138bffc34efcec5b2b655a",
+    "apps/web/src/lib/motion.ts": "bbe6373cdec6f79c31e4c25a49936a3f3ba469ab0cdbe80354f8c932d877415c",
+    "apps/web/src/server/logger.mjs": "417998e32e590cb094b74242379674239feb97aa553d6ddbf984bd46d82f07d6",
+    "apps/web/astro.config.mjs": "1d28a26301a29a2c7287a6554f5b5f8e5be234e4d2388b3b752d71beec276ee9",
+    "assets/brand/coil.mjs": "dfe5b93b4913819a091f0081863f8927931812d5e9738e338795c29f437255a0",
+    "Dockerfile": "9f3106d79b5418e0a4b28a76ff4bb81bb3464f9f1e71f196d1adf8fcfffaa2ae",
+    "pnpm-lock.yaml": "c05afd8338adbfe37b1dcdf179a99f40fa73ffaf417406f932cc4b472b1a4fde"
+  }
+}

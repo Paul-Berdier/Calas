@@ -1,0 +1,20 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "mode": "dry-run",
+  "startedAt": "2026-10-26T11:22:15.145Z",
+  "contentMutated": false,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "beforeVersion": 1,
+  "changedFields": [
+    "intro",
+    "diagnostic.text",
+    "reasons[0].text",
+    "reasons[1].text",
+    "reasons[2].text"
+  ],
+  "otherUnpublishedChanges": false,
+  "currentHasUnpublishedChanges": false,
+  "privateSnapshotSaved": true,
+  "completedAt": "2026-10-26T11:22:15.659Z"
+}

@@ -1,0 +1,16 @@
+import {randomBytes} from 'node:crypto';
+import {mkdir,writeFile,access} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import {fileURLToPath} from 'node:url';
+import {resolve} from 'node:path';
+import {spawnSync} from 'node:child_process';
+const root=fileURLToPath(new URL('../',import.meta.url));
+if(process.env.CI!=='true')throw new Error('Cette initialisation de compte est réservée à la CI isolée.');
+const path=resolve(root,'.cache/auth-test.json');
+await mkdir(resolve(root,'.cache'),{recursive:true});
+if(await access(path).then(()=>true,()=>false))throw new Error('La recette privée existe déjà ; aucun compte remplacé.');
+const fixture={baseURL:'http://localhost:4336',email:'ci-admin@example.test',name:'Recette CI Calas',password:randomBytes(32).toString('base64url')};
+const require=createRequire(resolve(root,'apps/web/package.json'));
+const result=spawnSync(process.execPath,[require.resolve('tsx/cli'),resolve(root,'scripts/auth-bootstrap.ts')],{cwd:root,env:{...process.env,BETTER_AUTH_URL:fixture.baseURL,SITE_URL:fixture.baseURL,INIT_ADMIN_EMAIL:fixture.email,INIT_ADMIN_NAME:fixture.name,INIT_ADMIN_PASSWORD:fixture.password},stdio:'pipe',windowsHide:true});
+if(result.status!==0)throw new Error('Le bootstrap CI a échoué. Aucun secret imprimé.');
+await writeFile(path,JSON.stringify(fixture),{mode:0o600});console.log('Compte de recette CI créé ; identité privée exclue des artefacts.');

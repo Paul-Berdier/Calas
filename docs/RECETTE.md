@@ -1,124 +1,108 @@
-# Recette après refonte — 25 octobre 2026
+# Recette de la migration propriétaire — 25 octobre 2026
 
-## Version livrée
+Ce rapport décrit la migration depuis `ece27bd`. Les résultats de l’ancienne version sont conservés dans [RECETTE-AVANT-MIGRATION.md](RECETTE-AVANT-MIGRATION.md) ; ils ne sont pas présentés comme une validation du nouveau CMS.
 
-Refonte locale de l’accueil, du Diagnostic, des pages Équipes/Managers/Approche/Équipe, de Réflexions et du contact. Composition, navigation, typographie et mouvement sont revus. Le titre et les six blocs de l’accueil sont conservés. Les compléments éditoriaux reposent sur les pièces fournies et restent à relire par Calas Conseil.
+## Environnement et méthode
 
-Le site tourne avec Astro SSR, un Studio Sanity séparé et le mode explicite `CONTENT_MODE=demo`. Aucun déploiement, achat ou envoi réel à Sara. Aucun portrait, article signé, témoignage, qualification ou engagement commercial inventé.
+Windows, Node 24.19.0, pnpm 11.25.0, Astro 7.4.2, Better Auth 1.7.12. PostgreSQL 17 et MinIO réels dans Docker, bucket privé, Mailpit local pour les emails. Les tests de données et de restauration utilisent des bases/buckets temporaires isolés. La recette éditoriale utilise des articles clairement nommés « Recette », archivés en fin de scénario ; aucun article fictif signé Sara n’est laissé public.
 
-## Vérifications exécutées
+Une API simulée est employée uniquement dans les tests unitaires de frontière preview et les tests d’interface qui provoquent volontairement une réponse perdue. Les scénarios de connexion, invitation, MFA, édition, téléversement, publication et restauration ci-dessous utilisent les services réels. Aucun email externe, aucun abonnement ni déploiement Railway.
 
-| Contrôle | Résultat |
+## Résultats fonctionnels vérifiés
+
+| Périmètre | Preuve |
 | --- | --- |
-| Build frontend Node standalone | Réussi sur la version finale |
-| Astro/TypeScript web | 35 fichiers, zéro erreur/avertissement |
-| TypeScript Studio | Réussi ; schémas inchangés par la refonte |
-| ESLint web et Studio | Réussi |
-| Suite Playwright | 37 scénarios couverts sur Chromium et Firefox ; détail des relances ci-dessous |
-| Navigation | Routes, liens internes, un H1, 404, objets des offres conservés au contact |
-| Formulaire | Erreurs serveur, simulation, panne de transport, nouvelle tentative, double clic, coupure réseau et délai dépassé |
-| Sans JavaScript | Menu, contenus, formulaire, étapes du Diagnostic et FAQ utilisables |
-| Clavier | Lien d’évitement, menu/Échap, ouverture des étapes du Diagnostic |
-| Responsive | Accueil et Diagnostic à 360/390/768/1280/1440 px, pages secondaires à 360/768 px, Contact/Réflexions de 320 à 1440 px ; aucun débordement observé |
-| Accessibilité automatique | axe WCAG A/AA sur accueil, Diagnostic et contact à 1280 et 390 px dans Chromium et Firefox, puis erreurs de formulaire : aucune violation |
-| Motion | 13 contrôles par navigateur, Chromium et Firefox, sans erreur JS |
-| Public/CMS | Budgets respectés ; aucun script d’édition Sanity, React ou Studio chargé publiquement |
-| Frontières serveur | Tests locaux de session preview signée, origine/antispam, flux bornés et idempotence conservés et réussis |
+| Référence avant migration | TypeScript, lint, build, 29 tests locaux et38 parcours publics réussis |
+| Configuration / preview / rendu riche / seed / PDF / journaux | 44 tests locaux réussis, dont cadrage et suppression des secrets dans les journaux |
+| Modèles + persistance | 25 contrôles réussis : validations, seed idempotent, conflit409, publié distinct du brouillon, versions immuables, restauration, clés étrangères et droits |
+| Validation des médias | 7 tests réussis : type réel, Sharp, variantes, limites, PDF natif/scanné/mixte, multipart et métadonnées |
+| Cycle média réel PostgreSQL/S3 | 16 contrôles réussis : propriété, privé, upload idempotent, métadonnées concurrentes, publication, révocation, remplacement et suppression protégée |
+| Contact sur plusieurs processus | 6 contrôles réussis : 4 envois concurrents du même jeton donnent une seule livraison ; 8 processus respectent la même limite de 3 ; contenu modifié refusé ; pool limité à une connexion sans blocage |
+| Sauvegarde/restauration | 6 contrôles réussis : archive chiffrée, dump cohérent, restauration réelle dans une autre base et un autre bucket, PDF identique, archive altérée et destination occupée refusées |
+| PDF/OCR navigateur | 6 cas réussis : texte natif, scan, mixte, OCR forcé, fichier invalide et annulation ; aucune requête externe |
+| Reprise d’import, API simulée explicitement | 5 contrôles d’interface : confirmation préalable, clics multiples, réponse perdue/reprise, brouillon et responsive |
+| Authentification réelle | 9 groupes de sécurité réussis, plus connexion TOTP réelle et refus d’accès anonyme |
+| Durée des sessions | 2 contrôles réels supplémentaires : session expirée refusée, déconnexion effective côté serveur |
+| Fraîcheur des sessions | 5 scénarios supplémentaires : ancien accès toujours éditorial, liste protégée après quinze minutes, reconnexion mot de passe/TOTP, timer d’onglet et expiration pendant un appel ; axe à 390/1440 px |
+| Parcours éditorial réel | 20 étapes PDF→Tiptap→aperçu→publication→nouveau brouillon→republication→restauration ; ajout/remplacement d’image, refus de suppression utilisée et suppression d’image inutilisée |
+| Administration | 53 états contrôlés aux largeurs 360/390/768/1280/1440 ; zéro violation axe A/AA, erreur console ou débordement horizontal |
+| Aperçu public dans l’administration | 15 combinaisons : viewport interne ordinateur/tablette/mobile exact, mise à l’échelle sans rognage, zéro violation axe |
+| Cadrage réel d’image |Zone asymétrique vérifiée dans Astro par échantillonnage de9 pixels et descripteurs srcset exacts |
+| Mouvement final | 48 contrôles du logo et 26 des effets éditoriaux réussis dans Chromium/Firefox ; chargement différé contrôlé à 390/1440 px |
 
-La première exécution de la suite a validé 35 scénarios sur 37. Les deux audits axe ont relevé le contraste des numéros de section ; une relance a également révélé l’opacité transitoire du bouton d’accueil. Les repères sont désormais opaques et les actions du héros ne sont plus estompées. Lighthouse mobile a ensuite détecté un lien fléché sans nom accessible : son libellé a été ajouté et les audits axe ont été étendus au mobile. La relance finale des cinq scénarios concernés (deux audits axe, captures responsive, contact étroit/texte agrandi, budgets) réussit intégralement. Les scénarios indépendants déjà réussis n’ont pas été rejoués inutilement.
+Les groupes de sécurité couvrent invitations à usage unique, email vérifié, mauvais mot de passe/compte inconnu, TOTP, refus d’une ancienne session pré-MFA, secours à usage unique, rôle éditeur, CSRF, inscription publique interdite, révocation de sessions, vrai lien de récupération Mailpit, jeton consommé et suspension du seul compte créé pour la recette.
 
-Le test de texte agrandi à 200 % est une simulation CSS à 640 px. Les outils automatiques ne constituent pas une certification d’accessibilité.
+## Corrections trouvées pendant la recette
 
-## Mouvement
+- Compatibilité des URLs Better Auth : accepter les chemins d’API sans barre finale et le callback de réinitialisation, tout en conservant les liens publics existants.
+- Tiptap : réactiver l’éditeur sans émettre de modification artificielle après publication.
+- Conflits de versions : comparaison JSON canonique pour éviter un changement dû au seul ordre des clés PostgreSQL.
+- Prévisualisation : conserver le viewport demandé et adapter son échelle à la colonne.
+- Rendu riche et navigation de preview : refuser les propriétés héritées et les chemins privés encodés.
+- Médias : appliquer le cadrage exact et annoncer dans srcset les dimensions réelles des variantes.
+- CI : migration explicite avec `--apply` et chemins de tests vérifiés.
+- Contact : réutiliser la connexion transactionnelle pour la limitation de débit, afin de fonctionner avec un pool limité à une connexion.
+- Exécution Windows : une relance des tests locaux a été bloquée par les droits de lecture du bac à sable dans esbuild ; la même commande hors de cette restriction réussit ses 44 contrôles, sans modification du code.
+- Première CI : image communautaire MinIO indisponible. Remplacement par une construction depuis source officielle verrouillée ; compilation, santé et intégration PostgreSQL/S3 réussies sur Ubuntu dans l’exécution `40183929033`.
+- Deuxième CI : axe a mesuré les statistiques pendant une transition translucide de l’iframe. La capture montre l’animation en cours ; le contraste final est 6,43:1. La recette attend maintenant la fin des révélations avant capture et audit, sans désactiver le mouvement ni exclure de règle axe.
+- Compte et sécurité : une session de plus de quinze minutes ne peut pas consulter la liste des sessions selon Better Auth. L’interface ignorait ce refus et affichait une liste vide ; elle explique désormais la reconnexion, sans modifier cette protection. Cinq scénarios vérifient les vraies réponses serveur ; seul le passage du timer d’onglet utilise une horloge de navigateur contrôlée.
 
-La coquille apparaît désormais en se déroulant depuis son noyau, ruban par ruban, sur 2,34 secondes. La pointe se courbe localement pendant sa progression ; le corps déjà formé et le conteneur restent fixes. Les cinq tracés finaux sont exactement ceux de la source SVG. Le logo est exclu de la parallaxe ; les autres décors conservent un déplacement limité à 18 px sur ordinateur.
+Ces échecs initiaux sont conservés comme constats de recette ; les scénarios concernés ont été corrigés et relancés. Les résultats du build final et la mesure Lighthouse sont consignés ci-dessous après leur exécution.
 
-Après cette correction, le build, le contrôle de types et le lint réussissent. La recette dédiée valide sept contrôles dans chacune des quatre combinaisons Chromium/Firefox et 1440/390 px : petite surface initiale, croissance visible, conteneur stable, tracés finaux exacts, état DOM avant peinture, mouvement réduit et absence d’erreur JavaScript. La planche des six étapes a été inspectée. L’échantillonnage DOM par frame complète la vidéo ; il ne constitue pas une analyse pixel par pixel de toutes les peintures.
+## Performance et protocole
 
-Les 13 contrôles généraux de mouvement ont également été rejoués et réussissent dans chacun des deux navigateurs sur le build standalone. Un contrôle indépendant sur le serveur de développement confirme le logo complet sans JavaScript, avec mouvement réduit au chargement, après blocage des scripts externes et après changement de préférence pendant le déroulement. Le test ciblé des budgets publics réussit avec 49 059 octets de JavaScript gzip et 283 245 octets de ressources décodées.
+Les mesures locales emploient Lighthouse 13.5.0, Chromium 156, viewport mobile et ralentissement simulé par défaut (CPU×4), navigateur neuf, Astro standalone et PostgreSQL local. Le build final passe TypeScript (90 fichiers, zéro erreur/avertissement, 18 indications de dépréciation), ESLint et compilation. L’administration, Tiptap et les moteurs PDF/OCR restent absents du JavaScript public initial.
 
-- [Déroulement corrigé en vidéo](../artifacts/logo-unfurl.webm).
-- [Six étapes du déroulement](../artifacts/logo-unfurl/progression.png) et [rapport dédié](../artifacts/logo-unfurl/report.json).
-- [Rapport animation Chromium/Firefox](../artifacts/logo-browser-report.json).
-- [Méthode animée](../artifacts/logo-method-progress.png).
-- [Sources, provenance et détails](LOGO.md).
+| Mesure Windows | Performance | Accessibilité | LCP | TBT | CLS |
+| --- | --- | --- | --- | --- | --- |
+| Première migration | 78 | 100 | 3,33 s | 359 ms | <0,001 |
+| Initialisation différée | 80 | 100 | 2,67 s | 258 ms | 0,032 |
+| Reflow supprimé | 85 | 100 | 2,59 s | 2 ms | <0,001 |
+| Authentification serveur différée, dernière mesure locale | 46 | 100 | 4,3 s | 1 220 ms | 0,03 |
 
-## Performance mobile
+Ces résultats ne satisfont pas la cible locale de 90 et leur variabilité est conservée, pas remplacée par le meilleur score. Certaines réponses observées par Lighthouse duraient 10–20 s, alors que les lectures PostgreSQL isolées étaient inférieures à une seconde. L’instrumentation temporaire a observé des rendus ultérieurs autour de 20–40 ms ; le poste disposait d’environ 1,2 Go de mémoire libre pendant la recette. Cela ne démontre pas à lui seul la cause de la variation. L’import privé différé et la suppression du reflow sont des corrections vérifiées, sans garantie tirée d’une mesure isolée.
 
-Lighthouse 13.5.0, Chrome for Testing 156.0.8078.4, Windows, build standalone sur `http://127.0.0.1:4330/`, profil mobile et ralentissement simulé par défaut, cache neuf. Mesure de la refonte après préchargement des polices locales et corrections d’accessibilité, avant la correction du déroulement du logo. Lighthouse n’a pas été rejoué après cette correction ; seuls les budgets publics ont été remesurés ci-dessus.
+`scripts/performance-check.mjs` reproduit le même profil de laboratoire dans la CI Ubuntu et impose performance ≥90, accessibilité100 et CLS≤0,1. Le système d’exploitation est différent : son score doit être présenté séparément de la comparaison Windows historique. Le résumé `performance-ci-report.json` et le rapport HTML sont conservés avec les artefacts de chaque exécution. Les mesures détaillées intermédiaires sont dans `artifacts/custom-cms/performance.json`. Aucune donnée Web Vitals de terrain n’est revendiquée.
 
-| Mesure | Résultat |
-| --- | --- |
-| Performance mobile | **94/100** |
-| Accessibilité Lighthouse | **100/100** |
-| Bonnes pratiques | **100/100** |
-| LCP de laboratoire | **2,7 s** |
-| CLS | **0** |
-| Total Blocking Time | **10 ms** |
-| Poids Lighthouse | **274 Kio** |
-| JavaScript externe initial gzip | **46 249 octets** |
-| Ressources décodées Playwright | **276 131 octets** |
+Dernière CI intégralement verte : [exécution 40186258008, révision applicative 48ade34a](https://github.com/Paul-Berdier/Calas/actions/runs/40186258008). Performance mobile **96/100**, accessibilité **100/100**, bonnes pratiques **100/100**, LCP **2,57 s**, TBT **0 ms**, CLS **0,00008**. Le LCP reste légèrement au-dessus de la cible idéale de 2,5 s ; les seuils obligatoires de performance et de stabilité passent. [Rapport Lighthouse Linux](../artifacts/lighthouse-custom-cms-ci.report.html) et [données du protocole](../artifacts/custom-cms/performance-ci-report.json).
 
-Le score mobile dépasse la cible de 90 ; le LCP de laboratoire reste légèrement au-dessus de l’objectif de 2,5 s et devra être remesuré sur l’hébergement retenu. Aucun INP réel ni résultat au 75e percentile n’est revendiqué. Les budgets de 150 Ko de JavaScript compressé et d’environ 1 Mo de ressources restent respectés. Le score SEO de 63 correspond à la désindexation volontaire de la recette ; ne pas la lever avant publication approuvée.
+Cette exécution vérifie également les deux jobs Linux complets : 44 tests CMS locaux, 15 de domaine, 38 d’intégration, 38 parcours publics, les recettes PDF/OCR et authentifiées, les cinq scénarios de fraîcheur des sessions, 53 états d’administration, 48 contrôles du logo et 26 des animations éditoriales. Aucun défaut axe ni erreur console après attente correcte des transitions. Le conteneur passe ses cinq groupes de contrôle.
 
-[Rapport Lighthouse HTML](../artifacts/lighthouse-redesign-mobile.report.html) · [Inventaire des ressources](../artifacts/resource-budget.json).
+GitHub exécute la PR sous un commit de fusion synthétique (`37d040ec…`), distinct du commit de branche `48ade34a…`. Les deux références, les identifiants d’artefacts et leurs empreintes SHA-256 sont conservés dans [ci-provenance.json](../artifacts/custom-cms/ci-provenance.json). Le commit de compte rendu qui suit ne modifie aucun code applicatif, configuration de build ou test ; il conserve les preuves sans relancer ces mêmes suites. La première CI complète, sur `45cec4ed`, est également conservée dans [l’exécution précédente](https://github.com/Paul-Berdier/Calas/actions/runs/40185045623).
 
-Reproduction après `pnpm build`, dans un terminal dédié :
+## Captures et rapports
+
+- [Administration1440](../artifacts/custom-cms/admin/dashboard-1440.png) et [390](../artifacts/custom-cms/admin/dashboard-390.png), [rapport53 états](../artifacts/custom-cms/admin/report.json).
+- [Aperçus](../artifacts/custom-cms/admin/preview-report.json), [sécurité réelle](../artifacts/custom-cms/auth-security-report.json), [parcours éditorial réel](../artifacts/custom-cms/editorial-e2e/report.json).
+- [Étude des trois enroulements](../artifacts/logo-coil/comparison.png), [comparaison animée](../artifacts/logo-coil/comparison.webm), [vidéo sur l’accueil](../artifacts/logo-coil/live.webm).
+- Captures publiques ordinateur/mobile : `artifacts/screenshots/`. Les sources graphiques initiales restent versionnées.
+
+Le guide de Sara utilise les captures réelles de la nouvelle administration. Les rapports excluent les mots de passe, secrets TOTP, codes de secours, cookies et liens d’invitation.
+
+## Reproduire
+
+Après installation et services locaux décrits dans le README :
 
 ```powershell
-$env:HOST='127.0.0.1'
-$env:PORT='4330'
-node --env-file-if-exists=.env dist/server/entry.mjs
+pnpm typecheck
+pnpm lint
+pnpm test:cms-local
+pnpm test:domain
+$env:RUN_CONTACT_INTEGRATION='1'
+$env:CALAS_MEDIA_INTEGRATION='yes'
+$env:RUN_BACKUP_INTEGRATION='1'
+pnpm test:integration
+pnpm build
+pnpm exec playwright install chromium firefox
+pnpm test
 ```
 
-Le serveur ci-dessus se lance depuis `apps/web`. Dans un second terminal à la racine, adapter le chemin de Chrome à la machine :
+La recette authentifiée requiert le compte local privé créé par la procédure de bootstrap, puis `scripts/auth-browser-check.mjs` pour la session MFA. `scripts/acceptance-standalone.mjs` refuse un port 4336 occupé et lance le build en base de données, la connexion, les tests de sécurité et le parcours PDF. La CI prépare sa propre identité aléatoire via `scripts/ci-auth-prepare.mjs` ; cette commande refuse hors CI. Aucun secret de test n’est committé.
 
-```powershell
-$env:CHROME_PATH='C:/Users/Paul/AppData/Local/ms-playwright/chromium-1248/chrome-win64/chrome.exe'
-pnpm exec lighthouse http://127.0.0.1:4330/ --output html --output json --output-path ./artifacts/lighthouse-redesign-mobile --chrome-flags='--headless' --no-enable-error-reporting --quiet
-```
+## Limites et décisions de production
 
-Ne pas reconstruire `dist` pendant qu’un serveur de recette l’utilise. Le serveur de développement `pnpm dev` reste indépendant.
+La recette couvre PostgreSQL, S3 compatible et SMTP local. Elle ne démontre pas une intégration Railway ou une délivrabilité externe. Restent l’autorisation/budget d’hébergement, le domaine détenu par Calas Conseil, les accès réels du cabinet, le fournisseur SMTP et son test autorisé SPF/DKIM/DMARC, la conservation des données, les sauvegardes externes et la validation éditoriale/juridique.
 
-## Captures de revue
+Un remplacement de média conserve son identité et affecte ses utilisations, y compris les anciennes révisions ; l’interface le signale. L’historique restaure le contenu et ses références, pas automatiquement les octets antérieurs du fichier. Les anciennes clés sont conservées dans la sauvegarde. Pour conserver deux visuels indépendants, téléverser un nouveau média.
 
-| Page | Ordinateur | Mobile |
-| --- | --- | --- |
-| Accueil, premier écran | [1440 px](../artifacts/screenshots/accueil-1440-premier-ecran.png) | [390 px](../artifacts/screenshots/accueil-390-premier-ecran.png) |
-| Accueil, entière | [1440 px](../artifacts/screenshots/accueil-1440.png) | [390 px](../artifacts/screenshots/accueil-390.png) |
-| Diagnostic, premier écran | [1440 px](../artifacts/screenshots/diagnostic-1440-premier-ecran.png) | [390 px](../artifacts/screenshots/diagnostic-390-premier-ecran.png) |
-| Diagnostic, entière | [1440 px](../artifacts/screenshots/diagnostic-1440.png) | [390 px](../artifacts/screenshots/diagnostic-390.png) |
-| Contact | [1440 px](../artifacts/screenshots/contact-refonte-1440.png) | [360 px](../artifacts/screenshots/contact-refonte-360.png) |
-| Réflexions | [1440 px](../artifacts/screenshots/reflexions-refonte-1440.png) | [360 px](../artifacts/screenshots/reflexions-refonte-360.png) |
-
-Les captures ont été ouvertes et inspectées. Les deux actions de l’accueil à 390 px sont visibles avant le coquillage. La version précédente est conservée dans `artifacts/before-redesign` et les anciens états de mouvement dans `artifacts/logo-original`.
-
-## Préparation Sanity et import PDF — complément du 25 octobre
-
-Les champs de textes, images, annotations et présentations de section ont été raccordés au Studio après la refonte. Le seed prépare 17 documents structurés en brouillon. Les configurations locales sont alignées, une clé de session est générée et le diagnostic de configuration ne montre pas les secrets. Le Project ID et les jetons restent absents : le site reste en démonstration explicite.
-
-L’import PDF crée un article modifiable avec le fichier original joint. L’extraction et l’OCR français/anglais se déroulent localement dans le navigateur ; une analyse complète forcée est proposée pour les pages hybrides. Les essais ne comportent ni données du cabinet, ni véritable connexion Sanity.
-
-| Vérification après raccordement | Résultat |
-| --- | --- |
-| Typecheck web / Studio | 40 fichiers Astro, aucune erreur/avertissement ; Studio réussi |
-| Lint et builds web / Studio | Réussis ; assets OCR séparés dans le Studio |
-| Suite publique Playwright | **38 scénarios réussis** sur Chromium/Firefox |
-| Contrôles locaux CMS/PDF | **29 tests réussis** : configuration, sécurité preview, images, téléchargements, seed, brouillons et formatage |
-| PDF réel dans Chromium | Texte natif, scan, document mixte, OCR forcé, PDF invalide et annulation pendant chargement des modèles : **6 cas réussis**, zéro requête externe observée |
-| Composant Studio, API simulée | **4 contrôles réussis** : aucun upload avant action, double clic, réponse perdue puis reprise idempotente, ouverture du brouillon |
-| Budget public remesuré | 49 059 octets JS gzip ; 283 257 octets de ressources décodées ; aucun moteur OCR chargé publiquement |
-
-Le test d’annulation pendant le chargement OCR a révélé une attente de terminaison PDF.js non résolue. Le nettoyage est désormais unique, ordonné et borné ; la reproduction complète réussit après correction. Les captures de l’extraction et de l’interface ont été ouvertes et inspectées. Les accès Sanity simulés sont explicitement indiqués sur ces captures.
-
-[Rapport PDF/OCR](../artifacts/pdf-import/report.json) · [Rapport interface](../artifacts/pdf-import/studio-report.json) · [Aperçu de l’importeur en test local](../artifacts/pdf-import/studio-analysis-ready.png).
-
-Lighthouse n’a pas été rejoué pour ce raccordement. Les scores précédents ne sont pas présentés comme une nouvelle mesure. L’upload réel, l’édition des textes/images, l’activation de la preview, la publication et le cache doivent toujours être recettés avec le compte du cabinet, puis un PDF représentatif.
-
-## Limites de la connexion réelle
-
-Le CMS n’est pas connecté à un projet Sanity réel : édition, publication, remplacement d’image, preview authentifiée en iframe, délai de cache, rôles et restauration restent à vérifier avec les accès du cabinet. L’administration et ses schémas existent ; les tests locaux ne remplacent pas cette recette connectée.
-
-Le formulaire fonctionne en simulation. SMTP, SPF/DKIM/DMARC et réception réelle restent à configurer et tester sur une destination autorisée. Aucun courriel de recette n’est envoyé à Sara.
-
-Les portraits, articles, biographie complète d’Agnès, qualification IPRP et paramètres commerciaux manquants restent dans la liste de validation. Les pages légales nécessitent l’identité juridique, l’hébergeur et les règles réelles de traitement. Les compléments de texte de cette refonte, puis l’accueil et le Diagnostic, doivent être relus avant publication. Voir [VALIDATION.md](VALIDATION.md).
+SMTP ne fournit pas de transaction atomique avec PostgreSQL : une perte de confirmation après envoi peut produire un doublon lors d’une nouvelle tentative. Le formulaire conserve la saisie et n’annonce pas une livraison non confirmée. Les mots de passe et clés perdus simultanément avec les moyens de secours nécessitent une récupération d’exploitation contrôlée, sans contournement public.

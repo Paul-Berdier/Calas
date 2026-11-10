@@ -1,0 +1,43 @@
+{
+  "origin": "http://localhost:4336",
+  "checkedAt": "2026-11-02T20:19:01.885Z",
+  "contentMutated": false,
+  "emailsSent": false,
+  "realPasswordLogin": true,
+  "totpVerified": true,
+  "checks": [
+    {
+      "name": "home-editorial-and-images",
+      "width": 390,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "home-editorial-and-images",
+      "width": 1440,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "settings-qualification",
+      "width": 390,
+      "noOverflow": true,
+      "violations": []
+    },
+    {
+      "name": "settings-qualification",
+      "width": 1440,
+      "noOverflow": true,
+      "violations": []
+    }
+  ],
+  "runtimeErrors": 0,
+  "unexpectedWrites": 0,
+  "contentUnchanged": true,
+  "ownSessionSignedOut": true,
+  "testServerStopped": true,
+  "imageSlots": 10,
+  "newPhotoReferencesPresent": true,
+  "passed": true,
+  "completedAt": "2026-11-02T20:19:14.302Z"
+}

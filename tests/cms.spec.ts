@@ -1,106 +1,72 @@
 import { test, expect } from '@playwright/test';
-import { createPreviewSession, verifyPreviewSession, safePreviewRedirect, PREVIEW_TTL } from '../apps/web/src/lib/cms/preview';
-import { createServerClient } from '../apps/web/src/lib/cms/client';
 
-const envKeys = ['PREVIEW_SESSION_SECRET', 'SANITY_API_READ_TOKEN', 'PUBLIC_SANITY_PROJECT_ID', 'PUBLIC_SANITY_DATASET'] as const;
-let previous: Record<string, string | undefined>;
-
-test.describe('Frontière de sécurité CMS — tests locaux sans compte Sanity', () => {
-  test.beforeEach(() => {
-    previous = Object.fromEntries(envKeys.map(key => [key, process.env[key]]));
-    process.env.PREVIEW_SESSION_SECRET = 'test-only-never-deploy-0123456789abcdef';
-    process.env.SANITY_API_READ_TOKEN = 'unit-test-token-not-a-real-credential';
-    process.env.PUBLIC_SANITY_PROJECT_ID = 'calas-test';
-    process.env.PUBLIC_SANITY_DATASET = 'staging';
+test.describe('Frontière HTTP du CMS propriétaire', () => {
+  test('la session administrative ne peut être obtenue par un paramètre de preview', async ({ request }) => {
+    const response = await request.get('/api/preview/enable/?preview=1&secret=invente', { maxRedirects: 0 });
+    expect(response.status()).toBe(401);
+    expect(response.headers()['set-cookie']).toBeUndefined();
+    expect(response.headers()['cache-control']).toContain('no-store');
+    expect(response.headers()['x-robots-tag']).toContain('noindex');
   });
-  test.afterEach(() => {
-    for (const key of envKeys) {
-      if (previous[key] === undefined) delete process.env[key];
-      else process.env[key] = previous[key];
+
+  test('les anciens cookies et un jeton Better Auth forgé ne donnent aucun brouillon', async ({ request }) => {
+    for (const cookie of ['calas_preview=drafts; sanity-preview-perspective=drafts', 'better-auth.session_token=forged']) {
+      const response = await request.get('/?preview=1', { headers: { Cookie: cookie } });
+      expect(response.status()).toBe(200);
+      const html = await response.text();
+      expect(html).not.toContain('Brouillon — prévisualisation privée');
+      expect(html).not.toContain('data-calas-preview');
+      expect(html).not.toContain('Private draft title');
     }
   });
 
-  test('une session signée est valide, puis expire au bout d’une heure', () => {
-    const now = Math.floor(Date.now() / 1000) * 1000;
-    const session = createPreviewSession(now);
-    expect(verifyPreviewSession(session, now)).toBe(true);
-    expect(verifyPreviewSession(session, now + PREVIEW_TTL * 1000 - 1)).toBe(true);
-    expect(verifyPreviewSession(session, now + PREVIEW_TTL * 1000)).toBe(false);
+  test('le visiteur anonyme est dirigé vers la connexion sans recevoir les données admin', async ({ request }) => {
+    const response = await request.get('/admin/', { maxRedirects: 0 });
+    expect([302, 303]).toContain(response.status());
+    expect(response.headers()['location']).toContain('/admin/login');
+    expect(response.headers()['cache-control']).toContain('no-store');
+    const login = await request.get('/admin/login/');
+    expect(login.status()).toBe(200);
+    expect(await login.text()).not.toContain('content_documents');
   });
 
-  test('refuse le cookie forgé, le payload modifié et la clé révoquée', () => {
-    const now = Date.now();
-    const session = createPreviewSession(now);
-    const [payload, signature] = session.split('.') as [string, string];
-    const claims = JSON.parse(Buffer.from(payload, 'base64url').toString());
-    claims.exp += 86400;
-    const changed = `${Buffer.from(JSON.stringify(claims)).toString('base64url')}.${signature}`;
-    expect(verifyPreviewSession(changed, now)).toBe(false);
-    expect(verifyPreviewSession('drafts', now)).toBe(false);
-    expect(verifyPreviewSession('true', now)).toBe(false);
-    expect(verifyPreviewSession('a'.repeat(4096), now)).toBe(false);
-    expect(verifyPreviewSession(undefined, now)).toBe(false);
-    process.env.PREVIEW_SESSION_SECRET = 'revoked-and-replaced-key-0123456789abcdef';
-    expect(verifyPreviewSession(session, now)).toBe(false);
-  });
-
-  test('la session reste liée au dataset/projet et exige le jeton de lecture serveur', () => {
-    const session = createPreviewSession();
-    process.env.PUBLIC_SANITY_DATASET = 'production';
-    expect(verifyPreviewSession(session)).toBe(false);
-    process.env.PUBLIC_SANITY_DATASET = 'staging';
-    process.env.PUBLIC_SANITY_PROJECT_ID = 'another-project';
-    expect(verifyPreviewSession(session)).toBe(false);
-    process.env.PUBLIC_SANITY_PROJECT_ID = 'calas-test';
-    process.env.SANITY_API_READ_TOKEN = '';
-    expect(verifyPreviewSession(session)).toBe(false);
-  });
-
-  test('les redirections ne quittent jamais le site et ne visent pas une API', () => {
-    const origin = 'https://calas.example';
-    for (const value of ['https://attacker.example/', '//attacker.example/', '/\\attacker.example/', '/api/preview/enable', '/contact/\r\nLocation: https://attacker.example']) {
-      expect(safePreviewRedirect(value, origin)).toBe('/');
+  test('les API éditoriales et la médiathèque refusent les lectures anonymes', async ({ request }) => {
+    for (const path of ['/api/admin/content/dashboard/', '/api/admin/content/pages/', '/api/admin/content/settings/', '/api/admin/media/']) {
+      const response = await request.get(path);
+      expect(response.status(), path).toBe(401);
+      expect(response.headers()['cache-control']).toContain('no-store');
+      expect(response.headers()['x-robots-tag']).toContain('noindex');
+      expect(await response.text()).not.toMatch(/password|token_hash|storage_key|postgresql:\/\//);
     }
-    expect(safePreviewRedirect('/diagnostic-rps/?sanity-preview-secret=secret#etapes', origin)).toBe('/diagnostic-rps/#etapes');
-    expect(safePreviewRedirect('/contact/?objet=equipes', origin)).toBe('/contact/?objet=equipes');
   });
 
-  test('la lecture publique ne porte ni jeton ni perspective de brouillons', () => {
-    const published = createServerClient(false).config();
-    expect(published.perspective).toBe('published');
-    expect(published.token).toBeUndefined();
-    expect(published.useCdn).toBe(false);
-    const draft = createServerClient(true).config();
-    expect(draft.perspective).toBe('drafts');
-    expect(draft.token).toBe('unit-test-token-not-a-real-credential');
-    expect(draft.useCdn).toBe(false);
+  test('la sortie de preview enlève le paramètre et refuse les redirections externes', async ({ request }) => {
+    const exit = await request.get('/api/preview/disable/?path=%2Fdiagnostic-rps%2F%3Fpreview%3D1%23etapes', { maxRedirects: 0 });
+    expect(exit.status()).toBe(303);
+    expect(exit.headers()['location']).toBe('/diagnostic-rps/#etapes');
+    expect(exit.headers()['set-cookie']).toBeUndefined();
+    for (const path of ['https://attacker.example/', '//attacker.example/', '/api/admin/content/', '/admin/articles/']) {
+      const response = await request.get(`/api/preview/disable/?path=${encodeURIComponent(path)}`, { maxRedirects: 0 });
+      expect(response.headers()['location']).toBe('/');
+    }
   });
 
-  test('les nouveaux textes éditoriaux sont ciblables sans encoder les champs de navigation', () => {
-    const filter = createServerClient(true).config().stega.filter;
-    expect(filter).toBeDefined();
-    const field = (sourcePath: Array<string | number>, allowed = true) => filter!({
-      sourcePath, resultPath: sourcePath, value: 'Texte de recette',
-      sourceDocument: { _id: 'homePage', _type: 'homePage' }, filterDefault: () => allowed,
-    });
-    expect(field(['editorial', 'heroAudience'])).toBe(true);
-    expect(field(['editorial', 'heroDisciplines', 0])).toBe(true);
-    expect(field(['statisticsTitle'])).toBe(true);
-    expect(field(['sections', 0, 'instruction'])).toBe(true);
-    expect(field(['sections', 0, 'presentation'])).toBe(false);
-    expect(field(['editorial', 'reasonsLink', 'href'], false)).toBe(false);
-    expect(field(['seo', 'title'], false)).toBe(false);
+  test('une panne de la base renvoie 503 sans contenus de démonstration ni diagnostic interne', async ({ request }) => {
+    const response = await request.get('http://127.0.0.1:4324/');
+    expect(response.status()).toBe(503);
+    expect(response.headers()['cache-control']).toContain('no-store');
+    const html = await response.text();
+    expect(html).toContain('momentanément indisponible');
+    expect(html).not.toMatch(/ContentUnavailableError|postgresql:\/\/|SELECT |39 %|Un constat largement partagé/);
   });
 
-  test('le site local refuse une activation arbitraire et reste sans cache', async ({ request }) => {
-    const activation = await request.get('/api/preview/enable/?preview=true&sanity-preview-secret=invente', { maxRedirects: 0 });
-    expect([401, 503]).toContain(activation.status());
-    expect(activation.headers()['set-cookie']).toBeUndefined();
-    expect(activation.headers()['cache-control']).toContain('no-store');
-    expect(activation.headers()['x-robots-tag']).toContain('noindex');
-    const publicPage = await request.get('/?preview=true', { headers: { Cookie: 'calas_preview=drafts; sanity-preview-perspective=drafts' } });
-    expect(publicPage.status()).toBe(200);
-    expect(await publicPage.text()).not.toContain('Brouillon — prévisualisation privée');
-    expect(await publicPage.text()).not.toContain('unit-test-token-not-a-real-credential');
+  test('le public ne charge pas les éditeurs ni le moteur PDF ou OCR', async ({ page }) => {
+    const assets: string[] = [];
+    page.on('request', request => { if (['script', 'worker'].includes(request.resourceType())) assets.push(request.url()); });
+    await page.goto('/');
+    await expect(page.locator('h1')).toBeVisible();
+    expect(assets.join('\n')).not.toMatch(/\/admin|tiptap|tesseract|pdf[.-]worker|better-auth|shadcn|ocr-models/i);
+    await expect(page.locator('[data-calas-preview]')).toHaveCount(0);
   });
 });
+

@@ -10,6 +10,11 @@ playwright-report/
 .cache/
 *.log
 backups/
+/tmp/
 artifacts/lighthouse*.json
 apps/web/public/_preview/
 apps/studio/public/ocr/
+apps/web/public/ocr/
+artifacts/logo-coil/live-video/
+artifacts/**/live-video/
+artifacts/logo-coil/layout-probe.json

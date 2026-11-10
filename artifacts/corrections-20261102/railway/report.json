@@ -1,0 +1,52 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "readOnly": true,
+  "checkedAt": "2026-11-02T20:27:40.888Z",
+  "checks": [
+    {
+      "path": "/",
+      "width": 390,
+      "imagesLoaded": true,
+      "noOverflow": true,
+      "axeViolations": 0
+    },
+    {
+      "path": "/qui-sommes-nous/",
+      "width": 390,
+      "imagesLoaded": true,
+      "noOverflow": true,
+      "axeViolations": 0
+    },
+    {
+      "path": "/situations-sensibles/",
+      "width": 390,
+      "imagesLoaded": true,
+      "noOverflow": true,
+      "axeViolations": 0
+    },
+    {
+      "path": "/",
+      "width": 1440,
+      "imagesLoaded": true,
+      "noOverflow": true,
+      "axeViolations": 0
+    },
+    {
+      "path": "/qui-sommes-nous/",
+      "width": 1440,
+      "imagesLoaded": true,
+      "noOverflow": true,
+      "axeViolations": 0
+    },
+    {
+      "path": "/situations-sensibles/",
+      "width": 1440,
+      "imagesLoaded": true,
+      "noOverflow": true,
+      "axeViolations": 0
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "completedAt": "2026-11-02T20:27:56.687Z"
+}

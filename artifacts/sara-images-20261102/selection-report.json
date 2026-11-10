@@ -1,0 +1,90 @@
+{
+  "date": "2026-11-02",
+  "sourceArchive": "ma_photo_profil_et_images_site.zip",
+  "providedBy": "Paul, pour Sara",
+  "images": [
+    {
+      "key": "portrait-sara",
+      "sourceFilename": "portrait_fond_naturel.png",
+      "uploadedFilename": "portrait-sara-serrano-cabeza.png",
+      "width": 1086,
+      "height": 1448,
+      "sha256": "9e10072384f31d0e3835b76356b55b87f1d03302332b6780297e822925b00126",
+      "alt": "Portrait de Sara Serrano Cabeza",
+      "hotspot": {
+        "x": 0.5,
+        "y": 0.44
+      },
+      "placements": [
+        "person:sara:portrait"
+      ],
+      "public": true
+    },
+    {
+      "key": "kintsugi",
+      "sourceFilename": "kintsugi-art-japonais-bol-repare-or.webp",
+      "uploadedFilename": "bol-kintsugi.webp",
+      "width": 1200,
+      "height": 675,
+      "sha256": "6f13d2827cd6c0840772148bb9340dcf31cec9287ee6c5b732039e0f24a7d264",
+      "alt": "Bol en céramique réparé au kintsugi",
+      "hotspot": {
+        "x": 0.5,
+        "y": 0.48
+      },
+      "placements": [
+        "home:visuals.kintsugi",
+        "page:situations-sensibles:image"
+      ],
+      "public": true
+    },
+    {
+      "key": "ripples",
+      "sourceFilename": "pexels-photo-36744232.avif",
+      "uploadedFilename": "ondes-eau.webp",
+      "width": 1112,
+      "height": 750,
+      "sha256": "c06eb5bb50465631acf6bcd43e362757a0983956209d674b42e2ebfd09106dad",
+      "alt": "Une goutte d’eau forme des ondes à la surface.",
+      "hotspot": {
+        "x": 0.5,
+        "y": 0.53
+      },
+      "placements": [
+        "home:visuals.ripples"
+      ],
+      "public": true
+    },
+    {
+      "key": "threads-reserve",
+      "sourceFilename": "Fils-Dores-Tissage-Ethchic.webp",
+      "uploadedFilename": "bobines-fils-dores.webp",
+      "width": 1024,
+      "height": 1024,
+      "sha256": "e1862ae928d47455a6a67bb337afde0386a3a619c16dd359b3ff8fc2d2c3504d",
+      "alt": "Bobines de fils dans des tons dorés et naturels",
+      "hotspot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "placements": [],
+      "public": false
+    },
+    {
+      "key": "compass-reserve",
+      "sourceFilename": "stickers-vintage-boussole-se-situe-sur-une-ancienne-carte-du-monde.jpg.jpg",
+      "uploadedFilename": "boussole-carte-ancienne.jpg",
+      "width": 700,
+      "height": 672,
+      "sha256": "eb14543acaaa55163d44e40eb9732ed3df3a60950228cd65c88bc0164949beca",
+      "alt": "Boussole posée sur une carte ancienne",
+      "hotspot": {
+        "x": 0.58,
+        "y": 0.62
+      },
+      "placements": [],
+      "public": false
+    }
+  ],
+  "changes": "CMS only; no application code or deployment change"
+}

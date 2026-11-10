@@ -1,0 +1,26 @@
+{
+  "origin": "https://calas-web-test-production.up.railway.app",
+  "mode": "dry-run",
+  "startedAt": "2026-11-02T18:48:56.117Z",
+  "contentMutated": false,
+  "mediaUploaded": 0,
+  "documentsPublished": 0,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "snapshotSaved": true,
+  "documents": [
+    {
+      "key": "sara",
+      "version": 3
+    },
+    {
+      "key": "home",
+      "version": 5
+    },
+    {
+      "key": "sensitive",
+      "version": 2
+    }
+  ],
+  "completedAt": "2026-11-02T18:48:56.742Z"
+}

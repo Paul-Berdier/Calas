@@ -1,0 +1,58 @@
+{
+  "checkedAt": "2026-11-02T20:30:48.334Z",
+  "site": "https://calas-web-test-production.up.railway.app",
+  "environment": "staging",
+  "applicationCommit": "f270ee3c807a5e72f264d10669778af82c5372ce",
+  "deploymentId": "e5d3289f-b0d0-42a6-a1a4-9182d82238fd",
+  "deploymentStatus": "SUCCESS",
+  "deployedAt": "2026-11-02T20:27:23.773Z",
+  "content": {
+    "targetedDocuments": 2,
+    "home": {
+      "beforeVersion": 7,
+      "publishedVersion": 9
+    },
+    "settings": {
+      "beforeVersion": 3,
+      "publishedVersion": 5
+    },
+    "photosUploaded": 2,
+    "previousRevisionsUnchanged": true,
+    "verifiedAfterFinalDeployment": true
+  },
+  "publicQa": {
+    "passed": true,
+    "views": 6
+  },
+  "adminQa": {
+    "passed": true,
+    "views": 4,
+    "readOnly": true,
+    "sessionSignedOut": true
+  },
+  "brand": "passed",
+  "ci": {
+    "runId": 41519165415,
+    "url": "https://github.com/Paul-Berdier/Calas/actions/runs/41519165415",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "container",
+        "conclusion": "success",
+        "steps": 9
+      },
+      {
+        "name": "validate",
+        "conclusion": "success",
+        "steps": 33
+      }
+    ]
+  },
+  "remaining": [
+    "Portrait d’Agnès à recevoir"
+  ],
+  "emailsSent": false,
+  "completedAt": "2026-11-02T20:36:49.748Z",
+  "passed": true
+}

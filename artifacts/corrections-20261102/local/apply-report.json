@@ -1,0 +1,33 @@
+{
+  "origin": "http://localhost:4336",
+  "mode": "apply",
+  "startedAt": "2026-11-02T20:18:13.173Z",
+  "contentMutated": true,
+  "mediaUploaded": 2,
+  "documentsPublished": 2,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "publishedMedia": [
+    {
+      "key": "calmFace",
+      "mediaId": "76cdb959-646e-4189-b9f8-452ae1dfd717",
+      "status": 200,
+      "uses": [
+        "home.visuals.calmFace"
+      ]
+    },
+    {
+      "key": "closing",
+      "mediaId": "c4960e3c-3532-4e68-a6e2-d62c7f642446",
+      "status": 200,
+      "uses": [
+        "home.visuals.closing"
+      ]
+    }
+  ],
+  "privateReserves": [],
+  "onlyReviewedCorrectionFieldsChanged": true,
+  "previousRevisionsUnchanged": true,
+  "localServerStopped": true,
+  "completedAt": "2026-11-02T20:18:19.128Z"
+}

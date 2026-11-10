@@ -1,0 +1,51 @@
+{
+  "origin": "http://localhost:4336",
+  "mode": "apply",
+  "startedAt": "2026-11-02T18:48:31.322Z",
+  "contentMutated": true,
+  "mediaUploaded": 5,
+  "documentsPublished": 3,
+  "ownSessionSignedOut": true,
+  "passed": true,
+  "publishedMedia": [
+    {
+      "key": "portrait-sara",
+      "mediaId": "9a4718dc-f6af-407e-97a2-e2b2345761c4",
+      "status": 200,
+      "uses": [
+        "person:sara:portrait"
+      ]
+    },
+    {
+      "key": "kintsugi",
+      "mediaId": "223cf60d-a939-4fc7-bee8-3d7cf0246c98",
+      "status": 200,
+      "uses": [
+        "home:visuals.kintsugi",
+        "page:situations-sensibles:image"
+      ]
+    },
+    {
+      "key": "ripples",
+      "mediaId": "3ac4fac0-facd-4477-9c9e-35be13829dc0",
+      "status": 200,
+      "uses": [
+        "home:visuals.ripples"
+      ]
+    }
+  ],
+  "privateReserves": [
+    {
+      "key": "threads-reserve",
+      "status": 404
+    },
+    {
+      "key": "compass-reserve",
+      "status": 404
+    }
+  ],
+  "onlyReviewedImageFieldsChanged": true,
+  "previousRevisionsUnchanged": true,
+  "localServerStopped": true,
+  "completedAt": "2026-11-02T18:48:36.838Z"
+}

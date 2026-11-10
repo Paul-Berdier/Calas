@@ -1,0 +1,69 @@
+---
+import type { Person, SiteSettings } from '../lib/cms/types';
+
+interface Props { settings: SiteSettings; person?: Person; profile?: boolean }
+const { settings, person, profile = false } = Astro.props;
+const qualification = settings.qualification;
+const iprp = person && person.id === qualification.personId ? qualification.registration : undefined;
+// The authority was supplied for Sara's declaration, independently of the qualification review.
+const isSaraDeclaration = iprp === '2026.16.004' && person?.name.trim().toLocaleLowerCase('fr-FR') === 'sara serrano cabeza';
+const registrations = [
+  {
+    kind: 'IPRP', number: iprp, title: 'Intervenante en prévention des risques professionnels',
+    detail: isSaraDeclaration ? 'DREETS Nouvelle-Aquitaine' : undefined,
+  },
+  {
+    kind: 'RPPS', number: profile && person?.rppsNumber, title: 'Répertoire partagé des professionnels intervenant dans le système de santé',
+    detail: 'Enregistrement professionnel',
+  },
+];
+---
+{person && registrations.filter(entry => entry.number).map(entry =>
+  <aside class:list={['registration', profile ? 'profile-registration' : 'diagnostic-registration']} aria-label={`Enregistrement ${entry.kind} – ${person.name}`}>
+    <span class="registration-heading">
+      <svg viewBox="0 0 32 36" width="17" height="19" fill="none" aria-hidden="true"><path d="M16 2 28 7v11c0 7-7 12-12 15C11 30 4 25 4 18V7L16 2Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="m11 17 3.5 4L22 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span><abbr title={entry.title}>{entry.kind}</abbr>{!profile && ' enregistrée'}</span>
+    </span>
+    {!profile && <><span class="registration-person">{person.name}</span><span>{entry.title}</span></>}
+    {!profile && entry.detail && <span class="registration-detail">Enregistrement auprès de la<br/>{entry.detail}</span>}
+    <strong class="registration-number"><span class="sr-only">{entry.kind === 'IPRP' ? 'Numéro d’enregistrement d’IPRP : ' : 'Numéro RPPS : '}</span>{!profile && <span aria-hidden="true">N° </span>}{entry.number}</strong>
+    {profile && entry.detail && <span class="registration-detail">{entry.detail}</span>}
+  </aside>
+)}
+<style>
+  .registration {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    box-sizing: border-box;
+    border: 1px solid #d6c7b1;
+    border-radius: 3px;
+    background: var(--ivory);
+    color: var(--navy);
+    font: 13px/1.4 var(--ui);
+    text-align: left;
+  }
+  .registration.profile-registration {
+    width: min(100%, 9rem);
+    aspect-ratio: 1;
+    margin-top: 18px;
+    padding: 12px 14px;
+    justify-content: center;
+  }
+  .registration-heading { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 600; letter-spacing: .09em; }
+  .registration-heading svg { color: var(--bronze); flex: none; }
+  .registration-heading abbr { text-decoration: none; }
+  .registration-person { font: 22px/1.15 var(--display); }
+  .registration .registration-number { font: 600 15px/1.3 var(--ui); font-variant-numeric: tabular-nums; letter-spacing: .02em; overflow-wrap: anywhere; }
+  .registration-detail { font-size: 12px; color: #625545; }
+  .registration.diagnostic-registration {
+    align-items: center; gap: 10px; max-width: 380px; margin-top: 32px; padding: 22px 18px;
+    border-color: #d0ded9; background: #f5faf7; color: #142e35; text-align: center; line-height: 1.5;
+  }
+  .diagnostic-registration .registration-heading { justify-content: center; gap: 10px; font-size: 12px; letter-spacing: .045em; text-transform: uppercase; }
+  .diagnostic-registration .registration-heading svg { width: 25px; height: 28px; color: #267a75; }
+  .diagnostic-registration .registration-person { font-size: 19px; margin-top: 5px; }
+  .diagnostic-registration .registration-detail { color: #45615e; }
+  .diagnostic-registration .registration-number { margin-top: 6px; padding: 5px 13px; background: #dbefdf; color: #205d37; border-radius: 20px; font-size: 13px; }
+</style>
