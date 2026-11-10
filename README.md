@@ -4,6 +4,12 @@ Site éditorial Astro SSR avec administration propriétaire sous `/admin`, Postg
 
 Le site et l’administration sont hébergés dans le projet Railway **Calas**, avec PostgreSQL et un stockage privé. L’adresse canonique de production est [www.calas-conseil.fr](https://www.calas-conseil.fr/). Le formulaire adresse les demandes à la boîte OVH partagée `contact@calas-conseil.fr`. Voir [l’exploitation de la messagerie](docs/COURRIEL.md) et [les déploiements](docs/DEPLOYMENT.md).
 
+## Reprendre le site existant
+
+Le dépôt contient les sources du site et de l’administration, les migrations SQL, le logo, les ressources statiques, les tests et les services de sauvegarde et de surveillance. Pour travailler en local avec les contenus initiaux de recette, suivre « Démarrage local » ci-dessous.
+
+Pour retrouver les textes publiés, les brouillons, les portraits, les PDF et les comptes du cabinet, restaurer la dernière archive privée de PostgreSQL et des médias dans une base et un bucket vides. L’opérateur récupère les secrets par un canal privé. Le guide indique où trouver l’archive et sa clé depuis un nouveau poste. [Récupérer et restaurer les données](docs/BACKUP.md#reprendre-une-archive-depuis-un-autre-poste) · [Transférer le site vers OVH](docs/DEPLOYMENT.md#passage-de-railway-au-vps-ovh)
+
 ## Démarrage local
 
 Prérequis : Node **24.19.0**, pnpm **11.25.0**, Docker Desktop démarré. Depuis la racine :
@@ -71,7 +77,7 @@ Le contact conserve validation, contrôle d’origine, honeypot, simulation et S
 - [CMS et accès](docs/CMS.md)
 - [Médias et PDF](docs/MEDIA.md)
 - [Sauvegarde quotidienne hébergée, alertes par e-mail et restauration](docs/BACKUP.md#sauvegarde-hébergée-et-alertes)
-- [Déploiement Railway préparé](docs/DEPLOYMENT.md)
+- [Déploiement Railway et transfert vers OVH](docs/DEPLOYMENT.md)
 - [Guide de Sara](docs/GUIDE-SARA.md)
 - [Migration et référence conservée](docs/MIGRATION.md)
 - [Recette et limites](docs/RECETTE.md)
