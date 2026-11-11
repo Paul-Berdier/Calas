@@ -1,0 +1,25 @@
+{
+  "startedAt": "2026-11-11T23:31:20.267Z",
+  "status": "passed",
+  "checks": [
+    "Exactly Paul selected; confirmation shown before any queue request",
+    "Integrated Railway worker submitted exactly one message; SMTP accepted",
+    "Campaign link opens Diagnostic, records its test arrival and can stop measurement without cookies",
+    "Dedicated test campaign paused after one accepted delivery; history retained"
+  ],
+  "queuedByTest": 1,
+  "subject": "Test Calas — campagne réelle du 12 novembre à 00:31",
+  "delivery": {
+    "total": 1,
+    "queued": 0,
+    "accepted": 1,
+    "simulated": 0,
+    "failed": 0,
+    "uncertain": 0,
+    "suppressed": 0
+  },
+  "finishedAt": "2026-11-11T23:31:47.946Z",
+  "testCampaignPaused": true,
+  "inboxReceipt": "awaiting-user-confirmation",
+  "recipientRole": "Paul — adresse de recette"
+}

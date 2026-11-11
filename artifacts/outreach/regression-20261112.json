@@ -1,0 +1,72 @@
+{
+  "at": "2026-11-11T23:30:41.008Z",
+  "scope": "Local outreach, imports, runner and MCP regression",
+  "node": "v24.19.0",
+  "fileConcurrency": 1,
+  "groups": [
+    {
+      "name": "typescript",
+      "files": [
+        "outreach.test.ts",
+        "outreach-database.test.ts",
+        "outreach-csv-ui.test.ts",
+        "outreach-import-ui.test.ts",
+        "outreach-notice.test.ts",
+        "agent-access.test.ts",
+        "agent-mcp.test.ts",
+        "agent-oauth.test.ts",
+        "outreach-runner.test.ts",
+        "auth-destination.test.ts"
+      ],
+      "exitCode": 0,
+      "tests": 62,
+      "passed": 62,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 38023.285,
+      "failures": []
+    },
+    {
+      "name": "launcher",
+      "files": [
+        "outreach-launcher.test.mjs"
+      ],
+      "exitCode": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 3610.905,
+      "failures": []
+    }
+  ],
+  "externalEmails": 0,
+  "productionTouched": false,
+  "rebuild": false,
+  "total": {
+    "tests": 64,
+    "passed": 64,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "status": "passed",
+  "limits": [
+    "Local isolated PostgreSQL fixtures and loopback protocol endpoints only. No production, inbox delivery or personal AI-client connection is inferred.",
+    "SMTP error and outcome branches use stubs or classification fixtures; no SMTP external connection is made."
+  ],
+  "temporaryDatabaseCleanup": {
+    "remainingTestDatabases": 0,
+    "checkedAt": "2026-11-11T23:32:00.385Z"
+  },
+  "coverage": [
+    "SMTP permanent/transient/ambiguous failure classification, capped retry and uncertain-result no replay",
+    "Concurrent queue idempotency and two-worker locking",
+    "Pause/resume, opposition, erasure, retention and unpublished destination protection",
+    "Actual XLSX parsing, CSV/TXT, deduplication, invalid/oversized archives",
+    "PKCE, OAuth audience/redirect exactness, refresh/revoke, scopes and live role/session checks in local fixtures",
+    "Integrated runner scheduling, shutdown, exception recovery and standalone launcher"
+  ]
+}

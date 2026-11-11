@@ -1,5 +1,13 @@
 # Revue éditoriale et autorisation de publication
 
+## Recette demandée après réparation SMTP — 12 novembre 2026
+
+Paul demande les tests après l’activation de l’envoi réel. Une campagne technique dédiée est créée pour sa seule adresse de recette, avec sélection unique et confirmation dans l’administration. Le message « Test Calas — campagne réelle du 12 novembre à 00:31 » est accepté par OVH via le traitement intégré au service Railway : un envoi, aucune erreur ni issue incertaine. Le lien ouvre Diagnostic, son arrivée et sa consultation remontent dans la campagne technique ; aucun cookie ou stockage navigateur de mesure, et l’arrêt de la mesure fonctionne. Cette campagne est ensuite mise en pause, historique conservé. Aucun message à Sara, Agnès ou à un prospect externe. Le classement dans la boîte Hotmail reste soumis à confirmation du destinataire ; l’acceptation SMTP ne le prouve pas.
+
+Les 64 tests locaux ciblés passent sans saut, ainsi que les 12 contrôles d’interface/accessibilité à 390 et 1440 pixels. Les deux transports MCP sont testés sur le domaine réel avec le SDK officiel : 31 outils sur chacun, identité administrateur, consentement OAuth/PKCE, renouvellement, révocation immédiate et refus des clés croisées. Les accès de recette et leur session sont révoqués ; le client OAuth technique reste enregistré sans autorisation active. Aucun raccordement aux comptes personnels ChatGPT/Claude n’est déduit des tests de protocole. Aucune modification applicative ou nouveau déploiement n’est nécessaire.
+
+Preuves : `artifacts/outreach/campaign-live-20261112.json`, `mcp-live-20261112.json`, `regression-20261112.json` et `artifacts/outreach-ui/report.json`.
+
 ## Prospection et connexions IA — 11 novembre 2026
 
 La demande comprend les imports Excel/CSV/TXT, les campagnes, un lien d’arrivée directe sur le site et les accès MCP locaux et distants. Les compteurs représentent des arrivées et consultations, sans déduire un nombre de personnes uniques ou des ouvertures d’e-mails. Les contacts suggérés par une IA doivent conserver une provenance vérifiable.

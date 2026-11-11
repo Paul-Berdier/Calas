@@ -1,0 +1,18 @@
+{
+  "startedAt": "2026-11-11T23:31:27.272Z",
+  "checks": [
+    "Discovery and anonymous access boundaries pass on production",
+    "Official stdio SDK initializes, lists 31 tools and identifies administrator; local key is refused on remote MCP and with foreign Origin",
+    "Remote OAuth DCR, browser consent, PKCE S256, state and single-use authorization code pass",
+    "Official Streamable HTTP SDK initializes, lists 31 tools and identifies administrator; OAuth token is refused on local API",
+    "Refresh rotation works; remote revocation rejects access and renewal; local revocation is enforced in an already-open SDK connection"
+  ],
+  "externalEmails": 0,
+  "contentMutations": 0,
+  "status": "passed",
+  "localTools": 31,
+  "remoteTools": 31,
+  "finishedAt": "2026-11-11T23:31:31.592Z",
+  "operatorSessionClosed": true,
+  "personalAiAccountConnected": false
+}
