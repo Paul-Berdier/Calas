@@ -25,14 +25,23 @@
     },
     "storedCredentialsMatchRemise": true,
     "ovhManagementSession": "signed-out",
-    "resolution": "updated-credentials-verified-before-deployment",
+    "resolution": "smtp-enabled-and-verified-after-deployment",
     "updatedCredentialsVerified": {
       "at": "2026-11-11T22:58:52.700Z",
       "railway": true,
       "local": true,
       "messageSent": false
     },
-    "pendingDeliveriesAtActivation": 0
+    "pendingDeliveriesAtActivation": 0,
+    "finalTransport": "smtp",
+    "replayedSimulations": 0,
+    "productionVerification": {
+      "at": "2026-11-11T23:08:58.749Z",
+      "smtpVerified": true,
+      "runnerEnabled": true,
+      "hourlyLimit": 20,
+      "externalMessagesSent": 0
+    }
   },
   "mcp": {
     "localApiStatus": 200,
@@ -42,5 +51,12 @@
     "remoteWithLocalKey": 401,
     "remoteAuthentication": "OAuth",
     "personalAiClientConnected": false
+  },
+  "deployment": {
+    "commit": "cdd674ec7dff27b2d40a41cba77e4f850e2b21fe",
+    "web": "8dd02fb3-8113-4bec-9dbd-b2700b2e1948",
+    "monitor": "54213f0d-6df5-4880-892f-a7cfac807690",
+    "backup": "c9692746-c6a2-4649-b1d4-6a06935ee653",
+    "newServices": 0
   }
 }

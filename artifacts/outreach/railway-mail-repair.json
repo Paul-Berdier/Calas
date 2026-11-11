@@ -1,0 +1,19 @@
+{
+  "at": "2026-11-11T23:08:00.206Z",
+  "checks": [
+    "Site, health, readiness and OAuth discovery respond 200",
+    "Production administration reports SMTP mode",
+    "Live duplicate opens and cancels without creating or sending",
+    "Live MCP UI distinguishes local key and remote OAuth"
+  ],
+  "emailsSentByCheck": 0,
+  "transport": "smtp",
+  "deliveryCounts": {
+    "queued": 0,
+    "accepted": 0,
+    "simulated": 1,
+    "failed": 0,
+    "uncertain": 0
+  },
+  "status": "passed"
+}
