@@ -1,6 +1,6 @@
 {
   "startedAt": "2026-11-11T23:31:20.267Z",
-  "status": "passed",
+  "status": "passed-with-deliverability-warning",
   "checks": [
     "Exactly Paul selected; confirmation shown before any queue request",
     "Integrated Railway worker submitted exactly one message; SMTP accepted",
@@ -20,6 +20,13 @@
   },
   "finishedAt": "2026-11-11T23:31:47.946Z",
   "testCampaignPaused": true,
-  "inboxReceipt": "awaiting-user-confirmation",
-  "recipientRole": "Paul — adresse de recette"
+  "inboxReceipt": "user-confirmed-junk-folder",
+  "recipientRole": "Paul — adresse de recette",
+  "deliveryAssessment": {
+    "received": true,
+    "confirmationSource": "Paul",
+    "folder": "junk",
+    "primaryInboxValidated": false,
+    "filteringCause": "not-established-for-this-message"
+  }
 }
