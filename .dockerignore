@@ -3,6 +3,7 @@
 .codex
 .agents
 **/node_modules
+**/.pnpm-store
 **/dist
 **/.astro
 **/.cache

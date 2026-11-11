@@ -3,6 +3,7 @@ WORKDIR /app
 RUN npm install --global pnpm@11.25.0
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/package.json
+COPY apps/mcp/package.json apps/mcp/package.json
 RUN pnpm install --frozen-lockfile
 COPY infra/monitor/*.mjs apps/web/monitor/
 RUN pnpm exec esbuild apps/web/monitor/run.mjs --bundle --platform=node --target=node24 --format=esm \

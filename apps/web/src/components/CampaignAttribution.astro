@@ -1,0 +1,61 @@
+<aside id="campaign-measurement" hidden aria-label="Mesure des consultations">
+  <span>Cette campagne compte les consultations de ses pages, sans identifiant individuel de visiteur.</span>
+  <button type="button" id="campaign-measurement-stop">Arrêter cette mesure</button>
+  <a href="/confidentialite/">En savoir plus</a>
+</aside>
+<script>
+  const current = new URL(window.location.href);
+  const campaignToken = current.searchParams.get('campagne');
+  if (campaignToken && /^c_[A-Za-z0-9_-]{20,150}$/.test(campaignToken)) {
+    const panel = document.querySelector<HTMLElement>('#campaign-measurement');
+    if (panel) panel.hidden = false;
+    const permitted = (path: string) => /^\/(?:[a-z0-9-]+\/)*$/.test(path)
+      && !/^\/(?:admin|api|media|r)(?:\/|$)/.test(path);
+    const campaignLinks: HTMLAnchorElement[] = [];
+    document.querySelectorAll<HTMLAnchorElement>('a[href]').forEach(link => {
+      const destination = new URL(link.href, current);
+      if (destination.origin !== current.origin || !permitted(destination.pathname) || destination.hash) return;
+      destination.searchParams.set('campagne', campaignToken);
+      link.href = destination.href;
+      campaignLinks.push(link);
+    });
+    let stopped = false;
+    let recorded = false;
+    const record = () => {
+      if (stopped || recorded || document.visibilityState !== 'visible' || !permitted(current.pathname)) return;
+      recorded = true;
+      void fetch('/api/outreach/visit/', {
+        method: 'POST',
+        credentials: 'omit',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campaignToken, path: current.pathname, arrival: current.searchParams.get('entree') === '1' }),
+        referrerPolicy: 'no-referrer',
+      }).catch(() => {});
+    };
+    // A preview fetched by an email scanner is not an observed browser page view.
+    const timer = window.setTimeout(record, 1500);
+    document.addEventListener('visibilitychange', record);
+    document.querySelector('#campaign-measurement-stop')?.addEventListener('click', () => {
+      stopped = true;
+      window.clearTimeout(timer);
+      document.removeEventListener('visibilitychange', record);
+      current.searchParams.delete('campagne');
+      current.searchParams.delete('entree');
+      window.history.replaceState(window.history.state, '', current.pathname + current.search + current.hash);
+      campaignLinks.forEach(link => {
+        const destination = new URL(link.href);
+        destination.searchParams.delete('campagne');
+        link.href = destination.href;
+      });
+      if (panel) {
+        panel.replaceChildren(document.createTextNode('La mesure est arrêtée pour cette navigation.'));
+      }
+    });
+  }
+</script>
+<style>
+  aside:not([hidden]) { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 16px; padding: 14px 24px; background: #efe5d4; color: #14213a; font: 14px/1.5 system-ui, sans-serif; }
+  button, a { color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  button { border: 0; background: transparent; padding: 0; cursor: pointer; }
+  button:focus-visible, a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+</style>

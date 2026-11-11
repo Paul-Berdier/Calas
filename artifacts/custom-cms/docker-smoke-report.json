@@ -29,6 +29,6 @@
     }
   ],
   "stopped": true,
-  "imageId": "sha256:90d07d0fde54056f9ba7a42ae13fc14f531865cfcf313752b7e87cb3107b249a",
+  "imageId": "sha256:ca60e63d8ec31c95e630d3ada0f0abe4f1d927ad7db6c6268b726912fcce166e",
   "status": "passed"
 }

@@ -1,5 +1,25 @@
 # Migration vers le CMS Calas Conseil
 
+## Prospection et accès des assistants — 11 novembre 2026
+
+La demande de Paul ajoute des campagnes de courriels, des liens ouvrant directement le site et un accès MCP à l’administration. Les précisions du 11 novembre excluent le questionnaire et demandent des fichiers Excel/TXT ainsi que tous les clients IA. Les fiches de contacts conservent leur provenance ; une suggestion ChatGPT n’est pas une vérification. Le périmètre ne comprend pas de facturation ni de CRM externe.
+
+Les migrations explicites `0004_prospection_mcp`, `0005_outreach_pause_retention` et `0006_mcp_oauth` créent les données de prospection et les accès délégués sans toucher aux documents publiés ou aux comptes existants. La deuxième préserve également les anciens liens de désinscription, même après effacement d’une fiche. La troisième ajoute les clients, demandes, autorisations, codes et jetons OAuth. Les contacts opposés ne peuvent pas redevenir actifs par import. Les envois conservent un instantané et une identité campagne/contact ; un résultat SMTP ambigu n’est pas rejoué automatiquement.
+
+La notice de confidentialité se met à jour séparément avec `scripts/content-outreach-notice.ts` : destination et administrateur explicites, simulation puis `--apply --publish`, nouvelles révisions, refus d’écraser des corrections éditoriales incompatibles. Aucun build, démarrage ou SQL de migration ne publie ces textes.
+
+La recette locale du premier lot passe 20 tests métier/PostgreSQL, 12 tests MCP local, 9 tests d’import, le test de migration de notice et huit vues navigateur contrôlées à 390/1440 px. Le parcours HTTP réel vérifie connexion et e-mail via Mailpit, refus d’origine étrangère, lien et statistiques, navigation sans JavaScript, désinscription native et révocation MCP. Un défaut de politique Referrer sur le formulaire natif a été corrigé, puis le parcours a entièrement réussi. Aucun courriel externe n’a été envoyé.
+
+Paul a ensuite confirmé vouloir aussi les clients web ChatGPT et Claude. Le transport MCP distant et son consentement OAuth complètent le connecteur local. La recette HTTP réelle vérifie le consentement navigateur, PKCE, le client SDK officiel sur HTTP, le renouvellement et la révocation. Le traitement de la file est intégré au service web existant et testé en simulation avec le vrai lanceur, pour éviter la création d’un service Railway supplémentaire. L’interface est contrôlée sur dix vues à 390/1440 px, sans erreur Axe ni débordement. Ces essais locaux ne constituent pas une connexion aux comptes personnels ChatGPT/Claude.
+
+Validation finale : 62 tests métier/imports/MCP/connexion/traitement, puis sept tests de configuration/lanceur réussis sans saut ; lint, typecheck (0 erreur, 0 avertissement, 27 indications), compilation et six groupes de recette HTTP réussis. L’image Docker Node 24.19.0 passe les cinq contrôles de démarrage, HTTP, utilisateur non privilégié, Sharp et journalisation. Le premier lancement simultané de toutes les bases de test et de Docker avait provoqué des délais SQL ; les suites ont été relancées une fois séquentiellement sans modifier les délais de l’application. Les deux bases temporaires laissées par ces délais ont été retirées après identification. `test:mcp` exécute désormais ses fichiers séquentiellement tout en conservant les assertions de concurrence à l’intérieur des tests. Rapport récapitulatif : `artifacts/outreach/validation.json`.
+
+Le déploiement reste à confirmer : à la question initiale proposant un service facturé supplémentaire, Paul a demandé une explication, sans donner son accord. L’architecture a depuis été simplifiée pour conserver le service existant. Aucun nouveau service, achat, courriel externe, migration de production ou publication de notice n’a été réalisé. La mise en ligne devra d’abord sauvegarder, conserver le nouveau secret des liens, appliquer les migrations, puis démarrer en simulation. La cadence réelle et les quotas de la messagerie OVH restent à valider avant toute prospection.
+
+Guides : [prospection](PROSPECTION.md), [connexion MCP](MCP.md). Preuves locales : `artifacts/outreach/http.json`, `artifacts/outreach-ui/report.json`. La production n’a pas encore reçu cette évolution à ce stade.
+
+## État historique — 2 novembre 2026
+
 **État au 2 novembre 2026 :** le cahier des charges du 31 octobre, les photos fournies pour Sara et une première livraison des corrections du document « CORRECTIONS SITE AU 02-11.pdf » sont appliqués en recette locale et sur la préproduction Railway. La photo de la femme rousse a ensuite été retirée à la demande de Paul. La reprise du lettrage `a49a2fd` est déployée, mais Paul en rejette les contours irréguliers ; sa CI échoue au seuil de performance. Une nouvelle version à courbes lisses est intégrée et vérifiée localement ; son déploiement, sa mesure de performance et sa CI complète restent à confirmer. Le portrait d’Agnès reste attendu. Le journal ci-dessous conserve les opérations antérieures. Voir [la matrice du nouveau brief](EVOLUTIONS-20261101.md) et [les décisions de validation](VALIDATION.md).
 
 ## Portrait d’Agnès et fiches de l’équipe — 9 novembre 2026

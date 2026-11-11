@@ -1,0 +1,48 @@
+{
+  "at": "2026-11-11T21:57:34.948Z",
+  "checks": [
+    {
+      "name": "outreach-overview",
+      "width": 390
+    },
+    {
+      "name": "outreach-overview",
+      "width": 1440
+    },
+    {
+      "name": "outreach-campaign",
+      "width": 390
+    },
+    {
+      "name": "outreach-campaign",
+      "width": 1440
+    },
+    {
+      "name": "outreach-import",
+      "width": 390
+    },
+    {
+      "name": "outreach-import",
+      "width": 1440
+    },
+    {
+      "name": "integrations-token",
+      "width": 390
+    },
+    {
+      "name": "integrations-token",
+      "width": 1440
+    },
+    {
+      "name": "oauth-consent",
+      "width": 390
+    },
+    {
+      "name": "oauth-consent",
+      "width": 1440
+    }
+  ],
+  "queued": 2,
+  "imported": 1,
+  "errors": []
+}

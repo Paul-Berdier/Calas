@@ -1,5 +1,18 @@
 # Revue éditoriale et autorisation de publication
 
+## Prospection et connexions IA — 11 novembre 2026
+
+La demande comprend les imports Excel/CSV/TXT, les campagnes, un lien d’arrivée directe sur le site et les accès MCP locaux et distants. Les compteurs représentent des arrivées et consultations, sans déduire un nombre de personnes uniques ou des ouvertures d’e-mails. Les contacts suggérés par une IA doivent conserver une provenance vérifiable.
+
+Les parcours locaux vérifient la connexion réelle, le traitement automatique simulé dans le service web, les oppositions, les permissions et la révocation OAuth. Le rapport navigateur est `artifacts/outreach/http.json` ; les dix vues d’administration sont dans `artifacts/outreach-ui/`. Aucun e-mail externe ni compte IA personnel n’a été utilisé pour ces essais.
+
+- [ ] Mise en ligne de cette évolution autorisée après présentation de la solution sur le service Railway existant.
+- [ ] Relecture de la notice de confidentialité avant sa publication explicite.
+- [ ] Connexion effective aux comptes ChatGPT/Claude/Codex souhaités après déploiement HTTPS.
+- [ ] Source, pertinence professionnelle, message et destinataires contrôlés avant la première campagne réelle ; quotas OVH vérifiés.
+
+La réponse de Paul demandant d’expliquer la proposition de service supplémentaire ne vaut pas autorisation de déployer ou de facturer ce service. Aucun service supplémentaire n’est désormais nécessaire. Les autres décisions historiques ci-dessous sont conservées.
+
 ## Lancement autorisé le 9 novembre 2026
 
 Paul a autorisé le lancement sur **www.calas-conseil.fr**, confirmé les identités des deux EI, les responsabilités de Sara, les destinataires du formulaire et la conservation des demandes. Il a autorisé un essai à la boîte partagée. La racine du domaine en HTTPS est hors du périmètre retenu. Les avis et cases de relecture ci-dessous décrivent les versions historiques.

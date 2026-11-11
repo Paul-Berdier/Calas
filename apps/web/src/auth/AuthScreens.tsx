@@ -9,6 +9,7 @@ import QRCode from "qrcode";
 import { ShieldCheck, ArrowLeft, LogOut, KeyRound, Mail } from "lucide-react";
 import { authClient } from "./client";
 import { SESSION_FRESH_AGE_SECONDS, sessionFreshUntil } from "./policy";
+import { authLoginPath, isConsentDestination, safeAuthDestination } from "./destination";
 import "./auth.css";
 type User = {
   id: string;
@@ -61,15 +62,17 @@ export default function AuthScreens({
   securityFreshUntil = 0,
   serverTime = Date.now(),
   passwordOnlyMode,
+  returnTo,
 }: {
   mode: "login" | "security" | "reset" | "invitation" | "users";
   user?: User;
   securityFreshUntil?: number;
   serverTime?: number;
   passwordOnlyMode?: PasswordOnlyMode;
+  returnTo?: string;
 }) {
   if (mode === "security" && user)
-    return <Security user={user} initialFreshUntil={securityFreshUntil} serverTime={serverTime} passwordOnlyMode={passwordOnlyMode} />;
+    return <Security user={user} initialFreshUntil={securityFreshUntil} serverTime={serverTime} passwordOnlyMode={passwordOnlyMode} returnTo={returnTo} />;
   if (mode === "users" && user) return <Users />;
   return (
     <Login mode={mode === "reset" || mode === "invitation" ? mode : "login"} />
@@ -86,9 +89,7 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
     () => new URLSearchParams(window.location.search).get("token") || "",
   );
   const [destination] = useState(() =>
-    new URLSearchParams(window.location.search).get("returnTo") === "security"
-      ? "/admin/security/"
-      : "/admin/",
+    safeAuthDestination(new URLSearchParams(window.location.search).get("returnTo")),
   );
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
@@ -143,7 +144,7 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
       if (step === "verify") {
         const result = await authClient.sendVerificationEmail({
           email,
-          callbackURL: new URL("/admin/login/", window.location.origin).href,
+          callbackURL: new URL(authLoginPath(destination), window.location.origin).href,
         });
         if (result.error)
           throw new Error(
@@ -157,7 +158,7 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
       if (step === "forgot") {
         const result = await authClient.requestPasswordReset({
           email,
-          redirectTo: new URL("/admin/reset-password/", window.location.origin)
+          redirectTo: new URL(`/admin/reset-password/${isConsentDestination(destination) ? `?returnTo=${encodeURIComponent(destination)}` : ""}`, window.location.origin)
             .href,
         });
         if (result.error)
@@ -369,7 +370,7 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
               </button>
             )}
             {(step === "forgot" || step === "verify" || mode !== "login") && (
-              <a className="auth-link" href="/admin/login/">
+              <a className="auth-link" href={authLoginPath(destination)}>
                 Retour à la connexion
               </a>
             )}
@@ -390,12 +391,15 @@ function Login({ mode }: { mode: "login" | "reset" | "invitation" }) {
     </Shell>
   );
 }
-function Security({ user, initialFreshUntil, serverTime, passwordOnlyMode }: {
+function Security({ user, initialFreshUntil, serverTime, passwordOnlyMode, returnTo }: {
   user: User;
   initialFreshUntil: number;
   serverTime: number;
   passwordOnlyMode?: PasswordOnlyMode;
+  returnTo?: string;
 }) {
+  const destination = safeAuthDestination(returnTo);
+  const resumeConsent = isConsentDestination(destination);
   const [password, setPassword] = useState(""),
     [newPassword, setNewPassword] = useState(""),
     [code, setCode] = useState(""),
@@ -499,7 +503,7 @@ function Security({ user, initialFreshUntil, serverTime, passwordOnlyMode }: {
       const result = await authClient.signOut();
       if (result.error)
         throw new Error("La déconnexion n’a pas pu être confirmée. Réessayez.");
-      window.location.assign(reconnect ? "/admin/login/?returnTo=security" : "/admin/login/");
+      window.location.assign(reconnect ? authLoginPath(resumeConsent ? destination : "/admin/security/") : "/admin/login/");
     });
   }
   async function setup(event: FormEvent) {
@@ -561,7 +565,7 @@ function Security({ user, initialFreshUntil, serverTime, passwordOnlyMode }: {
             {passwordOnlyMode ? <>
               <h2><KeyRound size={25} aria-hidden /> {passwordOnlyMode === "staging" ? "Accès au site de test" : "Votre connexion"}</h2>
               <p>{passwordOnlyMode === "staging" ? "Votre identifiant et votre mot de passe suffisent pour ce compte de recette." : <>Vous vous connectez avec <strong>{user.email}</strong> et votre mot de passe.</>}</p>
-              <a className="auth-button" href="/admin/">Accéder à mes contenus</a>
+              <a className="auth-button" href={destination}>{resumeConsent ? "Reprendre la connexion IA" : "Accéder à mes contenus"}</a>
             </> : <>
             <h2>
               <ShieldCheck size={25} aria-hidden /> Double authentification
@@ -656,8 +660,8 @@ function Security({ user, initialFreshUntil, serverTime, passwordOnlyMode }: {
               </>
             )}
             {enabled && (
-              <a className="auth-button" href="/admin/">
-                Accéder à mes contenus
+              <a className="auth-button" href={destination}>
+                {resumeConsent ? "Reprendre la connexion IA" : "Accéder à mes contenus"}
               </a>
             )}
             </>}

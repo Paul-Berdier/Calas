@@ -1,0 +1,87 @@
+---
+import { getCampaignLanding, getUnsubscribe, unsubscribeInvitation } from '../../server/outreach/service';
+import { assertSameOrigin, HttpError } from '../../server/http';
+import { readBoundedForm } from '../../lib/contact';
+import { consumeRateLimit } from '../../server/auth/rate-limit';
+import { clientAddress } from '../../server/client-address';
+
+const token = Astro.params.token ?? '';
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+let message = '';
+let available = false;
+let stopped = false;
+try {
+  if (token.startsWith('c_') && ['GET', 'HEAD'].includes(Astro.request.method)) {
+    const campaign = await getCampaignLanding(token);
+    if (campaign) {
+      const destination = new URL(campaign.targetPath, Astro.url.origin);
+      destination.searchParams.set('campagne', token);
+      destination.searchParams.set('entree', '1');
+      return new Response(null, { status: 302, headers: {
+        Location: destination.pathname + destination.search,
+        'Cache-Control': 'private, no-store',
+        'Referrer-Policy': 'no-referrer',
+        'X-Robots-Tag': 'noindex, nofollow, noarchive',
+      } });
+    }
+  } else if (token.startsWith('u_')) {
+    const subscription = await getUnsubscribe(token);
+    available = Boolean(subscription);
+    stopped = subscription?.subscribed === false;
+    if (available && Astro.request.method === 'POST') {
+      assertSameOrigin(Astro.request);
+      const form = await readBoundedForm(Astro.request);
+      if (form.get('action') !== 'unsubscribe') throw new HttpError(422, 'ACTION', 'Confirmez votre désinscription.');
+      const address = clientAddress(Astro.request, Astro.clientAddress);
+      if (!await consumeRateLimit('outreach-unsubscribe:' + address, 30, 900)) {
+        throw new HttpError(429, 'RATE_LIMIT', 'Veuillez patienter quelques minutes avant de réessayer.');
+      }
+      await unsubscribeInvitation(token);
+      stopped = true;
+    }
+  }
+  if (!available) {
+    Astro.response.status = 404;
+    message = 'Ce lien est indisponible. Vous pouvez retrouver nos informations sur le site.';
+  }
+} catch (error) {
+  Astro.response.status = error instanceof HttpError ? error.status : 503;
+  message = error instanceof HttpError ? error.message : 'La demande ne peut pas être traitée pour le moment. Veuillez réessayer.';
+}
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <title>Vos préférences de contact — Calas Conseil</title>
+    <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main>
+      <a href="/" aria-label="Calas Conseil, accueil"><img src="/brand/logo-horizontal.svg" width="232" height="90" alt="Calas Conseil" /></a>
+      <h1>{stopped ? 'Votre désinscription est enregistrée.' : available ? 'Gérer les sollicitations de Calas Conseil' : 'Lien indisponible'}</h1>
+      {message && <p role="alert">{message}</p>}
+      {available && !stopped && <>
+        <p>Vous pouvez demander à ne plus recevoir nos courriels de prospection. Cette préférence s’applique à toutes les campagnes de Calas Conseil.</p>
+        <form method="post">
+          <input type="hidden" name="action" value="unsubscribe" />
+          <button type="submit">Me désinscrire</button>
+        </form>
+      </>}
+      {stopped && <p>Votre adresse est exclue des prochains envois de prospection.</p>}
+      <p><a href="/">Revenir au site</a> · <a href="/confidentialite/">Protection des données</a></p>
+    </main>
+  </body>
+</html>
+<style>
+  :global(body) { margin: 0; background: #f7f2ea; color: #14213a; font: 18px/1.65 system-ui, sans-serif; }
+  main { max-width: 650px; padding: 64px 24px; margin: auto; }
+  img { width: min(232px, 80%); height: auto; }
+  h1 { font: 400 clamp(30px, 5vw, 44px)/1.2 Georgia, serif; margin-top: 46px; }
+  a { color: #233c51; text-underline-offset: 4px; }
+  button { margin: 15px 0; border: 0; border-radius: 6px; padding: 15px 24px; background: #14213a; color: white; font: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid #ab8344; outline-offset: 5px; }
+</style>

@@ -47,6 +47,8 @@ En production, Sara, Agnès et Paul utilisent leur e-mail vérifié et leur mot 
 
 Les courriels de développement arrivent dans [Mailpit local](http://localhost:18025/). Les autres collaborateurs sont invités depuis l’administration. Le [guide de Sara illustré](docs/GUIDE-SARA.md) présente la connexion, les pages, les images, l’import PDF, les brouillons, la publication et l’historique.
 
+Les écrans **Prospection** et **Connexions IA** ajoutent les contacts professionnels, les campagnes et l’accès délégué aux assistants. La prospection démarre en simulation. Son [guide d’exploitation](docs/PROSPECTION.md) décrit les imports Excel/CSV/TXT, la file persistante, les statistiques agrégées et son traitement intégré au service web. Le [guide MCP](docs/MCP.md) explique le raccordement distant avec OAuth pour ChatGPT, Claude et Codex, ainsi que le connecteur local, avec les droits du compte connecté. La connexion aux comptes personnels reste à effectuer après déploiement.
+
 ## Commandes principales
 
 | Commande | Effet |

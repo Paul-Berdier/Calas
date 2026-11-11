@@ -1,4 +1,5 @@
 node_modules/
+.pnpm-store/
 dist/
 .astro/
 .sanity/
@@ -18,3 +19,4 @@ apps/web/public/ocr/
 artifacts/logo-coil/live-video/
 artifacts/**/live-video/
 artifacts/logo-coil/layout-probe.json
+artifacts/outreach/*.mjs

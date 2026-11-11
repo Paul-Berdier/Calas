@@ -30,6 +30,8 @@ import {
   LogOut,
   Tag,
   PenLine,
+  Mail,
+  Plug,
 } from "lucide-react";
 import {
   request,
@@ -73,6 +75,8 @@ const PdfImport = lazy(() =>
     default: module.PdfImport,
   })),
 );
+const Outreach = lazy(() => import("./Outreach").then(module => ({ default: module.Outreach })));
+const Integrations = lazy(() => import("./Integrations").then(module => ({ default: module.Integrations })));
 const navigation = [
   { slug: "", label: "Tableau de bord", Icon: LayoutDashboard },
   { slug: "pages", label: "Pages du site", Icon: Files },
@@ -80,6 +84,8 @@ const navigation = [
   { slug: "media", label: "Médiathèque", Icon: Images },
   { slug: "people", label: "Équipe", Icon: Users },
   { slug: "statistics", label: "Chiffres et sources", Icon: ChartNoAxesColumn },
+  { slug: "outreach", label: "Prospection", Icon: Mail },
+  { slug: "integrations", label: "Connexions IA", Icon: Plug },
   {
     slug: "settings",
     label: "Paramètres du site",
@@ -211,7 +217,7 @@ export default function AdminApp({
     };
     window.addEventListener("popstate", pop);
     const warnBeforeLeavingImport = (event: BeforeUnloadEvent) => {
-      if (dirty.current && pathRef.current.replace(/\/$/, "") === "/admin/articles/import") {
+      if (dirty.current && (pathRef.current.replace(/\/$/, "") === "/admin/articles/import" || pathRef.current.startsWith("/admin/outreach"))) {
         event.preventDefault();
         event.returnValue = "";
       }
@@ -310,6 +316,8 @@ export default function AdminApp({
         </Suspense>
       </>
     );
+  else if (section === "outreach" && !id) panel = <Suspense fallback={<Loading label="Ouverture de la prospection…" />}><Outreach onDirtyChange={changeDirty} /></Suspense>;
+  else if (section === "integrations" && !id) panel = <Suspense fallback={<Loading label="Ouverture des connexions IA…" />}><Integrations user={user} /></Suspense>;
   else if (section === "guide" && !id) panel = <EditorialGuide />;
   else if (section === "history") panel = <HistoryView role={user.role} onNavigate={navigate} />;
   else if (section === "settings")

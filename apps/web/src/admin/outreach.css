@@ -1,0 +1,205 @@
+.outreach-space,
+.outreach-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.outreach-space .admin-section-heading {
+  margin-bottom: 0;
+}
+.outreach-stack {
+  gap: 16px;
+}
+.outreach-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.outreach-tabs button[aria-pressed="true"] {
+  background: var(--a-navy);
+  color: white;
+  border-color: var(--a-navy);
+}
+.outreach-list {
+  display: flex;
+  flex-direction: column;
+}
+.outreach-list-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-top: 1px solid var(--a-border);
+}
+.outreach-list-row:first-child {
+  border-top: 0;
+}
+.outreach-list-row h3 {
+  font-size: 15px;
+}
+.outreach-list-row p,
+.outreach-list-row small {
+  color: var(--a-muted);
+}
+.outreach-grow {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.outreach-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.outreach-grid .outreach-wide {
+  grid-column: 1/-1;
+}
+.outreach-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+.outreach-check input {
+  accent-color: var(--a-navy);
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin: 3px 0 0;
+}
+.outreach-check input:disabled + span {
+  color: var(--a-muted);
+}
+.outreach-check span {
+  overflow-wrap: anywhere;
+}
+.outreach-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 300px;
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid var(--a-border);
+  border-radius: 8px;
+}
+.outreach-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.outreach-metric {
+  background: var(--a-paper);
+  border: 1px solid var(--a-border);
+  border-radius: 8px;
+  padding: 18px;
+}
+.outreach-metric strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.outreach-metric span {
+  color: var(--a-muted);
+  font-size: 12px;
+}
+.outreach-message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.75;
+  padding: 20px;
+  border: 1px solid var(--a-border);
+  background: white;
+  border-radius: 8px;
+}
+.outreach-instructions {
+  padding-left: 20px;
+  margin: 0;
+}
+.outreach-instructions li + li {
+  margin-top: 10px;
+}
+.outreach-token {
+  border-color: #bd9c6d;
+}
+.outreach-space code {
+  overflow-wrap: anywhere;
+}
+.outreach-filter {
+  max-width: 420px;
+}
+.outreach-search {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.outreach-search input {
+  flex: 1;
+}
+.outreach-fieldset {
+  border: 1px solid var(--a-border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.outreach-fieldset legend {
+  padding: 0 6px;
+  font-weight: 600;
+}
+.outreach-response {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--a-border);
+}
+.outreach-response:last-child {
+  border-bottom: 0;
+}
+.outreach-response p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin-top: 8px;
+}
+.outreach-muted {
+  color: var(--a-muted);
+}
+.outreach-warning {
+  padding: 15px 18px;
+  border-left: 3px solid var(--a-bronze);
+  background: var(--a-ivory);
+  border-radius: 4px;
+}
+.oauth-consent { padding: 48px 24px; min-height: 100vh; background: var(--a-ivory); }
+.oauth-consent > .admin-card { max-width: 720px; margin: 24px auto; }
+.oauth-consent h1 { font-size: clamp(23px, 4vw, 30px); line-height: 1.25; }
+.oauth-brand { display: block; width: min(340px, 100%); margin: 0 auto; }
+.oauth-brand img { display: block; width: 100%; height: auto; }
+@media (max-width: 900px) {
+  .outreach-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .outreach-grid {
+    grid-template-columns: 1fr;
+  }
+  .outreach-list-row {
+    flex-wrap: wrap;
+    padding: 16px;
+    gap: 10px;
+  }
+  .outreach-list-row .outreach-grow {
+    flex-basis: 100%;
+  }
+  .outreach-metric {
+    padding: 14px;
+  }
+  .outreach-metric strong {
+    font-size: 24px;
+  }
+  .outreach-space .admin-actions {
+    flex-wrap: wrap;
+  }
+}

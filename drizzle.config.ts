@@ -7,7 +7,7 @@ try { loadEnvFile(resolve(root, 'apps/web/.env')); } catch (error) { if ((error 
 
 export default defineConfig({
   dialect: 'postgresql',
-  schema: ['apps/web/src/server/db/schema.ts', 'apps/web/src/server/db/auth-schema.ts', 'apps/web/src/server/db/contact-schema.ts', 'apps/web/src/server/media/schema.ts'].map(path => resolve(root, path).replaceAll('\\', '/')),
+  schema: ['apps/web/src/server/db/schema.ts', 'apps/web/src/server/db/auth-schema.ts', 'apps/web/src/server/db/contact-schema.ts', 'apps/web/src/server/media/schema.ts', 'apps/web/src/server/db/outreach-schema.ts', 'apps/web/src/server/db/agent-schema.ts', 'apps/web/src/server/db/oauth-schema.ts'].map(path => resolve(root, path).replaceAll('\\', '/')),
   out: relative(process.cwd(), resolve(root, 'drizzle')).replaceAll('\\', '/'),
   dbCredentials: { url: process.env.DATABASE_URL || '' },
   strict: true,

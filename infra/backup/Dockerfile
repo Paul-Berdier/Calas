@@ -3,6 +3,7 @@ WORKDIR /app
 RUN npm install --global pnpm@11.25.0
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/package.json
+COPY apps/mcp/package.json apps/mcp/package.json
 RUN pnpm install --frozen-lockfile
 COPY apps/web/src/server apps/web/src/server
 COPY scripts/cloud-backup.ts scripts/cloud-backup.ts

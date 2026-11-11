@@ -1,0 +1,11 @@
+{
+  "passed": [
+    "Vraie connexion et vérification via Mailpit ; aucun TOTP artificiel",
+    "API protégée et campagne traitée automatiquement en simulation dans le service web",
+    "Lien direct, arrivées/consultations distinctes, arrêt, zéro stockage navigateur, navigation sans JavaScript",
+    "Désinscription explicite, GET sans effet et POST externe refusé",
+    "Accès assistant réel, liste outils, isolation bearer/session et révocation immédiate",
+    "OAuth PKCE réel, consentement navigateur, SDK MCP HTTP, rotation puis révocation"
+  ],
+  "externalEmails": 0
+}

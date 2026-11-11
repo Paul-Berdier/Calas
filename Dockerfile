@@ -10,6 +10,7 @@ RUN npm install --global pnpm@11.25.0
 FROM base AS dependencies
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/package.json
+COPY apps/mcp/package.json ./apps/mcp/package.json
 RUN pnpm install --frozen-lockfile
 
 FROM dependencies AS build
@@ -26,6 +27,7 @@ RUN pnpm build
 FROM base AS production-dependencies
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/package.json
+COPY apps/mcp/package.json ./apps/mcp/package.json
 RUN pnpm install --prod --frozen-lockfile
 
 FROM os-base AS runtime
@@ -38,4 +40,4 @@ COPY --from=build --chown=node:node /app/apps/web/package.json ./package.json
 USER node
 EXPOSE 4321
 HEALTHCHECK --interval=30s --timeout=6s --start-period=20s --retries=3 CMD node -e "fetch('http://127.0.0.1:'+process.env.PORT+'/api/health/',{signal:AbortSignal.timeout(5000)}).then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
-CMD ["node", "./dist/server/entry.mjs"]
+CMD ["node", "./dist/start.mjs"]

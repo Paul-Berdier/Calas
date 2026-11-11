@@ -6,6 +6,7 @@ export function configurationProblems():string[]{
  for(const key of ['DATABASE_URL','BETTER_AUTH_URL','BETTER_AUTH_SECRET','S3_ENDPOINT','S3_REGION','S3_BUCKET','S3_ACCESS_KEY_ID','S3_SECRET_ACCESS_KEY','CONTACT_SIGNING_SECRET','SITE_URL'])if(!process.env[key])missing.push(key);
  if((process.env.BETTER_AUTH_SECRET?.length??0)<32)missing.push('BETTER_AUTH_SECRET (32 caractères minimum)');
  if((process.env.CONTACT_SIGNING_SECRET?.length??0)<32)missing.push('CONTACT_SIGNING_SECRET (32 caractères minimum)');
+ if((process.env.OUTREACH_LINK_SECRET?.length??0)<32)missing.push('OUTREACH_LINK_SECRET (32 caractères minimum)');
  try{const auth=new URL(process.env.BETTER_AUTH_URL!);const site=new URL(process.env.SITE_URL!);if(auth.origin!==site.origin||auth.pathname!=='/'||site.pathname!=='/')missing.push('SITE_URL / BETTER_AUTH_URL (même origine)');if(process.env.SITE_ENV==='production'&&(site.protocol!=='https:'||['localhost','127.0.0.1'].includes(site.hostname)))missing.push('SITE_URL (HTTPS public)');}catch{missing.push('SITE_URL / BETTER_AUTH_URL (URL valide)');}
  if(process.env.SITE_ENV==='production'){
   if(process.env.AUTH_TEST_PASSWORD_ONLY_USER_ID)missing.push('AUTH_TEST_PASSWORD_ONLY_USER_ID interdit en production');
@@ -19,7 +20,7 @@ export function configurationProblems():string[]{
 export async function checkServices():Promise<void>{
  let timeout:ReturnType<typeof setTimeout>|undefined;
  try{await Promise.race([
-  Promise.all([getPool().query('SELECT d.draft_revision_id,d.published_revision_id FROM content_documents d CROSS JOIN contact_receipts r LIMIT 0'),getMediaStorage().check()]),
+  Promise.all([getPool().query('SELECT d.draft_revision_id,d.published_revision_id,v.arrivals,t.session_id,g.resource FROM content_documents d CROSS JOIN contact_receipts r CROSS JOIN outreach_campaign_visits v CROSS JOIN outreach_unsubscribe_links u CROSS JOIN agent_tokens t CROSS JOIN oauth_grants g LIMIT 0'),getMediaStorage().check()]),
   new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('Readiness timeout')),5000);timeout.unref();}),
  ]);}finally{clearTimeout(timeout);}
 }

@@ -14,7 +14,7 @@ export const onRequest=defineMiddleware(async(context,next)=>{
     destination.search=context.url.search;
     return Response.redirect(destination,308);
   }
-  const privateRoute=path.startsWith('/admin')||path.startsWith('/api/')||path.startsWith('/media/');
+  const privateRoute=path.startsWith('/admin')||path.startsWith('/api/')||path.startsWith('/media/')||path.startsWith('/r/')||path==='/mcp'||path.startsWith('/mcp/')||path.startsWith('/oauth/')||path.startsWith('/.well-known/oauth-');
   try{
     context.locals.cmsPreview=await isPreview(context);
     response=await next();
@@ -34,7 +34,10 @@ export const onRequest=defineMiddleware(async(context,next)=>{
     headers.delete('Content-Type');
   }
   headers.set('X-Content-Type-Options','nosniff');
-  headers.set('Referrer-Policy',privateRoute||context.locals.cmsPreview?'no-referrer':'strict-origin-when-cross-origin');
+  // Native POST forms need a same-origin Origin header. `no-referrer` on a
+  // navigation can serialize Origin as null; same-origin still hides link codes externally.
+  const campaignNavigation = path.startsWith('/r/u_') || context.url.searchParams.has('campagne');
+  headers.set('Referrer-Policy',campaignNavigation?'same-origin':privateRoute||context.locals.cmsPreview?'no-referrer':'strict-origin-when-cross-origin');
   headers.set('Permissions-Policy','camera=(), microphone=(), geolocation=()');
   if(!isProductionSite()||privateRoute||context.locals.cmsPreview||context.url.searchParams.get('preview')==='1')headers.set('X-Robots-Tag','noindex, nofollow, noarchive');
   if(context.locals.cmsPreview||context.url.searchParams.has('preview')||privateRoute||path.startsWith('/contact'))headers.set('Cache-Control','private, no-store');

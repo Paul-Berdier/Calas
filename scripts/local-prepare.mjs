@@ -19,6 +19,8 @@ const defaults={DATABASE_URL:`postgresql://calas:${encodeURIComponent(local.POST
 for(const [k,v]of Object.entries(defaults))if(!web[k])web[k]=v;
 web.BACKUP_ENCRYPTION_KEY ||= randomBytes(32).toString('base64');
 web.BACKUP_POSTGRES_CONTAINER ||= 'calas-development-postgres-1';
+web.OUTREACH_MAIL_TRANSPORT ||= 'simulation';
+web.OUTREACH_LINK_SECRET ||= key();
 writeFileSync(webPath,Object.entries(web).map(([k,v])=>`${k}=${v}`).join('\n')+'\n',{mode:0o600});
 return {webPath,localPath};
 }

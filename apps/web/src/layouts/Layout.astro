@@ -5,6 +5,7 @@ import bodyFont from '@fontsource/eb-garamond/files/eb-garamond-latin-400-normal
 import titleFont from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-400-normal.woff2?url';
 import italicFont from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-400-italic.woff2?url';
 import Brand from '../components/Brand.astro';
+import CampaignAttribution from '../components/CampaignAttribution.astro';
 import {isPreview} from '../lib/cms/preview';
 import {env,isProductionSite} from '../lib/environment';
 import {safeHref} from '../lib/links';
@@ -75,6 +76,7 @@ const organization={
         <div class="footer-bottom"><span>© {new Date().getFullYear()} Calas Conseil</span><nav aria-label="Informations légales"><a href="/mentions-legales/">Mentions légales</a><a href="/confidentialite/">Confidentialité</a></nav></div>
       </div>
     </footer>
+    {!preview && <CampaignAttribution />}
     {Preview&&<Preview enabled={true} />}
     <script>
       import {initMotion} from '../lib/motion';

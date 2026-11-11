@@ -1,0 +1,15 @@
+{
+  "scope": "Prospection et MCP local/distant — validation locale du 11 novembre 2026",
+  "unitAndPostgres": { "tests": 62, "passed": 62, "failed": 0, "skipped": 0, "fileConcurrency": 1 },
+  "configurationAndLauncher": { "tests": 7, "passed": 7, "failed": 0, "skipped": 0 },
+  "lint": "passed",
+  "typecheck": { "errors": 0, "warnings": 0, "hints": 27 },
+  "build": "Astro SSR et lanceur avec traitement intégré compilés",
+  "http": "http.json : six groupes avec vraie session et consentement navigateur",
+  "ui": "../outreach-ui/report.json : dix vues à 390 et 1440 pixels, zéro erreur Axe ou débordement",
+  "container": "../custom-cms/docker-smoke-report.json : cinq contrôles réussis",
+  "externalEmails": 0,
+  "productionChanged": false,
+  "personalAiAccountsConnected": false,
+  "initialAttempt": "Exécution trop parallèle avec Docker : deux nettoyages de bases et un appel concurrent ont atteint les délais SQL. Relance séquentielle complète réussie sans changer les délais applicatifs ; bases temporaires identifiées puis retirées."
+}
