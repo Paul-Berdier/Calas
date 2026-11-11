@@ -2,6 +2,16 @@
 
 Le projet Railway **Calas** héberge l’application Astro SSR, PostgreSQL et le bucket privé. Le service web historique `Calas-Web-Test` porte la production sous `www.calas-conseil.fr`. Le domaine est géré chez OVH, qui héberge également la boîte de contact. Les étapes de recette datées ci-dessous documentent les versions précédentes.
 
+## Version prospection et MCP — 11 novembre 2026
+
+À la demande de Paul, le service web existant est épinglé au commit `9383df6b725f6da4eefef4905842de9d421a2bd1`, branche `codex/prospection-mcp`, déploiement réussi `9f5673cf-ec74-4e4f-bb14-6eb75596fc4d`. Aucun nouveau service, changement d’offre, changement de région, hausse de ressources ou achat. Les quatre services existants restent présents. Les modifications documentaires ultérieures ne redéploient pas automatiquement le site.
+
+Après sauvegarde immédiate chiffrée et vérifiée, les migrations 0004–0006 ont été appliquées par le propriétaire de la base via le tunnel SSH privé. Les données antérieures et les droits limités `calas_app` sont contrôlés. Le secret `OUTREACH_LINK_SECRET` est conservé en privé ; `OUTREACH_RUNNER_ENABLED=true`, `OUTREACH_MAIL_TRANSPORT=simulation`, `OUTREACH_MAX_BATCH=1000`, `OUTREACH_MAX_PER_HOUR=20` et `OUTREACH_WORKER_BATCH=10` activent le traitement intégré par `dist/start.mjs`. Les réglages SMTP du contact et de l’authentification restent inchangés. La notice de confidentialité est publiée par révision ciblée.
+
+La recette distante passe 24 contrôles publics et six groupes authentifiés, avec une seule campagne fictive simulée, les trois comptes nominatifs et le protocole MCP réel en HTTPS. La campagne, le contact fictif et le client OAuth de recette ont été supprimés ; les sessions de test sont déconnectées et les traces d’audit conservées. Aucun e-mail externe envoyé. Les comptes personnels ChatGPT/Claude/Codex restent à connecter suivant [MCP.md](MCP.md) ; l’envoi réel reste désactivé selon [PROSPECTION.md](PROSPECTION.md). Preuves dans `artifacts/outreach/railway-*.json`.
+
+Le job de sauvegarde existant porte désormais `BACKUP_SOURCE_REVISION=9383df6b725f6da4eefef4905842de9d421a2bd1` et a été redéployé avec son image existante (`2c11b415-93d7-4725-b2cb-c070ad145a1f`). Cette mise à jour prépare les prochaines archives ; elle n’est pas présentée comme une nouvelle capture du jour. En cas de retour arrière applicatif, désactiver le traitement et réutiliser le déploiement web précédent `7018a894-fb05-4cd5-80b5-5434248ec459` ; les tables ajoutées restent compatibles avec ce code. Ne supprimer aucune table et ne restaurer aucun dump sur la base existante.
+
 ## Passage de Railway au VPS OVH
 
 Le projet Railway et sa facturation restent sur le compte de Paul pendant cette période. Le futur VPS, son moyen de paiement, le domaine et la messagerie relèvent du compte client du cabinet. Le changement porte sur la destination web de **www.calas-conseil.fr**. Sara et Agnès continuent à utiliser **contact@calas-conseil.fr** chez OVH.

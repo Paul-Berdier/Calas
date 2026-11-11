@@ -6,12 +6,12 @@ La demande comprend les imports Excel/CSV/TXT, les campagnes, un lien d’arriv�
 
 Les parcours locaux vérifient la connexion réelle, le traitement automatique simulé dans le service web, les oppositions, les permissions et la révocation OAuth. Le rapport navigateur est `artifacts/outreach/http.json` ; les dix vues d’administration sont dans `artifacts/outreach-ui/`. Aucun e-mail externe ni compte IA personnel n’a été utilisé pour ces essais.
 
-- [ ] Mise en ligne de cette évolution autorisée après présentation de la solution sur le service Railway existant.
-- [ ] Relecture de la notice de confidentialité avant sa publication explicite.
+- [x] Mise en ligne de cette évolution autorisée par Paul (« ajoute le à mon projet calas »), sans nouveau service ni abonnement ; déploiement `9f5673cf-ec74-4e4f-bb14-6eb75596fc4d` réussi.
+- [x] Notice de confidentialité contrôlée puis publiée explicitement ; autres sections et anciennes révisions conservées.
 - [ ] Connexion effective aux comptes ChatGPT/Claude/Codex souhaités après déploiement HTTPS.
 - [ ] Source, pertinence professionnelle, message et destinataires contrôlés avant la première campagne réelle ; quotas OVH vérifiés.
 
-La réponse de Paul demandant d’expliquer la proposition de service supplémentaire ne vaut pas autorisation de déployer ou de facturer ce service. Aucun service supplémentaire n’est désormais nécessaire. Les autres décisions historiques ci-dessous sont conservées.
+La première demande d’explication de Paul n’avait pas été traitée comme une autorisation. Sa demande ultérieure d’ajout au projet Calas autorise la solution intégrée au service existant. Aucun achat ni changement d’offre n’a été effectué. Les 24 contrôles publics et six groupes authentifiés distants passent ; les données de recette ont été retirées et les accès temporaires révoqués. Cette recette ne vaut pas raccordement aux comptes personnels ChatGPT/Claude ni autorisation d’une campagne réelle. Les autres décisions historiques ci-dessous sont conservées.
 
 ## Lancement autorisé le 9 novembre 2026
 

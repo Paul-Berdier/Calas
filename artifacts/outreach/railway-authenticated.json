@@ -1,0 +1,15 @@
+{
+  "startedAt": "2026-11-11T22:32:12.631Z",
+  "checks": [
+    "Les trois comptes nominatifs accèdent par mot de passe à l’administration, à la prospection et aux connexions IA.",
+    "Les deux nouvelles rubriques se chargent réellement dans le navigateur, sans erreur JavaScript.",
+    "Le traitement intégré au service web a exécuté une campagne simulée, sans SMTP.",
+    "Le lien ouvre Diagnostic, les compteurs remontent et le visiteur peut arrêter la mesure sans cookie.",
+    "L’accès MCP local peut être créé puis révoqué immédiatement.",
+    "OAuth distant sur le vrai domaine : consentement, SDK officiel, renouvellement et révocation réussis."
+  ],
+  "externalEmails": 0,
+  "status": "passed",
+  "mcpTools": 31,
+  "finishedAt": "2026-11-11T22:32:21.747Z"
+}

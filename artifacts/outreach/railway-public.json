@@ -1,0 +1,158 @@
+{
+  "at": "2026-11-11T22:29:42.229Z",
+  "deployment": "9f5673cf-ec74-4e4f-bb14-6eb75596fc4d",
+  "revision": "9383df6b725f6da4eefef4905842de9d421a2bd1",
+  "mode": "anonymous GET only; no login, mutation, SMTP or personal data captured",
+  "checks": [
+    {
+      "name": "Public page /",
+      "pass": true,
+      "status": 200
+    },
+    {
+      "name": "SEO /",
+      "pass": true,
+      "canonical": "https://www.calas-conseil.fr/",
+      "hasDescription": true,
+      "indexable": true,
+      "h1Count": 1
+    },
+    {
+      "name": "Security headers /",
+      "pass": true,
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "setsCookie": false
+    },
+    {
+      "name": "Public page /diagnostic-rps/",
+      "pass": true,
+      "status": 200
+    },
+    {
+      "name": "SEO /diagnostic-rps/",
+      "pass": true,
+      "canonical": "https://www.calas-conseil.fr/diagnostic-rps/",
+      "hasDescription": true,
+      "indexable": true,
+      "h1Count": 1
+    },
+    {
+      "name": "Security headers /diagnostic-rps/",
+      "pass": true,
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "setsCookie": false
+    },
+    {
+      "name": "Public page /confidentialite/",
+      "pass": true,
+      "status": 200
+    },
+    {
+      "name": "SEO /confidentialite/",
+      "pass": true,
+      "canonical": "https://www.calas-conseil.fr/confidentialite/",
+      "hasDescription": true,
+      "indexable": true,
+      "h1Count": 1
+    },
+    {
+      "name": "Security headers /confidentialite/",
+      "pass": true,
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "setsCookie": false
+    },
+    {
+      "name": "Updated outreach and campaign privacy notice",
+      "pass": true
+    },
+    {
+      "name": "Service /api/health/",
+      "pass": true,
+      "status": 200,
+      "bodyIsJson": true
+    },
+    {
+      "name": "Service /api/ready/",
+      "pass": true,
+      "status": 200,
+      "bodyIsJson": true
+    },
+    {
+      "name": "Anonymous refusal /api/admin/outreach/overview/",
+      "pass": true,
+      "status": 401,
+      "noStore": true,
+      "noIndex": true
+    },
+    {
+      "name": "Anonymous refusal /api/admin/integrations/tokens/",
+      "pass": true,
+      "status": 401,
+      "noStore": true,
+      "noIndex": true
+    },
+    {
+      "name": "Anonymous refusal /api/admin/integrations/oauth/connections/",
+      "pass": true,
+      "status": 401,
+      "noStore": true,
+      "noIndex": true
+    },
+    {
+      "name": "Anonymous refusal /api/agent/tools/",
+      "pass": true,
+      "status": 401,
+      "noStore": true,
+      "noIndex": true
+    },
+    {
+      "name": "Anonymous MCP challenge",
+      "pass": true,
+      "status": 401,
+      "hasResourceChallenge": true
+    },
+    {
+      "name": "OAuth HTTPS issuer and PKCE discovery",
+      "pass": true,
+      "status": 200,
+      "issuer": "https://www.calas-conseil.fr"
+    },
+    {
+      "name": "MCP resource discovery /.well-known/oauth-protected-resource",
+      "pass": true,
+      "status": 200,
+      "resource": "https://www.calas-conseil.fr/mcp/"
+    },
+    {
+      "name": "MCP resource discovery /.well-known/oauth-protected-resource/mcp",
+      "pass": true,
+      "status": 200,
+      "resource": "https://www.calas-conseil.fr/mcp/"
+    },
+    {
+      "name": "Robots production indexation",
+      "pass": true,
+      "status": 200
+    },
+    {
+      "name": "Sitemap canonical public URLs",
+      "pass": true,
+      "status": 200,
+      "urlCount": 11
+    },
+    {
+      "name": "Diagnostic slash redirect",
+      "pass": true,
+      "status": 308,
+      "location": "/diagnostic-rps/"
+    },
+    {
+      "name": "Railway alias canonical redirect",
+      "pass": true,
+      "status": 308,
+      "location": "https://www.calas-conseil.fr/diagnostic-rps/"
+    }
+  ],
+  "failures": [],
+  "status": "passed"
+}
