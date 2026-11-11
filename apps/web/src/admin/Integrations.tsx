@@ -227,7 +227,8 @@ export function Integrations({ user }: { user: AdminUser }) {
             </li>
             <li>
               Choisissez l’authentification OAuth et l’enregistrement
-              automatique si ce choix est proposé.
+              automatique si ce choix est proposé. Aucune clé locale n’est
+              nécessaire : ne collez pas de clé personnelle dans ce formulaire.
             </li>
             <li>
               La page Calas s’ouvre : connectez-vous avec votre compte habituel,
@@ -330,6 +331,11 @@ export function Integrations({ user }: { user: AdminUser }) {
             <KeyRound size={20} aria-hidden />
           </div>
           <div className="admin-card-body outreach-stack">
+            <p>
+              Cette clé sert uniquement au connecteur installé sur votre
+              ordinateur. Pour l’adresse MCP distante, utilisez la connexion
+              OAuth présentée plus haut.
+            </p>
             <p>
               Cette clé est visible pendant cette visite. Elle expire le{" "}
               {formatDate(issued.item.expiresAt)} et à la fermeture de votre
@@ -478,8 +484,8 @@ export function Integrations({ user }: { user: AdminUser }) {
         onOpenChange={(open) => {
           if (!busy) setCreating(open);
         }}
-        title="Créer une connexion personnelle"
-        description="La clé reprend les droits de votre compte et expire avec votre session actuelle, au plus tard après huit heures."
+        title="Créer une clé pour le connecteur local"
+        description="Cette clé sert au programme installé sur votre ordinateur. Elle expire avec votre session actuelle, au plus tard après huit heures. L’adresse MCP distante utilise OAuth, sans cette clé."
       >
         <form
           onSubmit={(event) => void create(event)}

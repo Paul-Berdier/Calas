@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-11T21:57:34.948Z",
+  "at": "2026-11-11T22:56:06.257Z",
   "checks": [
     {
       "name": "outreach-overview",
@@ -15,6 +15,14 @@
     },
     {
       "name": "outreach-campaign",
+      "width": 1440
+    },
+    {
+      "name": "outreach-duplicate",
+      "width": 390
+    },
+    {
+      "name": "outreach-duplicate",
       "width": 1440
     },
     {
@@ -43,6 +51,7 @@
     }
   ],
   "queued": 2,
+  "duplicated": 1,
   "imported": 1,
   "errors": []
 }

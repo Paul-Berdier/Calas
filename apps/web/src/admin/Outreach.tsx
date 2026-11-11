@@ -161,6 +161,7 @@ export function Outreach({
   >(null);
   const [campaignInput, setCampaignInput] =
     useState<CampaignInput>(emptyCampaign);
+  const [duplicatingCampaign, setDuplicatingCampaign] = useState(false);
   const [confirmSend, setConfirmSend] = useState(false);
   const [contactAction, setContactAction] = useState<{
     contact: Contact;
@@ -260,6 +261,7 @@ export function Outreach({
   }
   function closeCampaign() {
     setEditingCampaign(null);
+    setDuplicatingCampaign(false);
     onDirtyChange(false);
   }
   function startContact(contact: Contact | "new") {
@@ -279,9 +281,10 @@ export function Outreach({
           },
     );
   }
-  function startCampaign(value: Campaign | "new") {
+  function startCampaign(value: Campaign | "new", duplicate = false) {
     setError("");
-    setEditingCampaign(value);
+    setDuplicatingCampaign(duplicate);
+    setEditingCampaign(duplicate ? "new" : value);
     setCampaignInput(
       value === "new"
         ? {
@@ -293,12 +296,13 @@ export function Outreach({
               : (data?.targets[0]?.path ?? ""),
           }
         : {
-            title: value.title,
+            title: duplicate ? `${value.title.slice(0, 112)} — copie` : value.title,
             subject: value.subject,
             body: value.body,
             targetPath: value.targetPath,
           },
     );
+    if (duplicate) onDirtyChange(true);
   }
   async function saveContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -333,7 +337,7 @@ export function Outreach({
     setError("");
     try {
       const existing = editingCampaign === "new" ? null : editingCampaign;
-      await request(
+      const saved = await request<Campaign>(
         `/api/admin/outreach/campaigns/${existing ? `${existing.id}/` : ""}`,
         {
           method: existing ? "PATCH" : "POST",
@@ -343,8 +347,19 @@ export function Outreach({
           }),
         },
       );
+      if (duplicatingCampaign) {
+        setCampaignId(saved.id);
+        setCampaignOverview(null);
+        setSelected([]);
+        setRecipientQuery("");
+        setRecipientPage(0);
+      }
       closeCampaign();
-      setNotice("Campagne enregistrée.");
+      setNotice(
+        duplicatingCampaign
+          ? "Copie enregistrée en brouillon. Choisissez les destinataires puis confirmez l’envoi séparément."
+          : "Campagne enregistrée.",
+      );
       await reload();
     } catch (cause) {
       setError((cause as Error).message);
@@ -575,10 +590,10 @@ export function Outreach({
           </p>
           <div className="outreach-warning" role="status">
             {data.transport === "smtp"
-              ? "Envoi réel configuré. Chaque sélection sera mise en file puis traitée progressivement par le serveur."
+              ? "Envoi réel configuré. Les nouveaux envois confirmés seront traités progressivement par le serveur. Les anciens essais simulés ne sont pas renvoyés : dupliquez leur campagne pour préparer un nouvel envoi."
               : data.transport === "local"
                 ? "Recette locale. Les messages sont remis à la boîte de test configurée."
-                : "Mode simulation. Le serveur prépare et vérifie les envois. Le raccordement SMTP de prospection permettra ensuite leur distribution."}{" "}
+                : "Mode simulation. Aucun e-mail n’est envoyé. L’activation ultérieure de l’envoi réel ne renverra pas ces essais : il faudra dupliquer la campagne et confirmer de nouveaux destinataires."}{" "}
             {data.stats.queued} message(s) en file · {data.stats.simulated}{" "}
             simulation(s).
           </div>
@@ -798,6 +813,14 @@ export function Outreach({
                     <h2>{campaign.title}</h2>
                     <p>{campaign.subject}</p>
                   </div>
+                  <Button
+                    variant="secondary"
+                    disabled={busy}
+                    onClick={() => startCampaign(campaign, true)}
+                  >
+                    <Copy size={16} aria-hidden />
+                    Dupliquer la campagne
+                  </Button>
                   {campaign.status === "draft" && (
                     <Button
                       variant="secondary"
@@ -1250,6 +1273,14 @@ export function Outreach({
           {error && (
             <p className="admin-error" role="alert">
               {error}
+            </p>
+          )}
+          {duplicatingCampaign && (
+            <p className="admin-hint">
+              Seuls le nom, l’objet, le message et la page proposée sont copiés.
+              Les destinataires, les envois et les statistiques restent dans
+              l’ancienne campagne. Enregistrer crée un brouillon avec un nouveau
+              lien, sans envoyer d’e-mail.
             </p>
           )}
           <Field label="Nom interne" required>

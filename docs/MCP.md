@@ -4,6 +4,8 @@ Le connecteur permet aux applications IA de travailler avec le compte de Sara, A
 
 L’URL du serveur distant est **https://www.calas-conseil.fr/mcp/**. `/api/agent/tools/` reste une API privée pour le pont local : ce n’est pas l’URL à saisir dans les applications web. Le serveur, les migrations et le domaine HTTPS doivent être déployés avant la connexion externe. Les tests locaux ne constituent pas une connexion effective aux comptes personnels ChatGPT/Claude.
 
+Une clé personnelle commençant par `calas_` appartient au **connecteur local**. La présenter directement à `/mcp/` renvoie un refus d’authentification : pour cette adresse, sélectionner **OAuth** et se connecter au compte Calas dans la page ouverte par l’application. Ne pas coller la clé locale dans le champ d’authentification distante.
+
 ## Connexion depuis ChatGPT ou Claude sur le web
 
 Pour ChatGPT, ouvrir **Plugins**, utiliser **Ajouter un serveur MCP personnalisé**, saisir le nom « Calas Conseil » et l’URL ci-dessus, puis choisir **OAuth**. Laisser l’identification du client en enregistrement automatique (DCR), sans inventer d’identifiant ni de secret. Créer puis installer le plugin dans le compte ou l’espace de travail autorisé. L’accès à cette fonction dépend des permissions et restrictions de l’espace ChatGPT. [Guide OpenAI des serveurs MCP personnalisés](https://developers.openai.com/api/docs/guides/custom-mcp-server).

@@ -1,0 +1,46 @@
+{
+  "at": "2026-11-11T22:55:52.937Z",
+  "productionOrigin": "https://www.calas-conseil.fr",
+  "mail": {
+    "mode": "simulation",
+    "campaigns": 1,
+    "contacts": 1,
+    "simulated": 1,
+    "queued": 0,
+    "accepted": 0,
+    "externalMessagesSent": 0,
+    "smtpVerification": {
+      "railway": {
+        "verified": false,
+        "code": "EAUTH",
+        "command": "AUTH PLAIN",
+        "responseCode": 535
+      },
+      "local": {
+        "verified": false,
+        "code": "EAUTH",
+        "command": "AUTH PLAIN",
+        "responseCode": 535
+      }
+    },
+    "storedCredentialsMatchRemise": true,
+    "ovhManagementSession": "signed-out",
+    "resolution": "updated-credentials-verified-before-deployment",
+    "updatedCredentialsVerified": {
+      "at": "2026-11-11T22:58:52.700Z",
+      "railway": true,
+      "local": true,
+      "messageSent": false
+    },
+    "pendingDeliveriesAtActivation": 0
+  },
+  "mcp": {
+    "localApiStatus": 200,
+    "stdioSdkVerified": true,
+    "tools": 31,
+    "role": "administrator",
+    "remoteWithLocalKey": 401,
+    "remoteAuthentication": "OAuth",
+    "personalAiClientConnected": false
+  }
+}

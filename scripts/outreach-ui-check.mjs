@@ -11,7 +11,7 @@ const output = resolve("artifacts/outreach-ui");
 await mkdir(output, { recursive: true });
 const bundle = await build({
   stdin: {
-    contents: `import React from 'react';import{createRoot}from'react-dom/client';import{Outreach}from'./Outreach';import{Integrations}from'./Integrations';import{OAuthConsent}from'./OAuthConsent';import AuthScreens from'../auth/AuthScreens';import './admin.css';const params=new URLSearchParams(location.search);const user={id:'fixture',name:'Compte de recette',email:'fixture@example.test',role:params.get('role')||'administrator'};const panel=params.get('panel');createRoot(document.getElementById('root')).render(panel==='integrations'?<Integrations user={user}/>:panel==='oauth'?<OAuthConsent user={user} requestId={params.get('request')}/>:panel==='login'?<AuthScreens mode="login"/>:<Outreach onDirtyChange={()=>{}}/>);`,
+    contents: `import React from 'react';import{createRoot}from'react-dom/client';import{Outreach}from'./Outreach';import{Integrations}from'./Integrations';import{OAuthConsent}from'./OAuthConsent';import AuthScreens from'../auth/AuthScreens';import './admin.css';const params=new URLSearchParams(location.search);const user={id:'fixture',name:'Compte de recette',email:'fixture@example.test',role:params.get('role')||'administrator'};const panel=params.get('panel');createRoot(document.getElementById('root')).render(panel==='integrations'?<Integrations user={user}/>:panel==='oauth'?<OAuthConsent user={user} requestId={params.get('request')}/>:panel==='login'?<AuthScreens mode="login"/>:<Outreach onDirtyChange={(dirty)=>{window.__outreachDirty=dirty;}}/>);`,
     resolveDir: resolve("apps/web/src/admin"),
     loader: "tsx",
   },
@@ -84,7 +84,10 @@ const campaign = {
   createdAt: "2026-11-10T12:00:00Z",
 };
 const contacts = [contact];
+const campaigns = [campaign];
+const campaignCreations = [];
 let queued = 0,
+  transport = "simulation",
   tokens = [],
   creationScopes = [],
   imported = 0;
@@ -110,7 +113,7 @@ await page.route("**/api/admin/**", async (route) => {
     result = {
       stats: {
         contacts: contacts.length,
-        campaigns: 1,
+        campaigns: campaigns.length,
         queued,
         accepted: 0,
         simulated: 0,
@@ -122,31 +125,46 @@ await page.route("**/api/admin/**", async (route) => {
         failed: 0,
       },
       contacts,
-      campaigns: [campaign],
+      campaigns,
       deliveries: [],
-      transport: "simulation",
+      transport,
       maxBatch: 1000,
       targets: [{ path: "/diagnostic-rps/", title: "Diagnostic" }],
       visits: [],
     };
-  else if (path.endsWith("/campaigns/campaign-1/overview/"))
+  else if (/\/campaigns\/[^/]+\/overview\/$/.test(path)) {
+    const selectedCampaign = campaigns.find((item) => path.includes(`/${item.id}/`));
+    assert.ok(selectedCampaign, "Campaign detail must use a known campaign");
+    const selectedQueued = selectedCampaign.id === campaign.id ? queued : 0;
     result = {
-      campaign,
+      campaign: selectedCampaign,
       stats: {
-        total: queued,
-        queued,
+        total: selectedQueued,
+        queued: selectedQueued,
         accepted: 0,
         simulated: 0,
         failed: 0,
         uncertain: 0,
         suppressed: 0,
       },
-      includedContactIds: queued ? contacts.map((item) => item.id) : [],
-      visits: [
+      includedContactIds: selectedQueued ? contacts.map((item) => item.id) : [],
+      visits: selectedCampaign.id === campaign.id ? [
         { path: "/diagnostic-rps/", day: "2026-11-10", arrivals: 2, visits: 3 },
-      ],
+      ] : [],
     };
-  else if (path.endsWith("/send/")) {
+  } else if (path === "/api/admin/outreach/campaigns/" && request.method() === "POST") {
+    campaignCreations.push(body);
+    const created = {
+      ...body,
+      id: `campaign-${campaigns.length + 1}`,
+      version: 0,
+      status: "draft",
+      linkPath: `/r/c_fixture_${campaigns.length + 1}`,
+      createdAt: new Date().toISOString(),
+    };
+    campaigns.push(created);
+    result = created;
+  } else if (path.endsWith("/send/")) {
     assert.equal(body.confirmation, true);
     queued += body.contactIds.length;
     campaign.status = "active";
@@ -259,6 +277,7 @@ try {
   await expect(
     page.getByRole("heading", { name: "Campagne de recette" }),
   ).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Aucun e-mail n’est envoyé." })).toBeVisible();
   await inspect("outreach-overview");
   await page.getByRole("button", { name: "Contacts", exact: true }).click();
   await page
@@ -305,6 +324,40 @@ try {
     page.getByRole("button", { name: "Mettre en pause", exact: true }),
   ).toBeVisible();
   await inspect("outreach-campaign");
+  transport = "smtp";
+  await page.getByRole("button", { name: "Actualiser la prospection" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Les anciens essais simulés ne sont pas renvoyés" })).toBeVisible();
+  const sourceCampaign = { ...campaign };
+  await page.getByRole("button", { name: "Dupliquer la campagne", exact: true }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByLabel("Nom interne")).toHaveValue(`${campaign.title} — copie`);
+  await expect(page.getByLabel("Objet de l’e-mail")).toHaveValue(campaign.subject);
+  await expect(page.getByRole("textbox", { name: "Message", exact: true })).toHaveValue(campaign.body);
+  await expect(page.getByLabel("Page du site proposée")).toHaveValue(campaign.targetPath);
+  assert.equal(campaignCreations.length, 0, "Opening a duplicate does not create a campaign");
+  assert.equal(await page.evaluate(() => window.__outreachDirty), true, "The unsaved copy is guarded");
+  await inspect("outreach-duplicate");
+  await page.getByRole("button", { name: "Annuler", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  assert.equal(campaignCreations.length, 0, "Cancelling a duplicate does not write");
+  assert.equal(await page.evaluate(() => window.__outreachDirty), false);
+  await page.getByRole("button", { name: "Dupliquer la campagne", exact: true }).click();
+  await page.getByRole("button", { name: "Enregistrer le brouillon", exact: true }).click();
+  await expect(page.getByRole("heading", { name: `${campaign.title} — copie`, exact: true })).toBeVisible();
+  assert.deepEqual(campaignCreations, [{
+    title: `${campaign.title} — copie`,
+    subject: campaign.subject,
+    body: campaign.body,
+    targetPath: campaign.targetPath,
+  }], "Only editable message fields are sent to the create API");
+  assert.deepEqual(campaign, sourceCampaign, "The original campaign is unchanged");
+  assert.equal(queued, 2, "Duplicating cannot queue or resend a message");
+  assert.equal(campaigns[1].status, "draft");
+  assert.notEqual(campaigns[1].linkPath, campaign.linkPath);
+  assert.equal(await page.evaluate(() => window.__outreachDirty), false);
+  await expect(page.getByRole("checkbox")).toHaveCount(contacts.length);
+  await expect(page.locator('input[type="checkbox"]:checked')).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Relire et mettre en file", exact: true })).toBeDisabled();
   await page
     .getByRole("button", { name: "Importer des contacts", exact: true })
     .click();
@@ -410,13 +463,13 @@ try {
   await writeFile(
     resolve(output, "report.json"),
     JSON.stringify(
-      { at: new Date().toISOString(), checks, queued, imported, errors },
+      { at: new Date().toISOString(), checks, queued, duplicated: campaignCreations.length, imported, errors },
       null,
       2,
     ),
   );
   console.log(
-    `PASS: ${checks.length} layout/accessibility checks; contact, explicit queue, TXT import, scoped token and revocation paths.`,
+    `PASS: ${checks.length} layout/accessibility checks; contact, explicit queue, duplicate draft without recipients or send, TXT import, scoped token and revocation paths.`,
   );
 } finally {
   await browser.close();

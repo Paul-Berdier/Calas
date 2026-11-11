@@ -1,5 +1,15 @@
 # Migration vers le CMS Calas Conseil
 
+## Diagnostic des envois et de la connexion MCP — 11 novembre 2026
+
+La campagne signalée par Paul a un message simulé et aucun envoi en attente : le service utilise encore `OUTREACH_MAIL_TRANSPORT=simulation`. Aucun destinataire n’est rejoué. Un deuxième blocage est constaté lors de `nodemailer.verify()` : OVH refuse l’authentification (`535`, `EAUTH`, `AUTH PLAIN`) depuis Railway et depuis le poste. Les variables enregistrées correspondent au fichier de remise de la boîte, serveur `smtp.mail.ovh.net`, port 465 avec TLS. La session de gestion OVH est déconnectée. Ces éléments ne permettent pas de distinguer un mot de passe changé d’un refus lié à l’état de la boîte ; le transport reste en simulation jusqu’à résolution. Aucun message n’a été envoyé par ces contrôles.
+
+Paul fournit ensuite le mot de passe actuel : l’authentification SMTP réussit depuis le poste puis depuis Railway, ce qui confirme l’obsolescence de l’ancien identifiant. Le secret est remplacé sans affichage dans les deux services qui l’utilisent, site et supervision, ainsi que dans le fichier privé de remise. Le contrôle distant confirme une seule livraison simulée et aucune file à rejouer. L’activation du transport SMTP est préparée pour les futurs envois confirmés, avec la cadence existante de 20/h. Aucun secret n’est inclus dans les preuves ou Git.
+
+La clé personnelle fournie fonctionne par le pont local : le client MCP officiel initialise stdio, liste 31 outils et confirme le rôle administrateur. Cette clé est refusée comme prévu par `/mcp/`, qui exige OAuth. L’administration et le guide expliquent cette distinction. Aucun accès à un compte personnel ChatGPT/Claude n’est déduit de ce test et aucune frontière d’authentification n’est modifiée.
+
+Le détail de campagne propose une duplication en brouillon, limitée au nom, objet, texte et page proposée ; nouveau lien, aucun destinataire ni mise en file automatique. Le mode simulation dit explicitement qu’aucun e-mail n’est envoyé. Aucun changement de schéma, de contenu publié, de droits ou de service d’hébergement n’est requis. Preuves : `artifacts/outreach/connection-diagnostic.json` et `artifacts/outreach-ui/report.json`.
+
 ## Prospection et accès des assistants — 11 novembre 2026
 
 La demande de Paul ajoute des campagnes de courriels, des liens ouvrant directement le site et un accès MCP à l’administration. Les précisions du 11 novembre excluent le questionnaire et demandent des fichiers Excel/TXT ainsi que tous les clients IA. Les fiches de contacts conservent leur provenance ; une suggestion ChatGPT n’est pas une vérification. Le périmètre ne comprend pas de facturation ni de CRM externe.

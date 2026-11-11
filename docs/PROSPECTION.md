@@ -6,6 +6,8 @@ Dans **Administration → Prospection**, ajouter les contacts professionnels ou 
 
 Créer une campagne avec un titre interne, un objet, un message et une page publique de destination. Le lien propre à la campagne est commun à tous ses destinataires et ouvre directement la page. Relire l’aperçu du courriel, sélectionner les destinataires, puis confirmer la mise en file. La campagne devient immuable après sa première mise en file ; une correction du message nécessite une nouvelle campagne. Mettre la campagne en pause pour arrêter les prochains envois ; un message déjà transmis au serveur SMTP ne peut pas être rappelé.
 
+Dans le détail, **Dupliquer la campagne** ouvre un nouveau brouillon prérempli : nom, objet, texte et page proposée. L’enregistrement crée un nouveau lien ; il ne reprend ni destinataires, ni envois, ni statistiques. Choisir les destinataires et confirmer séparément. Une ancienne simulation reste une simulation après activation du SMTP.
+
 Les désinscriptions s’appliquent à toutes les campagnes. Marquer manuellement un contact comme ayant répondu pour arrêter ses prochains envois. La boîte OVH n’est pas lue automatiquement : le tableau ne prétend pas détecter les réponses ni les rebonds entrants. Les fiches arrivées à la limite de conservation sont supprimées par le worker ; les empreintes d’opposition persistent pour empêcher une réimportation involontaire.
 
 ## Lire les chiffres
@@ -38,6 +40,8 @@ Au redémarrage, les états déjà acceptés ne sont jamais renvoyés. Sur SIGTE
 Pour la future migration OVH, `scripts/outreach-worker.ts --run` et `infra/outreach/Dockerfile` restent des alternatives si un ordonnanceur séparé devient utile. Ce n’est pas nécessaire sur le Railway actuel. Désactiver alors le traitement intégré (`OUTREACH_RUNNER_ENABLED=false`) et fournir à l’exécuteur les mêmes secrets et paramètres. Aucun mécanisme ne crée automatiquement un service payant.
 
 Les messages de contact, les invitations de compte et la prospection conservent leurs transports distincts. Un secret ou une panne SMTP ne doit jamais être rendu dans le navigateur ou les journaux. Les archives PostgreSQL contiennent les tables de prospection et les jetons MCP hachés ; la restauration nécessite également le secret des liens. Les connexions MCP restaurées restent liées à des sessions limitées et révocables.
+
+Avant d’activer le SMTP, vérifier l’authentification avec `nodemailer.verify()` depuis le service web ; ce contrôle n’envoie aucun message. Un refus `535` à l’étape AUTH doit être résolu côté identifiants/état de la boîte avant activation. Cette vérification ne prouve pas une remise en boîte de réception. OVH précise que ses boîtes standard ne sont pas conçues pour les campagnes massives et peuvent être bloquées ; la cadence applicative de 20/h n’est pas une garantie d’acceptation ou un quota accordé par OVH. Aucun service d’envoi supplémentaire n’est souscrit. [Consignes OVH sur les blocages de messagerie](https://docs.ovhcloud.com/fr/guides/web-cloud/email-and-collaborative-solutions/troubleshooting/locked-for-spam).
 
 ## Accès des assistants
 
