@@ -4,6 +4,8 @@
 
 Paul précise que chaque campagne possède un lien différent et doit avoir ses propres statistiques. Le tableau de bord reçoit un filtre de campagne, un sélecteur paginé/recherchable indépendant de la période et une fiche du lien partagé. L’API et MCP filtrent les agrégats en base par l’ID, y compris pour les campagnes anciennes sans activité. Les champs globaux non attribuables (contacts, réponses manuelles, exclusions) deviennent explicitement `null` dans ce périmètre. Le CSV porte le périmètre choisi. Aucun schéma, lien existant, publication ou paramètre SMTP ne change ; aucun envoi n’est nécessaire à la recette.
 
+Déployé depuis `41cf64c0767455ef4dd69eb35081301778c2ba2f` sur le service web existant le 12 novembre à 01 h 56 (Paris), déploiement `745f370d-c7eb-4264-9634-953f6791a0c7`. Les cinq groupes de recette distante passent sur les deux campagnes et leurs liens distincts. Aucune modification de campagne ou courriel ; la référence de code du job de sauvegarde est actualisée.
+
 ## Tableau de bord des statistiques — 12 novembre 2026
 
 La demande de Paul complète le tableau de bord avec les résultats de prospection et conserve le suivi éditorial. La nouvelle API privée et l’outil MCP en lecture seule partagent les agrégats SQL sans les limites de pagination des listes. Périodes 7/30/90 jours UTC, séries quotidiennes, résultats réels séparés des simulations/local, files actuelles, contacts disponibles, campagnes/pages et export CSV. Aucun schéma ne change, aucune donnée n’est migrée ou publiée, aucun courriel n’est nécessaire à la recette. Le lien vers une campagne ouvre seulement son détail.

@@ -1,0 +1,18 @@
+{
+  "at": "2026-11-12T00:57:16.760Z",
+  "status": "passed",
+  "checks": [
+    "Protected campaign catalog, pagination, search and invalid/unknown IDs verified",
+    "Each campaign has a different link and isolated 7/30/90-day outcomes, curves, pages and queue; no attributed manual responses",
+    "Sum of all per-campaign results matches global totals",
+    "Live selector separates two campaigns and their links; period/refresh preserve selection; global return restores contact metrics",
+    "Filtered dashboard fits desktop and mobile; saved screenshots mask campaign titles and public link"
+  ],
+  "emailsSentByCheck": 0,
+  "campaignWrites": 0,
+  "sessionSignedOut": true,
+  "campaignsChecked": 2,
+  "distinctLinksChecked": 2,
+  "pageErrors": 0,
+  "blockedWrites": 0
+}
