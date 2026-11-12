@@ -4,7 +4,9 @@
 
 Le modèle de personne reçoit un objet facultatif `iprp` contenant `registration`, `authority` et `validUntil`. Il est éditable sur la fiche Équipe et conservé dans les révisions JSON existantes : aucune migration SQL ni seed sur la base existante. La qualification globale de Sara et le numéro RPPS d’Agnès sont conservés. Les encadrés IPRP des profils sont blancs ; les deux enregistrements d’Agnès se répartissent avec retour à la ligne sur les petits écrans. Une date de validité dépassée masque l’encadré IPRP personnel.
 
-La correction distante est préparée uniquement sur le champ `iprp` d’Agnès, à partir de sa fiche publiée sans brouillon en attente. Un instantané privé, la version attendue et les révisions précédentes permettent de vérifier que les autres champs et personnes restent inchangés. Le PDF est une source de vérification privée, sans autorisation de téléchargement public. Mise en ligne et publication : en attente à ce stade.
+La correction distante porte uniquement sur le champ `iprp` d’Agnès, à partir de sa fiche publiée sans brouillon en attente. Un instantané privé, la version attendue et les révisions précédentes permettent de vérifier que les autres champs et personnes restent inchangés. Le PDF est une source de vérification privée, sans autorisation de téléchargement public.
+
+Le code `22b36810657fd1605452ee4670f120695c4be637` est déployé sur le service web existant (`07c8f033-ba57-4512-9dfb-7e540a2d9bea`). La correction publiée fait passer la fiche d’Agnès de v9 à v11 ; seuls numéro, autorité et validité de son objet `iprp` sont ajoutés. Les champs restants, la fiche de Sara et les anciennes révisions sont vérifiés identiques. Les dix contrôles publics distants passent à 390/1440 px, dont quatre audits Axe et les parcours sans JavaScript. Preuves : `artifacts/agnes-iprp-20261112/content-publication.json`, `content-verification.json` et `production/`.
 
 ## Administration complète de prospection et suivi technique — 12 novembre 2026
 

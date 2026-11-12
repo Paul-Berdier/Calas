@@ -2,6 +2,12 @@
 
 Le projet Railway **Calas** héberge l’application Astro SSR, PostgreSQL et le bucket privé. Le service web historique `Calas-Web-Test` porte la production sous `www.calas-conseil.fr`. Le domaine est géré chez OVH, qui héberge également la boîte de contact. Les étapes de recette datées ci-dessous documentent les versions précédentes.
 
+## IPRP personnel d’Agnès — 12 novembre 2026
+
+Le service web est épinglé à `22b36810657fd1605452ee4670f120695c4be637`, déploiement réussi `07c8f033-ba57-4512-9dfb-7e540a2d9bea`. Le contrat CMS accepte l’enregistrement IPRP personnel et le composant partagé affiche les encadrés blancs sur les profils. Aucune migration SQL ni import de média. Après bascule, seule la propriété `iprp` d’Agnès est publiée par API avec version attendue (v9 → v11), selon son récépissé DREETS Occitanie. Les dix contrôles publics distants et la préservation des données passent ; voir [VALIDATION.md](VALIDATION.md) et `artifacts/agnes-iprp-20261112/`.
+
+La référence `BACKUP_SOURCE_REVISION` du job existant est actualisée vers ce code pour ses prochaines archives. Son image reste compatible : les données de personne sont sauvegardées dans les révisions PostgreSQL complètes et les migrations n’ont pas changé. Aucun nouveau service ni abonnement ; aucune nouvelle capture n’est revendiquée par cette mise à jour.
+
 ## Gestion complète de prospection et état technique — 12 novembre 2026
 
 Le service web existant est épinglé à `d6e6981ddf13d8d0ab815d1d05a5901b29f1af16`, branche `codex/prospection-mcp` ; déploiement `78fa5808-d249-413e-86e6-413b0c7f0227` réussi à 03 h 19 (Paris). L’historique complet, les modèles, l’aperçu final, la programmation Paris, les comparaisons et l’état technique sont en production. Aucun changement d’offre, de région ou de capacité ; les quatre services sont conservés.

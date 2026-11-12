@@ -1,0 +1,15 @@
+{
+  "appliedAt": "2026-11-12T20:55:19.735Z",
+  "beforeVersion": 9,
+  "afterVersion": 11,
+  "changedFields": [
+    "iprp"
+  ],
+  "iprp": {
+    "registration": "2026090231067",
+    "authority": "DREETS Occitanie",
+    "validUntil": "2031-09-02"
+  },
+  "rppsPreserved": true,
+  "pdfUploaded": false
+}

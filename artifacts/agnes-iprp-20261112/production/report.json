@@ -1,0 +1,95 @@
+{
+  "checkedAt": "2026-11-12T20:55:38.288Z",
+  "base": "https://www.calas-conseil.fr",
+  "checks": [
+    {
+      "page": "/",
+      "width": 390,
+      "javascript": false,
+      "reducedMotion": true,
+      "agnesIprp": "2026090231067",
+      "agnesRpps": "10009722090",
+      "saraIprp": "2026.16.004",
+      "overflow": false
+    },
+    {
+      "page": "/qui-sommes-nous/",
+      "width": 390,
+      "javascript": false,
+      "reducedMotion": true,
+      "agnesIprp": "2026090231067",
+      "agnesRpps": "10009722090",
+      "saraIprp": "2026.16.004",
+      "overflow": false
+    },
+    {
+      "page": "/diagnostic-rps/",
+      "width": 390,
+      "javascript": false,
+      "reducedMotion": true,
+      "saraRegistrationUnchanged": true,
+      "overflow": false
+    },
+    {
+      "page": "/",
+      "width": 1440,
+      "javascript": false,
+      "reducedMotion": true,
+      "agnesIprp": "2026090231067",
+      "agnesRpps": "10009722090",
+      "saraIprp": "2026.16.004",
+      "overflow": false
+    },
+    {
+      "page": "/qui-sommes-nous/",
+      "width": 1440,
+      "javascript": false,
+      "reducedMotion": true,
+      "agnesIprp": "2026090231067",
+      "agnesRpps": "10009722090",
+      "saraIprp": "2026.16.004",
+      "overflow": false
+    },
+    {
+      "page": "/diagnostic-rps/",
+      "width": 1440,
+      "javascript": false,
+      "reducedMotion": true,
+      "saraRegistrationUnchanged": true,
+      "overflow": false
+    },
+    {
+      "page": "/",
+      "width": 390,
+      "javascript": true,
+      "reducedMotion": true,
+      "accessibilityViolations": 0
+    },
+    {
+      "page": "/qui-sommes-nous/",
+      "width": 390,
+      "javascript": true,
+      "reducedMotion": true,
+      "accessibilityViolations": 0
+    },
+    {
+      "page": "/",
+      "width": 1440,
+      "javascript": true,
+      "reducedMotion": true,
+      "accessibilityViolations": 0
+    },
+    {
+      "page": "/qui-sommes-nous/",
+      "width": 1440,
+      "javascript": true,
+      "reducedMotion": true,
+      "accessibilityViolations": 0
+    }
+  ],
+  "pageErrors": 0,
+  "blockedWrites": 0,
+  "blockedExternalRequests": 0,
+  "publicPdfRequests": 0,
+  "status": "passed"
+}
