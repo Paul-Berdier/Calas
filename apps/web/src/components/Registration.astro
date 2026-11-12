@@ -4,22 +4,27 @@ import type { Person, SiteSettings } from '../lib/cms/types';
 interface Props { settings: SiteSettings; person?: Person; profile?: boolean }
 const { settings, person, profile = false } = Astro.props;
 const qualification = settings.qualification;
-const iprp = person && person.id === qualification.personId ? qualification.registration : undefined;
+const personalIprp = person?.iprp;
+const expired = personalIprp?.validUntil && personalIprp.validUntil < new Date().toISOString().slice(0, 10);
+const iprp = personalIprp
+  ? (expired ? undefined : personalIprp.registration)
+  : person && person.id === qualification.personId ? qualification.registration : undefined;
 // The authority was supplied for Sara's declaration, independently of the qualification review.
 const isSaraDeclaration = iprp === '2026.16.004' && person?.name.trim().toLocaleLowerCase('fr-FR') === 'sara serrano cabeza';
 const registrations = [
   {
     kind: 'IPRP', number: iprp, title: 'Intervenante en prévention des risques professionnels',
-    detail: isSaraDeclaration ? 'DREETS Nouvelle-Aquitaine' : undefined,
+    detail: personalIprp?.authority ?? (isSaraDeclaration ? 'DREETS Nouvelle-Aquitaine' : undefined),
   },
   {
     kind: 'RPPS', number: profile && person?.rppsNumber, title: 'Répertoire partagé des professionnels intervenant dans le système de santé',
     detail: 'Enregistrement professionnel',
   },
-];
+].filter(entry => entry.number);
 ---
-{person && registrations.filter(entry => entry.number).map(entry =>
-  <aside class:list={['registration', profile ? 'profile-registration' : 'diagnostic-registration']} aria-label={`Enregistrement ${entry.kind} – ${person.name}`}>
+{person && registrations.length > 0 && <div class:list={['registration-group', profile && 'profile-registrations']}>
+{registrations.map(entry =>
+  <aside class:list={['registration', profile ? 'profile-registration' : 'diagnostic-registration']} data-registration={entry.kind} aria-label={`Enregistrement ${entry.kind} – ${person.name}`}>
     <span class="registration-heading">
       <svg viewBox="0 0 32 36" width="17" height="19" fill="none" aria-hidden="true"><path d="M16 2 28 7v11c0 7-7 12-12 15C11 30 4 25 4 18V7L16 2Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="m11 17 3.5 4L22 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span><abbr title={entry.title}>{entry.kind}</abbr>{!profile && ' enregistrée'}</span>
@@ -29,8 +34,9 @@ const registrations = [
     <strong class="registration-number"><span class="sr-only">{entry.kind === 'IPRP' ? 'Numéro d’enregistrement d’IPRP : ' : 'Numéro RPPS : '}</span>{!profile && <span aria-hidden="true">N° </span>}{entry.number}</strong>
     {profile && entry.detail && <span class="registration-detail">{entry.detail}</span>}
   </aside>
-)}
+)}</div>}
 <style>
+  .profile-registrations { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; margin-top: 18px; }
   .registration {
     display: flex;
     flex-direction: column;
@@ -47,10 +53,11 @@ const registrations = [
   .registration.profile-registration {
     width: min(100%, 9rem);
     aspect-ratio: 1;
-    margin-top: 18px;
+    margin-top: 0;
     padding: 12px 14px;
     justify-content: center;
   }
+  .profile-registration[data-registration="IPRP"] { background: #fff; }
   .registration-heading { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 600; letter-spacing: .09em; }
   .registration-heading svg { color: var(--bronze); flex: none; }
   .registration-heading abbr { text-decoration: none; }

@@ -1,5 +1,13 @@
 # Revue éditoriale et autorisation de publication
 
+## Enregistrement IPRP d’Agnès — 12 novembre 2026
+
+Le récépissé transmis par Paul établit l’enregistrement `2026090231067` auprès de la DREETS Occitanie, valide jusqu’au 2 septembre 2031. Les données sont portées par la fiche de personne, indépendamment du RPPS et de la qualification globale de Sara. Seul le champ `iprp` d’Agnès doit être publié ; le justificatif n’est pas téléversé ni rendu téléchargeable.
+
+Les dix tests du modèle de contenu passent, dont le nouvel objet facultatif/complet, la date ISO et la séparation IPRP/RPPS/Sara. Astro check vérifie 147 fichiers : zéro erreur, zéro avertissement et 30 indications ; lint et compilation standalone passent. La recette publique locale passe dix contrôles : accueil et Qui sommes-nous à 390/1440 px, carré blanc et numéro entier, RPPS distinct, Diagnostic toujours attribué à Sara, absence de débordement et quatre audits Axe sans violation. Six parcours s’exécutent sans JavaScript et en mouvement réduit ; les audits Axe utilisent un contexte JavaScript distinct. Captures inspectées, aucun e-mail, mutation, requête externe ou PDF. Preuves : `artifacts/agnes-iprp-20261112/local/`.
+
+Déploiement et publication ciblée : en attente à ce stade. La fiche distante d’Agnès est en version 9, publiée sans brouillon ; l’instantané opérateur privé préserve tous ses champs et les versions des autres personnes.
+
 ## Six évolutions d’administration — 12 novembre 2026, validation et production
 
 **Production validée** depuis `d6e6981ddf13d8d0ab815d1d05a5901b29f1af16` : migration `0007` appliquée, marqueurs privés raccordés, déploiement et recette distante réussis. Les preuves locales et distantes sont distinguées ci-dessous. Aucun courriel externe n’a été envoyé pour cette recette.

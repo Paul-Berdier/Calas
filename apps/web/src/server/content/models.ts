@@ -116,6 +116,11 @@ export const statisticSchema = z.object({ id: optionalId, value: required(80), l
 export const personSchema = z.object({
   id: optionalId, name: required(150), role: required(600), bio: optionalText(8000), portrait: imageSchema.optional(),
   rppsNumber: z.string().trim().regex(/^(?:\d{11})?$/, 'Le numéro RPPS comporte 11 chiffres.').optional(),
+  iprp: z.object({
+    registration: z.string().trim().min(1, 'Renseignez le numéro figurant sur l’attestation.').max(80),
+    authority: z.string().trim().min(1, 'Renseignez la DREETS figurant sur l’attestation.').max(220),
+    validUntil: z.string().date().optional(),
+  }).strict().optional(),
   order: z.number().int().min(0).max(1000).optional(),
 }).strict();
 export const categorySchema = z.object({ id: optionalId, title: required(100), slug: slugSchema, description: optionalText(1000) }).strict();

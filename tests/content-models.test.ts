@@ -40,6 +40,23 @@ test('le RPPS reste facultatif et conserve les onze chiffres de sa titulaire', (
   assert.doesNotThrow(() => parseContent('person', { ...agnes, rppsNumber: '' }));
   assert.throws(() => parseContent('person', { ...agnes, rppsNumber: '2026.16.004' }), ContentError);
 });
+
+test('l’IPRP personnel reste facultatif, complet et distinct du RPPS et de la titulaire générale', () => {
+  const people = prepareSeedPlan(demoContent).entries.filter(entry => entry.kind === 'person');
+  const agnes = people.find(entry => entry.id === stableContentId('person', 'person-agnes'))!.content;
+  const sara = people.find(entry => entry.id === stableContentId('person', 'person-sara'))!.content;
+  const expected = { registration: '2026090231067', authority: 'DREETS Occitanie', validUntil: '2031-09-02' };
+  assert.deepEqual(agnes.iprp, expected);
+  assert.equal(agnes.rppsNumber, '10009722090');
+  assert.equal(sara.iprp, undefined);
+  assert.equal(demoContent.settings.qualification.registration, '2026.16.004');
+  assert.equal(demoContent.settings.qualification.personId, 'person-sara');
+  assert.doesNotThrow(() => parseContent('person', { ...agnes, iprp: undefined }));
+  assert.doesNotThrow(() => parseContent('person', { ...agnes, iprp: { registration: expected.registration, authority: expected.authority } }));
+  for (const iprp of [{}, { registration: expected.registration }, { ...expected, registration: ' ' }, { ...expected, authority: ' ' }, { ...expected, validUntil: '2031-02-29' }, { ...expected, unexpected: true }]) {
+    assert.throws(() => parseContent('person', { ...agnes, iprp }), ContentError);
+  }
+});
 test('les liens actifs et attributs arbitraires sont refusés', () => {
   for (const href of ['javascript:alert(1)', 'data:text/html,x', '//evil.test/', 'https://user:password@example.test/', '/\\evil', 'https://example.test/a\n']) assert.equal(safeEditorialUrl(href), false, href);
   for (const href of ['/contact/?objet=diagnostic', '#chiffres', 'https://example.test/', 'mailto:contact@example.test', 'tel:+33600000000']) assert.equal(safeEditorialUrl(href), true, href);

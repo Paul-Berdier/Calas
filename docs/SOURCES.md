@@ -66,6 +66,12 @@ Ces observations portent sur les contenus et la structure des pages consultées,
 8. Le consentement n'est pas une case obligatoire universelle. Le responsable du traitement doit valider la base légale appropriée, la conservation, les destinataires et l'information. [CNIL, consentement](https://www.cnil.fr/fr/les-bases-legales/consentement). La [CNIL, site vitrine](https://www.cnil.fr/fr/rgpd-en-pratique-communiquer-en-ligne) demande une information au formulaire, un moyen électronique d'exercer les droits et l'identification de l'éditeur.
 
 Ces corrections encadrent une préparation éditoriale ; elles ne constituent pas une validation juridique ni une attestation des qualifications du cabinet.
+## Enregistrement IPRP d’Agnès — document fourni le 12 novembre 2026
+
+Le récépissé DREETS Occitanie `DOC-20261112-WA0005.pdf`, transmis par Paul à la demande d’Agnès, est lu visuellement sur son unique page. Il est établi au nom de **LOUPIAS Agnès**, personne physique, le **15 octobre 2026**, avec le numéro **2026090231067** et la fin de validité **2 septembre 2031**. Empreinte SHA-256 du fichier fourni : `3642c7f65250219ca4d4d41b0283c03050a3410fe11cf4fcb7f648f09039e4d6`.
+
+Ces informations constituent la source de l’encadré propre à Agnès sur l’accueil et « Qui sommes-nous ». Elles sont distinctes du numéro RPPS `10009722090` et de l’enregistrement IPRP de Sara `2026.16.004`. Le document justificatif, son adresse et sa signature ne sont pas publiés ni téléversés. La vérification porte sur le document fourni, sans prétendre à une confirmation indépendante par l’administration.
+
 ## Repères publiés le 9 novembre 2026
 
 Le tableau du 7 novembre répartit neuf indicateurs en trois groupes. Le contexte « Pourquoi maintenant » renvoie séparément aux enquêtes Gallup (8 % engagés) et Empreinte Humaine / Ipsos bva (un salarié sur deux). Ces deux données ne sont plus répétées dans les cartes.

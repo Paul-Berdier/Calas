@@ -17,7 +17,7 @@ export interface Statistic {
   id: string; value: string; label: string; source: string; sourceUrl: string;
   year: string; note: string; verified: boolean; group?: 'people' | 'cost' | 'financial';
 }
-export interface Person { id: string; name: string; role: string; bio?: string; portrait?: ContentImage; rppsNumber?: string }
+export interface Person { id: string; name: string; role: string; bio?: string; portrait?: ContentImage; rppsNumber?: string; iprp?: { registration: string; authority: string; validUntil?: string } }
 export interface Section {
   key: string; title?: string; eyebrow?: string; text?: string;
   kind?: 'text' | 'steps' | 'list' | 'split' | 'notice';

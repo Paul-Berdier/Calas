@@ -1,5 +1,11 @@
 # Migration vers le CMS Calas Conseil
 
+## IPRP d’Agnès — 12 novembre 2026
+
+Le modèle de personne reçoit un objet facultatif `iprp` contenant `registration`, `authority` et `validUntil`. Il est éditable sur la fiche Équipe et conservé dans les révisions JSON existantes : aucune migration SQL ni seed sur la base existante. La qualification globale de Sara et le numéro RPPS d’Agnès sont conservés. Les encadrés IPRP des profils sont blancs ; les deux enregistrements d’Agnès se répartissent avec retour à la ligne sur les petits écrans. Une date de validité dépassée masque l’encadré IPRP personnel.
+
+La correction distante est préparée uniquement sur le champ `iprp` d’Agnès, à partir de sa fiche publiée sans brouillon en attente. Un instantané privé, la version attendue et les révisions précédentes permettent de vérifier que les autres champs et personnes restent inchangés. Le PDF est une source de vérification privée, sans autorisation de téléchargement public. Mise en ligne et publication : en attente à ce stade.
+
 ## Administration complète de prospection et suivi technique — 12 novembre 2026
 
 **État : migration `0007`, déploiement web et recette distante réussis.** Les six évolutions demandées sont l’historique paginé/recherchable, le suivi technique, l’aperçu du mail final, les périodes et comparaisons, les modèles de message et la programmation. Les preuves des versions déjà publiées ci-dessous restent historiques et ne valident pas cette évolution.

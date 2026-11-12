@@ -912,6 +912,7 @@ export function ContentForm({
     );
   if (kind === "person")
     return (
+      <>
       <Group
         title="Présentation de la personne"
         description="Une biographie approuvée et un portrait authentique uniquement."
@@ -932,6 +933,28 @@ export function ContentForm({
         ])}
         {image(["portrait"], "Portrait authentique")}
       </Group>
+      <Group
+        title="Enregistrement IPRP de cette personne"
+        description="Recopiez uniquement une attestation établie au nom de cette personne. Le numéro et la DREETS seront affichés après publication de la fiche."
+        open={Boolean(value.iprp)}
+      >
+        {value.iprp ? <>
+          {texts([
+            { name: "registration", label: "Numéro d’enregistrement IPRP", required: true, max: 80 },
+            { name: "authority", label: "DREETS ayant établi l’attestation", required: true, max: 220 },
+            { name: "validUntil", label: "Date de fin de validité", type: "date", hint: "Recopiez la date exacte si elle figure sur l’attestation. L’encadré ne sera plus affiché après cette date." },
+          ], ["iprp"])}
+          <Button variant="ghost" size="sm" disabled={disabled} onClick={() => update(["iprp"], undefined)}>
+            Retirer cet enregistrement IPRP
+          </Button>
+        </> : <>
+          <p className="admin-hint">Cet enregistrement est facultatif. Les autres informations de la fiche peuvent être enregistrées sans le renseigner.</p>
+          <Button variant="secondary" size="sm" disabled={disabled} onClick={() => update(["iprp"], { registration: "", authority: "" })}>
+            Ajouter un enregistrement IPRP
+          </Button>
+        </>}
+      </Group>
+      </>
     );
   if (kind === "statistic")
     return (
