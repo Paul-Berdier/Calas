@@ -20,7 +20,7 @@ export function configurationProblems():string[]{
 export async function checkServices():Promise<void>{
  let timeout:ReturnType<typeof setTimeout>|undefined;
  try{await Promise.race([
-  Promise.all([getPool().query('SELECT d.draft_revision_id,d.published_revision_id,v.arrivals,t.session_id,g.resource FROM content_documents d CROSS JOIN contact_receipts r CROSS JOIN outreach_campaign_visits v CROSS JOIN outreach_unsubscribe_links u CROSS JOIN agent_tokens t CROSS JOIN oauth_grants g LIMIT 0'),getMediaStorage().check()]),
+  Promise.all([getPool().query('SELECT d.draft_revision_id,d.published_revision_id,v.arrivals,t.session_id,g.resource,m.version,e.scheduled_at FROM content_documents d CROSS JOIN contact_receipts r CROSS JOIN outreach_campaign_visits v CROSS JOIN outreach_unsubscribe_links u CROSS JOIN agent_tokens t CROSS JOIN oauth_grants g CROSS JOIN outreach_message_templates m CROSS JOIN outreach_deliveries e LIMIT 0'),getMediaStorage().check()]),
   new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('Readiness timeout')),5000);timeout.unref();}),
  ]);}finally{clearTimeout(timeout);}
 }

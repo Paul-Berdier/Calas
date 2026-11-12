@@ -1,4 +1,5 @@
-import type { DashboardMetrics } from "../lib/dashboard-metrics";
+import type { DashboardComparison, DashboardMetrics } from "../lib/dashboard-metrics";
+import { comparisonMetrics, metricDifference } from "../lib/dashboard-comparison";
 
 /** Export displayed aggregates only; formula-leading user text stays inert in spreadsheets. */
 function cell(value: string | number) {
@@ -9,7 +10,7 @@ function cell(value: string | number) {
   return '"' + safe.replaceAll('"', '""') + '"';
 }
 
-export function dashboardCsv(data: DashboardMetrics): string {
+export function dashboardCsv(data: DashboardMetrics, comparison?: DashboardComparison): string {
   const rows: (string | number)[][] = [
     ["Calas Conseil — chiffres agrégés"],
     ["Période UTC", data.period.from, data.period.to],
@@ -65,14 +66,29 @@ export function dashboardCsv(data: DashboardMetrics): string {
     ["Page", "Chemin", "Arrivées", "Consultations"],
     ...data.pages.map(p => [p.title, p.path, p.arrivals, p.consultations]),
   ];
-  return "\uFEFF" + rows.map(row => row.map(cell).join(";")).join("\r\n") + "\r\n";
+  if (comparison) {
+    const reference = comparison.data;
+    rows.push([], ["Comparaison", comparison.kind === "previous" ? "Période précédente de même durée" : "Autre campagne sur la même période"],
+      ["A — Analyse", data.campaign?.title ?? "Toutes les campagnes", data.period.from, data.period.to],
+      ["B — Référence", reference.campaign?.title ?? "Toutes les campagnes", reference.period.from, reference.period.to],
+      ["Actualisation de la référence", reference.generatedAt],
+      ["Indicateur", "A", "B", "Écart A − B", "Variation (%)"],
+      ...comparisonMetrics.map(([key, label]) => {
+        const value = data.activity[key], baseline = reference.activity[key];
+        const change = metricDifference(value, baseline);
+        return [label, value ?? "Non attribuable", baseline ?? "Non attribuable", change.difference ?? "Non disponible",
+          change.percentage === null ? baseline === 0 && value !== null ? "Non calculable : référence nulle" : "Non disponible" : Number(change.percentage.toFixed(2))];
+      }));
+  }
+  const result = "\uFEFF" + rows.map(row => row.map(cell).join(";")).join("\r\n") + "\r\n";
+  return comparison ? result + '\r\n"Détail de la référence B"\r\n' + dashboardCsv(comparison.data).slice(1) : result;
 }
 
-export function downloadDashboardCsv(data: DashboardMetrics) {
-  const url = URL.createObjectURL(new Blob([dashboardCsv(data)], { type: "text/csv;charset=utf-8" }));
+export function downloadDashboardCsv(data: DashboardMetrics, comparison?: DashboardComparison) {
+  const url = URL.createObjectURL(new Blob([dashboardCsv(data, comparison)], { type: "text/csv;charset=utf-8" }));
   const link = document.createElement("a");
   link.href = url;
-  link.download = `calas-statistiques-${data.period.days}-jours${data.campaign ? `-${data.campaign.id}` : ""}.csv`;
+  link.download = `calas-statistiques-${data.period.from.slice(0, 10)}-${data.period.to.slice(0, 10)}${data.campaign ? `-${data.campaign.id}` : ""}${comparison ? "-comparaison" : ""}.csv`;
   document.body.append(link);
   link.click();
   link.remove();

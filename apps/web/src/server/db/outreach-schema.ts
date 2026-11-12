@@ -31,9 +31,15 @@ export const outreachCampaigns=pgTable('outreach_campaigns',{
 export const outreachDeliveries=pgTable('outreach_deliveries',{
  id:uuid('id').primaryKey().defaultRandom(),campaignId:uuid('campaign_id').notNull().references(()=>outreachCampaigns.id,{onDelete:'cascade'}),contactId:uuid('contact_id').notNull().references(()=>outreachProspects.id,{onDelete:'cascade'}),
  email:text('email').notNull(),emailHash:text('email_hash').notNull(),subject:text('subject').notNull(),body:text('body').notNull(),transport:text('transport').notNull(),
- status:text('status').notNull().default('queued'),attempts:integer('attempts').notNull().default(0),nextAttemptAt:time('next_attempt_at'),startedAt:timestamp('started_at',{withTimezone:true}),finishedAt:timestamp('finished_at',{withTimezone:true}),
+ status:text('status').notNull().default('queued'),attempts:integer('attempts').notNull().default(0),scheduledAt:timestamp('scheduled_at',{withTimezone:true}),nextAttemptAt:time('next_attempt_at'),startedAt:timestamp('started_at',{withTimezone:true}),finishedAt:timestamp('finished_at',{withTimezone:true}),
  unsubscribeHash:text('unsubscribe_hash').notNull().unique(),unsubscribeEncrypted:text('unsubscribe_encrypted').notNull(),createdAt:time('created_at'),
-},t=>[unique('outreach_deliveries_campaign_contact').on(t.campaignId,t.contactId),index('outreach_deliveries_queue').on(t.status,t.nextAttemptAt),index('outreach_deliveries_email_hash').on(t.emailHash),check('outreach_deliveries_status',sql`${t.status} IN ('queued','sending','accepted','simulated','failed','uncertain','suppressed')`),check('outreach_deliveries_transport',sql`${t.transport} IN ('simulation','local','smtp')`),check('outreach_deliveries_attempts',sql`${t.attempts} >= 0`)]);
+},t=>[unique('outreach_deliveries_campaign_contact').on(t.campaignId,t.contactId),index('outreach_deliveries_queue').on(t.status,t.nextAttemptAt),index('outreach_deliveries_history').on(t.createdAt,t.id),index('outreach_deliveries_campaign_history').on(t.campaignId,t.createdAt,t.id),index('outreach_deliveries_email_hash').on(t.emailHash),check('outreach_deliveries_status',sql`${t.status} IN ('queued','sending','accepted','simulated','failed','uncertain','suppressed')`),check('outreach_deliveries_transport',sql`${t.transport} IN ('simulation','local','smtp')`),check('outreach_deliveries_attempts',sql`${t.attempts} >= 0`)]);
+
+/** Reusable messages are independent of recipients, campaigns and their tracking links. */
+export const outreachMessageTemplates=pgTable('outreach_message_templates',{
+ id:uuid('id').primaryKey().defaultRandom(),version:integer('version').notNull().default(0),title:text('title').notNull(),subject:text('subject').notNull(),body:text('body').notNull(),targetPath:text('target_path').notNull(),
+ createdBy:text('created_by').references(()=>user.id,{onDelete:'set null'}),createdAt:time('created_at'),updatedAt:time('updated_at'),
+},t=>[check('outreach_message_templates_version',sql`${t.version} >= 0`),index('outreach_message_templates_created').on(t.createdAt,t.id)]);
 
 /** Campaign totals only: never a recipient, IP, browser fingerprint or visitor identifier. */
 export const outreachCampaignVisits=pgTable('outreach_campaign_visits',{

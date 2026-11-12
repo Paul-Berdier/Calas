@@ -115,3 +115,22 @@
 @media (max-width: 360px) { .dashboard-kpis { grid-template-columns: minmax(0, 1fr); } .dashboard-kpi > p { min-height: 0; } .dashboard-periods { width: 100%; } .dashboard-periods button { flex: 1; padding-inline: 10px; } }
 @media (max-width: 720px) { .dashboard-campaign-filter, .dashboard-selected-campaign { padding: 15px; } .dashboard-filter-select, .dashboard-filter-search { flex-basis: 100%; } .dashboard-filter-footer { gap: 4px; } .dashboard-selected-heading { flex-direction: column; gap: 10px; } .dashboard-selected-heading h3 { font-size: 22px; } .dashboard-copy-link { align-items: stretch; flex-direction: column; } .dashboard-copy-link button { align-self: flex-start; } .dashboard-current-grid.dashboard-current-filtered { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .dashboard-insights *, .dashboard-insights *::before, .dashboard-insights *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+.dashboard-periods { flex-wrap: wrap; }
+.dashboard-custom-dates { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; padding: 16px; margin: 12px 0; border: 1px solid var(--a-border); border-radius: 7px; background: var(--a-paper); }
+.dashboard-custom-dates > div { min-width: 145px; flex: 1; }
+.dashboard-custom-dates label, .dashboard-comparison-controls > label { display: block; font-weight: 600; font-size: 12px; margin-bottom: 5px; }
+.dashboard-custom-dates > p { flex-basis: 100%; font-size: 11px; color: var(--a-muted); }
+.dashboard-custom-dates > p[role="alert"] { color: var(--a-red); }
+.dashboard-comparison-controls { margin: 15px 0; max-width: 510px; }
+.dashboard-comparison-controls p { font-size: 11px; color: var(--a-muted); margin-top: 6px; }
+.dashboard-comparison-card { margin-bottom: 24px; }
+.dashboard-comparison-scopes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 16px 20px; background: #f1eee7; }
+.dashboard-comparison-scopes strong, .dashboard-comparison-scopes span { display: block; overflow-wrap: anywhere; }
+.dashboard-comparison-scopes strong { font-size: 12px; }
+.dashboard-comparison-scopes span { font-size: 11px; margin-top: 5px; color: var(--a-muted); }
+.dashboard-comparison-table { min-width: 600px; }
+.dashboard-comparison-note { padding: 15px 20px; font-size: 11px; color: var(--a-muted); border-top: 1px solid var(--a-border); }
+.dashboard-comparison-pending { padding: 16px 20px; margin-bottom: 20px; background: var(--a-ivory); border-radius: 7px; font-size: 12px; }
+.dashboard-comparison-pending[role="alert"] { color: var(--a-red); border: 1px solid #d7a5a6; }
+.dashboard-comparison-pending button { margin-top: 10px; }
+@media (max-width: 600px) { .dashboard-comparison-scopes { grid-template-columns: minmax(0, 1fr); } .dashboard-periods button { flex: 1 1 auto; } .dashboard-custom-dates > div { flex-basis: 100%; } .dashboard-comparison-controls { max-width: none; } }

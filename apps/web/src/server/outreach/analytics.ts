@@ -18,6 +18,24 @@ export function dashboardPeriod(value: unknown = 30): DashboardPeriod {
   throw new HttpError(422, 'PERIOD', 'Choisissez une période de 7, 30 ou 90 jours.');
 }
 
+/** Date-only values describe recorded UTC days, never browser-local midnights. */
+export function dashboardDateRange(days: unknown, range: { from?: unknown; to?: unknown } = {}, now = new Date()) {
+  const today = now.toISOString().slice(0, 10);
+  if (range.from === undefined && range.to === undefined) {
+    return { days: dashboardPeriod(days), from: null, to: null };
+  }
+  if (days !== undefined) throw new HttpError(422, 'PERIOD', 'Choisissez une durée ou des dates personnalisées, pas les deux.');
+  const validDay = (value: unknown): value is string => {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value) || value < '1970-01-01' || value > today) return false;
+    const parsed = new Date(value + 'T00:00:00Z');
+    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+  };
+  if (!validDay(range.from) || !validDay(range.to)) throw new HttpError(422, 'PERIOD', 'Indiquez deux dates valides, passées ou actuelles, en jours UTC.');
+  const length = (Date.parse(range.to + 'T00:00:00Z') - Date.parse(range.from + 'T00:00:00Z')) / 86400000 + 1;
+  if (!Number.isInteger(length) || length < 1 || length > 366) throw new HttpError(422, 'PERIOD', 'La période doit compter de 1 à 366 jours, avec la date de début avant celle de fin.');
+  return { days: length, from: range.from, to: range.to };
+}
+
 export function dashboardCampaignId(value: unknown): string | undefined {
   if (value === undefined) return undefined;
   const result = z.uuid().safeParse(value);
@@ -65,9 +83,10 @@ const deliverySums = `
   count(*) FILTER (WHERE terminal AND transport='local' AND status='accepted')::int AS "localAccepted"`;
 
 /** One statement gives every aggregate the same database snapshot and UTC clock. */
-export async function getDashboardMetrics(actor: Actor, requestedDays: unknown = 30, requestedCampaignId?: unknown): Promise<DashboardMetrics> {
+export async function getDashboardMetrics(actor: Actor, requestedDays?: unknown, requestedCampaignId?: unknown, dateRange: { from?: unknown; to?: unknown } = {}): Promise<DashboardMetrics> {
   checkActor(actor);
-  const days = dashboardPeriod(requestedDays);
+  const range = dashboardDateRange(requestedDays, dateRange);
+  const days = range.days;
   const campaignId = dashboardCampaignId(requestedCampaignId);
   const transport = outreachTransport();
   type StoredMetrics = Omit<DashboardMetrics, 'campaign'> & {
@@ -75,17 +94,18 @@ export async function getDashboardMetrics(actor: Actor, requestedDays: unknown =
   };
   const { rows } = await getPool().query<{ metrics: StoredMetrics }>(`
     WITH clock AS (SELECT now() AS at), bounds AS (
-      SELECT at, (at AT TIME ZONE 'UTC')::date AS today,
-        (at AT TIME ZONE 'UTC')::date-($1::int-1) AS first_day FROM clock
+      SELECT at, coalesce($4::date, (at AT TIME ZONE 'UTC')::date) AS today,
+        coalesce($3::date, (at AT TIME ZONE 'UTC')::date-($1::int-1)) AS first_day,
+        (coalesce($4::date, (at AT TIME ZONE 'UTC')::date)+1)::timestamp AT TIME ZONE 'UTC' AS until FROM clock
     ), selected_campaigns AS (
       SELECT id,title,status,target_path,created_at,link_encrypted FROM outreach_campaigns WHERE $2::uuid IS NULL OR id=$2::uuid
     ), deliveries AS (
       SELECT d.campaign_id,d.transport,d.status,d.finished_at,
         d.transport='smtp' AND d.created_at >= (b.first_day::timestamp AT TIME ZONE 'UTC')
-          AND d.created_at <= b.at AS requested,
+          AND d.created_at < b.until AND d.created_at <= b.at AS requested,
         d.status IN ('accepted','failed','uncertain','suppressed','simulated')
           AND d.finished_at >= (b.first_day::timestamp AT TIME ZONE 'UTC')
-          AND d.finished_at <= b.at AS terminal
+          AND d.finished_at < b.until AND d.finished_at <= b.at AS terminal
       FROM outreach_deliveries d JOIN selected_campaigns c ON c.id=d.campaign_id CROSS JOIN bounds b
     ), delivery_totals AS (SELECT ${deliverySums} FROM deliveries),
     delivery_campaigns AS (SELECT campaign_id,${deliverySums} FROM deliveries GROUP BY campaign_id),
@@ -103,7 +123,7 @@ export async function getDashboardMetrics(actor: Actor, requestedDays: unknown =
         coalesce(v.arrivals,0) AS arrivals,coalesce(v.consultations,0) AS consultations
       FROM selected_campaigns c CROSS JOIN bounds b
       LEFT JOIN delivery_campaigns d ON d.campaign_id=c.id LEFT JOIN visit_campaigns v ON v.campaign_id=c.id
-      WHERE $2::uuid IS NOT NULL OR (c.created_at >= (b.first_day::timestamp AT TIME ZONE 'UTC') AND c.created_at<=b.at)
+      WHERE $2::uuid IS NOT NULL OR (c.created_at >= (b.first_day::timestamp AT TIME ZONE 'UTC') AND c.created_at<b.until AND c.created_at<=b.at)
         OR coalesce(d.requested+d.accepted+d.failed+d.uncertain+d.suppressed+d.simulated+d."localAccepted",0)>0
         OR coalesce(v.consultations,0)>0
     ), page_totals AS (
@@ -149,10 +169,10 @@ export async function getDashboardMetrics(actor: Actor, requestedDays: unknown =
           'paused',count(*) FILTER(WHERE d.status='queued' AND c.status='paused')::int)
           FROM outreach_deliveries d JOIN selected_campaigns c ON c.id=d.campaign_id)),
       'activity',(SELECT row_to_json(t) FROM (SELECT dt.*,
-        CASE WHEN $2::uuid IS NOT NULL THEN NULL ELSE (SELECT count(*)::int FROM outreach_prospects WHERE created_at >= (b.first_day::timestamp AT TIME ZONE 'UTC') AND created_at<=b.at) END AS "newContacts",
-        (SELECT count(*)::int FROM selected_campaigns WHERE created_at >= (b.first_day::timestamp AT TIME ZONE 'UTC') AND created_at<=b.at) AS "newCampaigns",
-        CASE WHEN $2::uuid IS NOT NULL THEN NULL ELSE (SELECT count(*)::int FROM outreach_prospects WHERE last_response_at >= (b.first_day::timestamp AT TIME ZONE 'UTC') AND last_response_at<=b.at) END AS "responsesRecorded",
-        CASE WHEN $2::uuid IS NOT NULL THEN NULL ELSE (SELECT count(*)::int FROM outreach_suppressions WHERE created_at >= (b.first_day::timestamp AT TIME ZONE 'UTC') AND created_at<=b.at) END AS "exclusionsAdded",
+        CASE WHEN $2::uuid IS NOT NULL THEN NULL ELSE (SELECT count(*)::int FROM outreach_prospects WHERE created_at >= (b.first_day::timestamp AT TIME ZONE 'UTC') AND created_at<b.until AND created_at<=b.at) END AS "newContacts",
+        (SELECT count(*)::int FROM selected_campaigns WHERE created_at >= (b.first_day::timestamp AT TIME ZONE 'UTC') AND created_at<b.until AND created_at<=b.at) AS "newCampaigns",
+        CASE WHEN $2::uuid IS NOT NULL THEN NULL ELSE (SELECT count(*)::int FROM outreach_prospects WHERE last_response_at >= (b.first_day::timestamp AT TIME ZONE 'UTC') AND last_response_at<b.until AND last_response_at<=b.at) END AS "responsesRecorded",
+        CASE WHEN $2::uuid IS NOT NULL THEN NULL ELSE (SELECT count(*)::int FROM outreach_suppressions WHERE created_at >= (b.first_day::timestamp AT TIME ZONE 'UTC') AND created_at<b.until AND created_at<=b.at) END AS "exclusionsAdded",
         (SELECT coalesce(sum(arrivals),0)::int FROM visits) AS arrivals,
         (SELECT coalesce(sum(visits),0)::int FROM visits) AS consultations FROM delivery_totals dt) t),
       'daily',(SELECT coalesce(json_agg(t ORDER BY t.day),'[]'::json) FROM daily_rows t),
@@ -162,7 +182,7 @@ export async function getDashboardMetrics(actor: Actor, requestedDays: unknown =
       'pages',(SELECT coalesce(json_agg(t ORDER BY t.consultations DESC,t.arrivals DESC,t.path),'[]'::json)
         FROM (SELECT * FROM page_rows ORDER BY consultations DESC,arrivals DESC,path LIMIT 10) t),
       'pageRowsTotal',(SELECT count(*)::int FROM page_rows)
-    ) AS metrics FROM bounds b`, [days, campaignId ?? null]);
+    ) AS metrics FROM bounds b`, [days, campaignId ?? null, range.from, range.to]);
   const metrics = rows[0].metrics;
   if (campaignId && !metrics.campaign) throw new HttpError(404, 'NOT_FOUND', 'Cette campagne est introuvable.');
   const { campaign: selected, ...aggregates } = metrics;

@@ -20,6 +20,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 loadEnvFile(resolve(root, 'apps/web/.env'));
 const original = process.env.DATABASE_URL!;
 assert(['localhost', '127.0.0.1'].includes(new URL(original).hostname), 'Local database only');
+assert(['localhost', '127.0.0.1'].includes(new URL(process.env.S3_ENDPOINT!).hostname), 'Local media storage only');
 const base = 'http://localhost:4348';
 const database = `calas_http_test_${randomUUID().replaceAll('-', '')}`;
 const password = randomBytes(28).toString('base64url');
@@ -37,6 +38,8 @@ Object.assign(process.env, {
   AUTH_SMTP_FROM: 'Calas local <cms@example.test>', ALLOW_REAL_EMAIL: 'false', OUTREACH_MAIL_TRANSPORT: 'simulation', OUTREACH_RUNNER_ENABLED: 'true',
   OUTREACH_LINK_SECRET: randomBytes(32).toString('hex'), BETTER_AUTH_SECRET: randomBytes(32).toString('hex'),
 });
+// This isolated recipe must never read the production backup markers.
+for (const key of Object.keys(process.env).filter(key => key.startsWith('STATUS_S3_'))) delete process.env[key];
 const pass = (name: string) => { report.push(name); console.log(name); };
 try {
   await migrateDatabase(resolve(root, 'drizzle'));
@@ -55,8 +58,16 @@ try {
   const anon = await request.newContext({ baseURL: base }); clients.push(anon);
   const call = (path: string, data?: unknown, origin = base) => admin.fetch(path, { method: data === undefined ? 'GET' : 'POST', data, headers: { Origin: origin } });
   async function ok(path: string, data?: unknown) { const response = await call(path, data); assert(response.ok(), `${path}: HTTP ${response.status()}`); return response.json(); }
+  async function privateRead(path: string, expectedStatus = 200) {
+    const response = await call(path); assert.equal(response.status(), expectedStatus, path);
+    assert.match(response.headers()['cache-control'] ?? '', /no-store/); return response.json();
+  }
   assert.equal((await anon.get('/api/admin/outreach/overview/')).status(), 401);
   assert.equal((await anon.get('/api/admin/integrations/tokens/')).status(), 401);
+  for (const path of ['/api/admin/operations/', '/api/admin/outreach/deliveries/', '/api/admin/outreach/contacts/', '/api/admin/outreach/campaigns/', '/api/admin/outreach/templates/', '/api/admin/outreach/analytics/?from=2024-02-28&to=2024-03-01']) {
+    const response = await anon.get(path); assert.equal(response.status(), 401, path);
+    assert.match(response.headers()['cache-control'] ?? '', /no-store/);
+  }
   const inbox = await (await fetch('http://127.0.0.1:18025/api/v1/messages')).json();
   const mail = inbox.messages.find((item: { To?: { Address: string }[] }) => item.To?.some(to => to.Address === email));
   assert(mail, 'Local verification email');
@@ -69,6 +80,65 @@ try {
   assert.equal((await call('/api/admin/outreach/contacts/', {}, 'https://outside.example')).status(), 403);
   const prospect = await ok('/api/admin/outreach/contacts/', { email: 'recipient@example.test', name: 'Contact de recette', company: 'Entreprise locale', jobTitle: 'Direction', source: 'Recette locale sans diffusion', sourceDate: new Date().toISOString().slice(0, 10), informationConfirmed: true });
   const campaign = await ok('/api/admin/outreach/campaigns/', { title: 'Recette HTTP', subject: 'Découvrir Calas Conseil', body: 'Présentation professionnelle de recette sans envoi externe.', targetPath: '/diagnostic-rps/' });
+  const beforePreview = (await getPool().query('SELECT (SELECT count(*)::int FROM outreach_deliveries) AS deliveries,(SELECT count(*)::int FROM outreach_unsubscribe_links) AS links,(SELECT count(*)::int FROM outreach_campaign_visits) AS visits')).rows[0];
+  const previewPath = `/api/admin/outreach/campaigns/${campaign.id}/preview/`;
+  assert.equal((await anon.post(previewPath, { data: { contactId: prospect.id }, headers: { Origin: base } })).status(), 401);
+  assert.equal((await call(previewPath, { contactId: prospect.id }, 'https://outside.example')).status(), 403);
+  const previewResponse = await call(previewPath, { contactId: prospect.id }); assert.equal(previewResponse.status(), 200);
+  assert.match(previewResponse.headers()['cache-control'] ?? '', /no-store/);
+  const preview = await previewResponse.json();
+  assert.equal(preview.recipient.email, prospect.email); assert.equal(preview.unsubscribeIsExample, true);
+  assert(preview.text.includes(campaign.linkPath)); assert(preview.text.includes('/confidentialite/')); assert(!preview.text.includes('/r/u_'));
+  assert.deepEqual((await getPool().query('SELECT (SELECT count(*)::int FROM outreach_deliveries) AS deliveries,(SELECT count(*)::int FROM outreach_unsubscribe_links) AS links,(SELECT count(*)::int FROM outreach_campaign_visits) AS visits')).rows[0], beforePreview);
+  pass('Aperçu privé du mail final : authentification/origine, absence de cache et aucune création de jeton ou mesure');
+
+  const templateInput = { title: 'Modèle HTTP', subject: 'Sujet professionnel', body: 'Message professionnel de recette pour une entreprise.', targetPath: '/contact/' };
+  assert.equal((await call('/api/admin/outreach/templates/', templateInput, 'https://outside.example')).status(), 403);
+  const model = await ok('/api/admin/outreach/templates/', templateInput);
+  const modelPath = `/api/admin/outreach/templates/${model.id}/`;
+  assert.equal((await admin.patch(modelPath, { data: { ...templateInput, version: 0 }, headers: { Origin: 'https://outside.example' } })).status(), 403);
+  const models = await privateRead('/api/admin/outreach/templates/?q=HTTP&offset=0&limit=1'); assert.equal(models.total, 1); assert.equal(models.items[0].id, model.id);
+  const updatedModel = await admin.patch(modelPath, { data: { ...templateInput, subject: 'Sujet actualisé', version: 0 }, headers: { Origin: base } });
+  assert.equal(updatedModel.status(), 200); assert.match(updatedModel.headers()['cache-control'] ?? '', /no-store/);
+  assert.equal((await admin.patch(modelPath, { data: { ...templateInput, version: 0 }, headers: { Origin: base } })).status(), 409);
+  assert.equal((await admin.delete(modelPath, { data: { version: 1 }, headers: { Origin: 'https://outside.example' } })).status(), 403);
+  assert.equal((await admin.delete(modelPath, { data: { version: 0 }, headers: { Origin: base } })).status(), 409);
+  assert.equal((await admin.delete(modelPath, { data: { version: 1 }, headers: { Origin: base } })).status(), 200);
+  assert.equal((await privateRead('/api/admin/outreach/templates/')).total, 0);
+  pass('Modèles HTTP : création, recherche, modification versionnée, conflit, suppression et origine protégée');
+
+  const scheduleCampaign = await ok('/api/admin/outreach/campaigns/', { ...templateInput, title: 'Programmation HTTP' });
+  const schedulePath = `/api/admin/outreach/campaigns/${scheduleCampaign.id}/send/`;
+  const scheduleInput = { version: 0, contactIds: [prospect.id], confirmation: true, scheduledAt: new Date(Date.now() + 3600000).toISOString() };
+  assert.equal((await call(schedulePath, { ...scheduleInput, confirmation: false })).status(), 422);
+  assert.equal((await call(schedulePath, { ...scheduleInput, scheduledAt: '2020-01-01T00:00:00Z' })).status(), 422);
+  assert.equal((await call(schedulePath, scheduleInput, 'https://outside.example')).status(), 403);
+  const scheduled = await ok(schedulePath, scheduleInput); assert.equal(scheduled.queued, 1); assert.equal(scheduled.scheduledAt, scheduleInput.scheduledAt);
+  const history = await privateRead(`/api/admin/outreach/deliveries/?campaignId=${scheduleCampaign.id}&status=queued&q=Entreprise&limit=1&offset=0`);
+  assert.equal(history.total, 1); assert.equal(history.items.length, 1); assert.equal(new Date(history.items[0].scheduledAt).toISOString(), scheduleInput.scheduledAt);
+  assert.equal(history.items[0].attempts, 0); assert(!Object.hasOwn(history.items[0], 'unsubscribeLink'));
+  const beyondHistory = await privateRead(`/api/admin/outreach/deliveries/?campaignId=${scheduleCampaign.id}&offset=50&limit=1`);
+  assert.equal(beyondHistory.total, 1); assert.deepEqual(beyondHistory.items, []);
+  const fullOverview = await privateRead('/api/admin/outreach/overview/');
+  const summaryOverview = await privateRead('/api/admin/outreach/overview/?summary=true');
+  assert(fullOverview.contacts.length > 0); assert(fullOverview.campaigns.length > 0);
+  assert.deepEqual(summaryOverview, { ...fullOverview, contacts: [], campaigns: [], deliveries: [], visits: [] });
+  for (const query of ['summary=false', 'summary=1', 'summary=true&summary=true', 'unexpected=true']) await privateRead('/api/admin/outreach/overview/?' + query, 422);
+  const contactsPage = await privateRead(`/api/admin/outreach/contacts/?campaignId=${scheduleCampaign.id}&eligibleOnly=true&q=recipient&limit=1`); assert.equal(contactsPage.total, 0);
+  const campaignPage = await privateRead('/api/admin/outreach/campaigns/?q=Programmation&limit=1'); assert.equal(campaignPage.total, 1); assert.equal(campaignPage.items[0].id, scheduleCampaign.id);
+  for (const path of ['/api/admin/outreach/deliveries/?limit=101', '/api/admin/outreach/deliveries/?limit=1&limit=2', '/api/admin/outreach/templates/?unexpected=1', '/api/admin/outreach/contacts/?eligibleOnly=yes']) await privateRead(path, 422);
+  await ok(`/api/admin/outreach/campaigns/${scheduleCampaign.id}/pause/`, { version: 1, paused: true });
+  pass('Historique et listes paginés sans cache ; programmation future persistée, confirmation et filtres invalides contrôlés');
+
+  const custom = await privateRead('/api/admin/outreach/analytics/?from=2024-02-28&to=2024-03-01');
+  assert.equal(custom.period.days, 3); assert.equal(custom.period.from, '2024-02-28'); assert.equal(custom.period.to, '2024-03-01'); assert.equal(custom.daily.length, 3);
+  for (const query of ['from=2024-02-30&to=2024-03-01', 'from=2024-02-28', 'from=2024-02-28&to=2024-03-01&days=7', 'from=2024-02-28&from=2024-02-29&to=2024-03-01']) await privateRead('/api/admin/outreach/analytics/?' + query, 422);
+  const operations = await privateRead('/api/admin/operations/');
+  assert.equal(operations.site.status, 'ok'); assert.equal(operations.backup.status, 'unconfigured');
+  assert.equal(operations.mail.mode, 'simulation'); assert.equal(operations.mail.configured, false);
+  assert(!JSON.stringify(operations).includes(process.env.OUTREACH_LINK_SECRET!));
+  assert(!Object.hasOwn(operations.mail, 'host')); assert(!Object.hasOwn(operations.backup, 'bucket'));
+  pass('Dates personnalisées UTC et état technique HTTP : réponses privées, sonde locale réussie et aucun secret exposé');
   const queued = await ok(`/api/admin/outreach/campaigns/${campaign.id}/send/`, { version: campaign.version, contactIds: [prospect.id], confirmation: true });
   assert.equal(queued.queued, 1); assert.equal(queued.simulation, true);
   let simulated = false;

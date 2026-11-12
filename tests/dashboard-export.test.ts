@@ -1,10 +1,37 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { dashboardCsv } from "../apps/web/src/admin/dashboard-export";
+import { metricDifference, previousDashboardRange } from "../apps/web/src/lib/dashboard-comparison";
 import type { DashboardMetrics } from "../apps/web/src/lib/dashboard-metrics";
 import { dashboardFixture, emptyDashboardFixture, campaignDashboardFixture, dashboardCampaignId, secondDashboardCampaignId, inactiveDashboardCampaignId } from "./fixtures/dashboard-metrics.mjs";
 
 const fixture = () => dashboardFixture() as DashboardMetrics;
+
+test("previous interval has exactly the same UTC day count across DST and leap days", () => {
+  assert.deepEqual(previousDashboardRange({days:3,from:'2024-03-01',to:'2024-03-03',timeZone:'UTC'}),{from:'2024-02-27',to:'2024-02-29'});
+  assert.deepEqual(previousDashboardRange({days:3,from:'2026-03-30',to:'2026-04-01',timeZone:'UTC'}),{from:'2026-03-27',to:'2026-03-29'});
+  assert.deepEqual(metricDifference(10,0),{difference:10,percentage:null});
+  assert.deepEqual(metricDifference(0,0),{difference:0,percentage:null});
+  assert.deepEqual(metricDifference(null,0),{difference:null,percentage:null});
+  assert.deepEqual(metricDifference(3,6),{difference:-3,percentage:-50});
+});
+
+test("comparison export identifies both periods/campaigns and exports both complete aggregate sets", () => {
+  const primary = campaignDashboardFixture(dashboardCampaignId) as DashboardMetrics;
+  const reference = campaignDashboardFixture(secondDashboardCampaignId) as DashboardMetrics;
+  reference.campaign!.title='=malicious()';
+  reference.activity.arrivals=0;
+  const csv=dashboardCsv(primary,{kind:'campaign',data:reference});
+  assert(csv.includes('"Comparaison";"Autre campagne sur la même période"'));
+  assert(csv.includes('"B — Référence";"\'=malicious()"'));
+  assert(csv.includes('"Arrivées depuis les liens";"4";"0";"4";"Non calculable : référence nulle"'));
+  assert(csv.includes('"Réponses signalées";"Non attribuable";"Non attribuable";"Non disponible";"Non disponible"'));
+  assert(csv.includes('"Détail de la référence B"'));
+  assert(csv.includes('"Lien propre à la campagne";"/r/c_first_fixture"'));
+  assert(csv.includes('"Lien propre à la campagne";"/r/c_second_fixture"'));
+  assert.equal([...csv].filter(c=>c==='\uFEFF').length,1);
+  assert(!csv.includes('NaN')&&!csv.includes('Infinity'));
+});
 
 test("CSV preserves real, simulated and local totals as separate columns with their period", () => {
   const data = fixture();

@@ -21,7 +21,7 @@ export async function processOutreachQueue(options:{limit?:number;signal?:AbortS
   result.uncertain+=(await client.query("UPDATE outreach_deliveries SET status='uncertain',finished_at=now() WHERE status='sending' AND started_at<now()-interval '15 minutes'")).rowCount||0;
   for(let index=0;index<limit;index++){
    if(options.signal?.aborted)break;
-   const next=(await client.query<{id:string;email_hash:string;transport:string;campaign_id:string}>("SELECT d.id,d.email_hash,d.transport,d.campaign_id FROM outreach_deliveries d JOIN outreach_campaigns c ON c.id=d.campaign_id WHERE d.status='queued' AND c.status='active' AND d.next_attempt_at<=now() AND (d.transport='simulation' OR d.transport=$1) ORDER BY d.created_at,d.id LIMIT 1",[mode])).rows[0];
+   const next=(await client.query<{id:string;email_hash:string;transport:string;campaign_id:string}>("SELECT d.id,d.email_hash,d.transport,d.campaign_id FROM outreach_deliveries d JOIN outreach_campaigns c ON c.id=d.campaign_id WHERE d.status='queued' AND c.status='active' AND d.next_attempt_at<=now() AND (d.scheduled_at IS NULL OR d.scheduled_at<=now()) AND (d.transport='simulation' OR d.transport=$1) ORDER BY d.created_at,d.id LIMIT 1",[mode])).rows[0];
    if(!next)break;
    if(next.transport!=='simulation'&&!await consumeRateLimit('outreach:smtp:hour',hourly,3600,client)){result.rateLimited=true;break;}
    // Commit the claim before talking to SMTP. A later database outage cannot make it queued again.

@@ -11,7 +11,15 @@ export const prospectInputSchema=z.object({
 export const prospectUpdateSchema=prospectInputSchema.extend({version:z.number().int().nonnegative()});
 export const campaignInputSchema=z.object({title:line(120).min(3),subject:line(180).min(3),body:z.string().trim().min(10).max(15000).refine(v=>!v.includes('\u0000')),targetPath:publicPathSchema}).strict();
 export const campaignUpdateSchema=campaignInputSchema.extend({version:z.number().int().nonnegative()});
-export const queueInputSchema=z.object({version:z.number().int().nonnegative(),contactIds:z.array(z.uuid()).min(1).max(5000).transform(v=>[...new Set(v)]),confirmation:z.literal(true)}).strict();
+export const scheduledAtSchema=z.iso.datetime().refine(value=>{
+ const at=Date.parse(value),now=Date.now();
+ return at>now&&at<=now+366*24*60*60*1000;
+},'Choisissez une date future, dans les 366 prochains jours.');
+export const queueInputSchema=z.object({version:z.number().int().nonnegative(),contactIds:z.array(z.uuid()).min(1).max(5000).transform(v=>[...new Set(v)]),confirmation:z.literal(true),scheduledAt:scheduledAtSchema.optional()}).strict();
+export const campaignPreviewSchema=z.object({contactId:z.uuid().optional()}).strict();
+export const messageTemplateInputSchema=campaignInputSchema;
+export const messageTemplateUpdateSchema=campaignUpdateSchema;
+export const messageTemplateDeleteSchema=z.object({version:z.number().int().nonnegative()}).strict();
 export const pauseCampaignSchema=z.object({version:z.number().int().nonnegative(),paused:z.boolean()}).strict();
 export const importProspectsSchema=z.object({contacts:z.array(prospectInputSchema).min(1).max(200)}).strict();
 export const uuidSchema=z.uuid();

@@ -1,0 +1,25 @@
+{
+  "checks": [
+    {
+      "name": "template-creation-saving",
+      "width": 390
+    },
+    {
+      "name": "template-creation-saving",
+      "width": 1440
+    },
+    {
+      "name": "template-edition-saving",
+      "width": 390
+    },
+    {
+      "name": "template-edition-saving",
+      "width": 1440
+    }
+  ],
+  "blockedInputDuringCreate": true,
+  "blockedInputDuringUpdate": true,
+  "preservedSubmittedData": true,
+  "realEmails": 0,
+  "errors": []
+}

@@ -1,5 +1,30 @@
 # Revue éditoriale et autorisation de publication
 
+## Six évolutions d’administration — 12 novembre 2026, validation locale
+
+**Production : EN ATTENTE.** Les résultats ci-dessous concernent le code local. Ils ne prouvent ni application de la migration `0007`, ni raccordement des marqueurs privés, ni mise en ligne. Les déploiements historiques documentés plus bas restent distincts. Aucun courriel externe n’a été envoyé pour cette recette.
+
+| Périmètre | Preuves locales obtenues |
+| --- | --- |
+| Historique, modèles, aperçu et programmation serveur | 30 tests réussis dans `outreach-management.test.ts`, `outreach.test.ts` et `outreach-database.test.ts` : base isolée, historique au-delà de 1 000 lignes, filtres, versions concurrentes, rendu partagé et attente du worker |
+| Contrats MCP de gestion | 7 tests réussis dans `outreach-management-mcp.test.ts` : permissions lecture/écriture/envoi, confirmation, limites, deux transports et base isolée, sans SMTP |
+| Dates, comparaisons et CSV | 26 tests réussis dans `dashboard-analytics.test.ts` et `dashboard-export.test.ts`, aucun saut : dates invalides, année bissextile, UTC/changements d’heure, bornes inclusives, plus de 1 000 résultats, périmètres, MCP et export des deux références |
+| Programmation côté interface | 4 tests réussis dans `outreach-schedule-ui.test.ts` : hiver/été, heure inexistante et double occurrence à Paris, futur et horizon de 366 jours |
+| État technique | 6 tests réussis dans `operations-status.test.ts` : droits, fraîcheur UTC des marqueurs, panne partielle, sonde canonique, absence de fuite et configuration SMTP invalide, sans authentification ou envoi SMTP |
+| Tableau de bord navigateur | 47 contrôles réussis dont 30 vues Axe à 390/1440 px : dates personnalisées, conservation du filtre en cas d’erreur, comparaison précédente/deux campagnes, référence nulle, échec de référence, réponse tardive ignorée et CSV. `artifacts/dashboard-ui/report.json` |
+| Prospection navigateur | 18 contrôles de rendu/accessibilité à 390/1440 px, sans erreur navigateur ; parcours complémentaires : recherche du 1 002e envoi, pagination/statuts, modèle créé/modifié/supprimé sans modifier les campagnes, sélection sur deux pages, aperçu en échec puis réessayé, confirmation de simulation programmée. Navigateur réglé sur New York : l’heure choisie reste 09 h 30 à Paris. `artifacts/outreach-ui/report.json` |
+| État technique navigateur | 26 contrôles Axe/débordement à 390/1440 px : tous les états de sauvegarde, panne partielle, compteurs indisponibles, erreur initiale, nouvelle tentative au clavier, anciens résultats conservés et signalés après échec, récupération. Dates Paris dans un navigateur réglé sur New York ; API fictive en lecture seule. `artifacts/operations-ui/report.json` |
+
+Le contrôle intégré passe ensuite 53 tests sans saut. Astro check vérifie 147 fichiers avec zéro erreur, zéro avertissement et 29 indications ; TypeScript MCP, ESLint, compilation Astro et génération du lanceur passent. Ces exécutions successives recouvrent une partie des tests du tableau ci-dessus : leurs nombres ne doivent pas être additionnés comme des tests distincts.
+
+Les tests SQL utilisent `RUN_OUTREACH_INTEGRATION=1` avec les services locaux et des bases isolées. Les recettes navigateur emploient des données fictives et n’envoient aucun message ; le tableau de bord n’effectue aucune mutation ni mesure de consultation. La CI inclut les nouvelles commandes `pnpm test:outreach-management`, `pnpm test:operations` et `pnpm check:operations-ui`, ainsi que les recettes tableau de bord et prospection déjà présentes.
+
+Limites vérifiées : l’aperçu utilise un lien de désinscription inactif et indique quand la provenance est un exemple ; les dates statistiques sont UTC, la programmation utilise Paris ; une date programmée fixe un début au plus tôt, soumis à disponibilité et cadence ; une référence zéro ne donne pas de faux pourcentage ; les sauvegardes sont déduites de marqueurs, pas d’une restauration effectuée par cet écran ; « SMTP configuré » et « accepté » ne signifient pas livré en boîte principale. La sonde reste dépendante de Railway.
+
+La recette HTTP du serveur recompilé passe dix groupes, avec PostgreSQL/MinIO/Mailpit locaux, authentification réelle, worker simulé et OAuth PKCE/SDK MCP. Le stockage local initialement indisponible a été reconstruit avant cette réussite ; aucune protection n’a été contournée. Le verrouillage des champs pendant l’enregistrement des modèles est vérifié par quatre contrôles supplémentaires avec réponses retardées (création et modification). Preuves : `artifacts/outreach/http.json` et `artifacts/outreach-ui/template-save-report.json`.
+
+La sauvegarde préalable chiffrée et vérifiée couvre la base et 53 objets. La migration additive `0007` est appliquée via tunnel privé le 12 novembre à 03 h 10 (Paris), avec les droits applicatifs et du rôle de sauvegarde. Aucun contenu, compte ou envoi existant n’est modifié. Rapports : `artifacts/management-release/pre-migration.json` et `migration.json`. Le déploiement web et sa recette distante restent en attente à cette étape.
+
 ## Barre latérale sans défilement interne — 12 novembre 2026
 
 La navigation conserve ses 13 liens administrateur (11 pour une éditrice), ses libellés à 13 px et les accès au site public et à la déconnexion. Les marges s’adaptent à la hauteur : cibles de 36 px, puis 32 px sur les petits écrans. Aucun lien n’est masqué et la barre n’a plus de zone de défilement propre. Sous 591 px de hauteur sur ordinateur, elle rejoint le flux du document pour préserver tous les accès ; sur mobile, le menu modal conserve son défilement de secours. Sa fermeture restitue désormais le focus au bouton d’ouverture.

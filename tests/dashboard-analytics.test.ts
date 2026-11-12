@@ -6,7 +6,7 @@ import { loadEnvFile } from 'node:process';
 import { resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { closeDatabase, getDb, getPool } from '../apps/web/src/server/db';
-import { dashboardCampaignId, dashboardPeriod, getDashboardCampaignOptions, getDashboardMetrics } from '../apps/web/src/server/outreach/analytics';
+import { dashboardCampaignId, dashboardDateRange, dashboardPeriod, getDashboardCampaignOptions, getDashboardMetrics } from '../apps/web/src/server/outreach/analytics';
 import { getCampaignLanding, recordCampaignVisit } from '../apps/web/src/server/outreach/service';
 import { digest, makeToken, seal } from '../apps/web/src/server/outreach/tokens';
 import { availableAgentTools, callAgentTool } from '../apps/web/src/server/agent/tools';
@@ -20,6 +20,18 @@ const { Pool } = require('pg');
 const { migrate } = await import(pathToFileURL(require.resolve('drizzle-orm/node-postgres/migrator')).href);
 try { loadEnvFile(resolve(root, 'apps/web/.env')); } catch { /* Runner may provide environment. */ }
 const actor: Actor = { id: randomUUID(), name: 'Recette statistiques', email: 'analytics@example.test', role: 'editor' };
+
+test('custom date ranges are strict UTC calendar intervals, including leap years and DST days', () => {
+  const now = new Date('2026-11-12T00:15:00Z');
+  assert.deepEqual(dashboardDateRange(undefined, {}, now), {days:30,from:null,to:null});
+  for (const [from,to,days] of [['2024-02-28','2024-03-01',3],['2024-01-01','2024-12-31',366],['2026-03-28','2026-03-30',3],['2026-10-24','2026-10-26',3],['2026-11-12','2026-11-12',1]] as const) {
+    assert.deepEqual(dashboardDateRange(undefined,{from,to},now),{days,from,to});
+  }
+  for(const range of [{from:'2026-02-29',to:'2026-03-01'},{from:'2026-04-31',to:'2026-05-01'},{from:'2026-11-12',to:'2026-11-13'},{from:'2026-11-12'}, {to:'2026-11-12'}, {from:'2026-11-12',to:'2026-11-11'}, {from:'2025-01-01',to:'2026-01-02'}, {from:'1969-12-31',to:'1970-01-01'}, {from:'2026-1-01',to:'2026-01-02'}, {from:['2026-01-01'],to:'2026-01-02'}, {from:'2026-01-01T00:00:00Z',to:'2026-01-02'}]) {
+    assert.throws(()=>dashboardDateRange(undefined,range,now),{status:422,code:'PERIOD'});
+  }
+  assert.throws(()=>dashboardDateRange(7,{from:'2026-11-01',to:'2026-11-02'},now),{status:422,code:'PERIOD'});
+});
 
 test('dashboard periods are strict and unauthorized roles cannot access aggregates', async () => {
   assert.equal(dashboardPeriod(), 30);
@@ -57,7 +69,7 @@ test('analytics MCP catalogue is read-only and rejects missing scope or invalid 
   let executions = 0;
   const beforeExecution = async () => { executions++; };
   await assert.rejects(() => callAgentTool({ ...access, scopes: ['outreach'] }, tool.name, { days: 7 }, beforeExecution), { status: 403, code: 'AGENT_SCOPE' });
-  for (const args of [{ days: 8 }, { days: '7' }, { days: null }, { days: 30, recipient: 'private@example.test' }, { campaignId: 'invalid' }]) {
+  for (const args of [{ days: 8 }, { days: '7' }, { days: null }, { days: 30, recipient: 'private@example.test' }, { campaignId: 'invalid' }, {from:'2024-02-29'}, {to:'2024-02-29'}, {days:7,from:'2024-02-28',to:'2024-02-29'}, {from:'2026-02-29',to:'2026-03-01'}]) {
     await assert.rejects(() => callAgentTool(access, tool.name, args, beforeExecution), { status: 422, code: 'VALIDATION' });
   }
   const selector = availableAgentTools(access).find(item => item.name === 'calas_outreach_campaigns');
@@ -354,6 +366,31 @@ test('dashboard aggregates use complete, isolated PostgreSQL data', { skip: proc
         assert.equal(selected.activity.consultations, 1);
         assert.equal(selected.current.contacts, null);
         await assert.rejects(() => callAgentTool(access, 'calas_outreach_analytics', { campaignId: randomUUID() }), { status: 404 });
+      }
+    });
+    await t.test('custom range includes both UTC days and excludes the following midnight', async () => {
+      const custom = await campaign('Bornes personnalisées', 'active', true);
+      await delivery(custom,'smtp','accepted','2024-02-28T23:59:59.999Z','2024-02-28T23:59:59.999Z');
+      await delivery(custom,'smtp','accepted','2024-02-29T00:00:00.000Z','2024-02-29T00:00:00.000Z');
+      await delivery(custom,'smtp','accepted','2024-02-29T23:59:59.999Z','2024-02-29T23:59:59.999Z');
+      await delivery(custom,'smtp','accepted','2024-03-01T00:00:00.000Z','2024-03-01T00:00:00.000Z');
+      await getPool().query("SET TIME ZONE 'Europe/Paris'");
+      await getPool().query("INSERT INTO outreach_campaign_visits(campaign_id,path,day,arrivals,visits) VALUES($1,'/contact/','2024-02-28',1,3),($1,'/contact/','2024-02-29',2,5),($1,'/contact/','2024-03-01',7,12)",[custom]);
+      const leap = await getDashboardMetrics(actor,undefined,custom,{from:'2024-02-29',to:'2024-02-29'});
+      assert.deepEqual(leap.period,{days:1,from:'2024-02-29',to:'2024-02-29',timeZone:'UTC'});
+      assert.equal(leap.activity.accepted,2);assert.equal(leap.activity.requested,2);
+      assert.deepEqual(leap.daily,[{day:'2024-02-29',accepted:2,arrivals:2,consultations:5}]);
+      assert.equal(leap.activity.newCampaigns,0,'Current campaigns are not new within a historical range');
+      const previous = await getDashboardMetrics(actor,undefined,custom,{from:'2024-02-28',to:'2024-02-28'});
+      assert.equal(previous.activity.accepted,1);assert.equal(previous.activity.consultations,3);
+      const combined = await getDashboardMetrics(actor,undefined,custom,{from:'2024-02-28',to:'2024-03-01'});
+      assert.equal(combined.daily.length,3);assert.equal(combined.activity.accepted,4);assert.equal(combined.activity.consultations,20);
+      const bulkCustom = await getDashboardMetrics(actor,undefined,bulk,{from:times.today,to:times.today});
+      assert.equal(bulkCustom.activity.accepted,1001,'Custom periods keep complete aggregates over 1000 records');
+      for(const transport of [undefined,'oauth'] as const) {
+        const access: AgentAccess={actor,tokenId:randomUUID(),scopes:['read'],transport};
+        const result=await callAgentTool(access,'calas_outreach_analytics',{campaignId:custom,from:'2024-02-29',to:'2024-02-29'}) as DashboardMetrics;
+        assert.deepEqual(result.period,leap.period);assert.deepEqual(result.activity,leap.activity);assert.deepEqual(result.daily,leap.daily);
       }
     });
   } finally {

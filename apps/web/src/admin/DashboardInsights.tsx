@@ -10,7 +10,8 @@ import {
   RefreshCw,
   Users,
 } from "lucide-react";
-import type { DashboardCampaignOption, DashboardCampaignOptions, DashboardMetrics, DashboardPeriod } from "../lib/dashboard-metrics";
+import type { DashboardCampaignOption, DashboardCampaignOptions, DashboardComparison, DashboardMetrics, DashboardPeriod } from "../lib/dashboard-metrics";
+import { comparisonMetrics, metricDifference, previousDashboardRange } from "../lib/dashboard-comparison";
 import { request } from "./api";
 import { Button, Loading } from "./ui";
 import { downloadDashboardCsv } from "./dashboard-export";
@@ -19,18 +20,22 @@ import "./dashboard-insights.css";
 const integer = new Intl.NumberFormat("fr-FR");
 const compact = new Intl.NumberFormat("fr-FR", { notation: "compact", maximumFractionDigits: 1 });
 const utcDay = new Intl.DateTimeFormat("fr-FR", { timeZone: "UTC", day: "numeric", month: "short" });
+const periodDay = new Intl.DateTimeFormat("fr-FR", { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" });
 const refreshedAt = new Intl.DateTimeFormat("fr-FR", {
   timeZone: "Europe/Paris", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit",
 });
 const dayLabel = (value: string) => utcDay.format(new Date(`${value.slice(0, 10)}T12:00:00Z`));
+const periodLabel = (value: string) => periodDay.format(new Date(`${value.slice(0, 10)}T12:00:00Z`));
 const campaignStatus = { draft: "Brouillon", active: "Ouverte", paused: "En pause" };
 const createdOn = new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", day: "numeric", month: "long", year: "numeric" });
 type CampaignSelection = Pick<DashboardCampaignOption, "id" | "title"> | null;
 
-function CampaignFilter({ selected, onSelect, refreshVersion }: {
+function CampaignFilter({ selected, onSelect, refreshVersion, reference = false, excludeId }: {
   selected: CampaignSelection;
   onSelect: (campaign: CampaignSelection) => void;
   refreshVersion: number;
+  reference?: boolean;
+  excludeId?: string;
 }) {
   const searchId = useId(), selectId = useId(), helpId = useId();
   const [query, setQuery] = useState("");
@@ -55,25 +60,25 @@ function CampaignFilter({ selected, onSelect, refreshVersion }: {
     setOptions(null); setLoading(true); setError(""); setQuery(nextQuery); setOffset(nextOffset);
   }
   const items = !loading ? options?.items ?? [] : [];
-  return <section className="dashboard-campaign-filter" aria-label="Choisir les campagnes à analyser">
+  return <section className="dashboard-campaign-filter" aria-label={reference ? "Choisir la campagne de référence" : "Choisir les campagnes à analyser"}>
     <div className="dashboard-filter-fields">
       <div className="dashboard-filter-select">
-        <label htmlFor={selectId}>Campagne analysée</label>
+        <label htmlFor={selectId}>{reference ? "Campagne de référence" : "Campagne analysée"}</label>
         <select id={selectId} className="admin-input" value={selected?.id ?? ""} aria-describedby={helpId} onChange={event => {
           const next = items.find(item => item.id === event.target.value);
           if (!event.target.value) onSelect(null);
           else if (next) onSelect(next);
         }}>
-          <option value="">Toutes les campagnes</option>
+          <option value="">{reference ? "Choisir une campagne" : "Toutes les campagnes"}</option>
           {selected && !items.some(item => item.id === selected.id) && <option value={selected.id}>{selected.title} · {selected.id.slice(0, 8)}</option>}
-          {items.map(item => <option key={item.id} value={item.id}>{item.title} · {campaignStatus[item.status]} · {createdOn.format(new Date(item.createdAt))} · {item.id.slice(0, 8)}</option>)}
+          {items.map(item => <option key={item.id} value={item.id} disabled={item.id === excludeId}>{item.title} · {campaignStatus[item.status]} · {createdOn.format(new Date(item.createdAt))} · {item.id.slice(0, 8)}</option>)}
         </select>
       </div>
       <div className="dashboard-filter-search">
-        <label htmlFor={searchId}>Rechercher une campagne</label>
+        <label htmlFor={searchId}>{reference ? "Rechercher une campagne de référence" : "Rechercher une campagne"}</label>
         <input id={searchId} className="admin-input" type="search" value={query} maxLength={100} placeholder="Nom de la campagne" onChange={event => changeList(event.target.value, 0)} />
       </div>
-      {selected && <Button variant="secondary" size="sm" onClick={() => onSelect(null)}>Toutes les campagnes</Button>}
+      {selected && !reference && <Button variant="secondary" size="sm" onClick={() => onSelect(null)}>Toutes les campagnes</Button>}
     </div>
     <p id={helpId}>La liste comprend aussi les campagnes anciennes ou sans activité. La recherche et les pages ci-dessous modifient les choix de la liste.</p>
     <div className="dashboard-filter-footer">
@@ -84,6 +89,28 @@ function CampaignFilter({ selected, onSelect, refreshVersion }: {
       </div>
     </div>
     {error && <div className="dashboard-filter-error" role="alert"><p>{error} La vue sélectionnée reste inchangée.</p><Button variant="secondary" size="sm" onClick={() => { setLoading(true); setRetry(value => value + 1); }}>Réessayer la liste des campagnes</Button></div>}
+  </section>;
+}
+
+function ComparisonTable({ data, comparison }: { data: DashboardMetrics; comparison: DashboardComparison }) {
+  const reference = comparison.data;
+  const signed = new Intl.NumberFormat("fr-FR", { signDisplay: "exceptZero", maximumFractionDigits: 1 });
+  return <section className="admin-card dashboard-comparison-card" aria-label="Résultats comparés">
+    <div className="admin-card-header"><div><h3>{comparison.kind === "previous" ? "Comparaison avec la période précédente" : "Comparaison des deux campagnes"}</h3><p>Écart de A par rapport à B. Les chiffres « maintenant » ne sont pas comparés.</p></div></div>
+    <div className="dashboard-comparison-scopes">
+      <p><strong>A · {data.campaign?.title ?? "Toutes les campagnes"}</strong><span>Du {data.period.from.slice(0, 10)} au {data.period.to.slice(0, 10)} · UTC</span></p>
+      <p><strong>B · {reference.campaign?.title ?? "Toutes les campagnes"}</strong><span>Du {reference.period.from.slice(0, 10)} au {reference.period.to.slice(0, 10)} · UTC</span></p>
+    </div>
+    <div className="dashboard-table-scroll" role="region" aria-label="Comparaison des indicateurs" tabIndex={0}>
+      <table className="dashboard-table dashboard-comparison-table"><caption>{data.period.days} jours par période · données conservées</caption>
+        <thead><tr><th scope="col">Indicateur</th><th scope="col">A</th><th scope="col">B</th><th scope="col">Écart A − B</th><th scope="col">Variation</th></tr></thead>
+        <tbody>{comparisonMetrics.map(([key, label]) => {
+          const value = data.activity[key], baseline = reference.activity[key], change = metricDifference(value, baseline);
+          return <tr key={key}><th scope="row">{label}</th><td>{value === null ? "Non attribuable" : integer.format(value)}</td><td>{baseline === null ? "Non attribuable" : integer.format(baseline)}</td><td>{change.difference === null ? "Non disponible" : signed.format(change.difference)}</td><td>{change.percentage === null ? baseline === 0 && value !== null ? "Base nulle" : "Non disponible" : signed.format(change.percentage) + " %"}</td></tr>;
+        })}</tbody>
+      </table>
+    </div>
+    <p className="dashboard-comparison-note">Une base nulle ne permet pas de calculer un pourcentage. Les réponses signalées restent non attribuables à une campagne. Le jour UTC en cours peut être incomplet.</p>
   </section>;
 }
 
@@ -158,33 +185,80 @@ function DailyChart({ data }: { data: DashboardMetrics }) {
 
 export function DashboardInsights() {
   const [period, setPeriod] = useState<DashboardPeriod>(30);
+  const [range, setRange] = useState<{ from: string; to: string } | null>(null);
+  const [customOpen, setCustomOpen] = useState(false);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [dateError, setDateError] = useState("");
   const [selected, setSelected] = useState<CampaignSelection>(null);
   const [data, setData] = useState<DashboardMetrics | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(0);
+  const [comparisonKind, setComparisonKind] = useState<"none" | "previous" | "campaign">("none");
+  const [comparisonSelected, setComparisonSelected] = useState<CampaignSelection>(null);
+  const [comparisonResult, setComparisonResult] = useState<{ key: string; value: DashboardComparison } | null>(null);
+  const [comparisonError, setComparisonError] = useState("");
+  const dateFromId = useId(), dateToId = useId(), comparisonId = useId();
+  const today = new Date().toISOString().slice(0, 10);
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
     setData(null);
     setError("");
-    const params = new URLSearchParams({ days: String(period) });
+    const params = new URLSearchParams(range ?? { days: String(period) });
     if (selected) params.set("campaignId", selected.id);
     request<DashboardMetrics>(`/api/admin/outreach/analytics/?${params}`, { signal: controller.signal })
       .then(value => {
         if (controller.signal.aborted) return;
         if ((value.campaign?.id ?? null) !== (selected?.id ?? null)) throw new Error("Les chiffres reçus ne correspondent pas à la campagne sélectionnée. Réessayez l’actualisation.");
+        if (range && (value.period.from.slice(0, 10) !== range.from || value.period.to.slice(0, 10) !== range.to)) throw new Error("Les dates reçues ne correspondent pas à la période sélectionnée.");
         setData(value);
       })
       .catch(cause => { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "Les statistiques ne sont pas disponibles."); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [period, reload, selected]);
-  const visible = !loading && data?.period.days === period && (data.campaign?.id ?? null) === (selected?.id ?? null) ? data : null;
+  }, [period, range, reload, selected]);
+  const visible = !loading && data && (range ? data.period.from.slice(0, 10) === range.from && data.period.to.slice(0, 10) === range.to : data.period.days === period) && (data.campaign?.id ?? null) === (selected?.id ?? null) ? data : null;
+  const comparisonKey = visible && comparisonKind !== "none" && (comparisonKind !== "campaign" || (selected && comparisonSelected && selected.id !== comparisonSelected.id))
+    ? [visible.generatedAt, visible.period.from, visible.period.to, selected?.id ?? "all", comparisonKind, comparisonSelected?.id ?? ""].join("|") : "";
+  useEffect(() => {
+    const controller = new AbortController();
+    setComparisonResult(null); setComparisonError("");
+    if (!comparisonKey || !visible || comparisonKind === "none") return () => controller.abort();
+    const bounds = comparisonKind === "previous" ? previousDashboardRange(visible.period) : { from: visible.period.from.slice(0, 10), to: visible.period.to.slice(0, 10) };
+    const campaignId = comparisonKind === "previous" ? selected?.id : comparisonSelected?.id;
+    const params = new URLSearchParams(bounds);
+    if (campaignId) params.set("campaignId", campaignId);
+    request<DashboardMetrics>(`/api/admin/outreach/analytics/?${params}`, { signal: controller.signal }).then(value => {
+      if (controller.signal.aborted) return;
+      if ((value.campaign?.id ?? null) !== (campaignId ?? null) || value.period.from.slice(0, 10) !== bounds.from || value.period.to.slice(0, 10) !== bounds.to) throw new Error("La référence reçue ne correspond pas à la comparaison demandée.");
+      setComparisonResult({ key: comparisonKey, value: { kind: comparisonKind, data: value } });
+    }).catch(cause => { if (!controller.signal.aborted) setComparisonError(cause instanceof Error ? cause.message : "La comparaison n’est pas disponible."); });
+    return () => controller.abort();
+  }, [comparisonKey, comparisonKind, comparisonSelected, selected, visible]);
+  const comparison = comparisonResult?.key === comparisonKey ? comparisonResult.value : undefined;
+  const exportReady = !!visible && (comparisonKind === "none" || !!comparison);
   function refresh() { setData(null); setLoading(true); setError(""); setReload(value => value + 1); }
   function selectCampaign(campaign: CampaignSelection) {
     if ((campaign?.id ?? null) === (selected?.id ?? null)) return;
     setData(null); setLoading(true); setError(""); setSelected(campaign);
+    if (!campaign) setComparisonKind("none");
+    if (campaign?.id === comparisonSelected?.id) setComparisonSelected(null);
+  }
+  function choosePeriod(days: DashboardPeriod) {
+    setCustomOpen(false); setDateError("");
+    if (!range && period === days) return;
+    setData(null); setLoading(true); setRange(null); setPeriod(days);
+  }
+  function applyDates(event: React.SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const from = new Date(dateFrom + "T00:00:00Z"), to = new Date(dateTo + "T00:00:00Z");
+    const days = (to.getTime() - from.getTime()) / 86400000 + 1;
+    if (!Number.isInteger(days) || days < 1 || days > 366 || dateFrom < "1970-01-01" || dateTo > today || from.toISOString().slice(0, 10) !== dateFrom || to.toISOString().slice(0, 10) !== dateTo) {
+      setDateError("Choisissez deux dates valides, sans date future, sur 1 à 366 jours."); return;
+    }
+    setDateError(""); setData(null); setLoading(true); setRange({ from: dateFrom, to: dateTo });
   }
 
   return (
@@ -201,21 +275,34 @@ export function DashboardInsights() {
       <p className="dashboard-scope" role="status">{selected ? <>Analyse de la campagne : <strong>{selected.title}</strong></> : "Vue d’ensemble · toutes les campagnes"}</p>
       <div className="dashboard-toolbar">
         <div className="dashboard-periods" role="group" aria-label="Période des statistiques">
-          {([7, 30, 90] as const).map(days => <button key={days} type="button" aria-pressed={period === days} onClick={() => setPeriod(days)}>{days} jours</button>)}
+          {([7, 30, 90] as const).map(days => <button key={days} type="button" aria-pressed={!range && period === days} onClick={() => choosePeriod(days)}>{days} jours</button>)}
+          <button type="button" aria-pressed={!!range} aria-expanded={customOpen} onClick={() => { setCustomOpen(value => !value); if (visible) { setDateFrom(visible.period.from.slice(0, 10)); setDateTo(visible.period.to.slice(0, 10)); } }}>Dates personnalisées</button>
         </div>
         <div className="dashboard-toolbar-actions">
           <Button variant="secondary" size="sm" onClick={refresh} disabled={loading}><RefreshCw size={15} aria-hidden />Actualiser les chiffres</Button>
-          <Button variant="ghost" size="sm" onClick={() => { if (visible) downloadDashboardCsv(visible); }} disabled={!visible}><Download size={15} aria-hidden />Exporter les chiffres</Button>
+          <Button variant="ghost" size="sm" onClick={() => { if (visible && exportReady) downloadDashboardCsv(visible, comparison); }} disabled={!exportReady}><Download size={15} aria-hidden />Exporter les chiffres</Button>
         </div>
       </div>
+      {customOpen && <form className="dashboard-custom-dates" onSubmit={applyDates}>
+        <div><label htmlFor={dateFromId}>Du (UTC)</label><input id={dateFromId} className="admin-input" type="date" required min="1970-01-01" max={dateTo || today} value={dateFrom} onChange={event => setDateFrom(event.target.value)} /></div>
+        <div><label htmlFor={dateToId}>Au (UTC)</label><input id={dateToId} className="admin-input" type="date" required min={dateFrom || "1970-01-01"} max={today} value={dateTo} onChange={event => setDateTo(event.target.value)} /></div>
+        <Button variant="secondary" size="sm" type="submit">Appliquer les dates</Button><p>Jusqu’à 366 jours. Les dates suivent les jours UTC des statistiques.</p>
+        {dateError && <p role="alert">{dateError}</p>}
+      </form>}
+      <div className="dashboard-comparison-controls"><label htmlFor={comparisonId}>Comparer avec</label><select id={comparisonId} className="admin-input" value={comparisonKind} onChange={event => setComparisonKind(event.target.value as typeof comparisonKind)}>
+        <option value="none">Aucune comparaison</option><option value="previous">La période précédente de même durée</option><option value="campaign" disabled={!selected}>Une autre campagne</option>
+      </select>{!selected && <p>Choisissez une campagne ci-dessus pour la comparer à une autre.</p>}</div>
+      {comparisonKind === "campaign" && <CampaignFilter reference excludeId={selected?.id} selected={comparisonSelected} onSelect={setComparisonSelected} refreshVersion={reload} />}
       {loading && <div className="dashboard-loading"><Loading label="Chargement des statistiques…" /></div>}
       {error && <div className="dashboard-error" role="alert"><p><strong>Les chiffres n’ont pas pu être actualisés.</strong></p><p>{error}</p><p>Vos contenus restent accessibles plus bas.</p><Button variant="secondary" size="sm" onClick={refresh}>Réessayer les statistiques</Button></div>}
       {visible && <>
         {visible.campaign && <SelectedCampaign key={visible.campaign.id} campaign={visible.campaign} />}
         <div className="dashboard-period-caption">
-          <p>Du {dayLabel(visible.period.from)} au {dayLabel(visible.period.to)} · jours UTC</p>
+          <p>Du {periodLabel(visible.period.from)} au {periodLabel(visible.period.to)} · jours UTC</p>
           <p>Actualisé le <time dateTime={visible.generatedAt}>{refreshedAt.format(new Date(visible.generatedAt))}</time> (Paris)</p>
         </div>
+        {comparison && <ComparisonTable data={visible} comparison={comparison} />}
+        {comparisonKind !== "none" && !comparison && <div className="dashboard-comparison-pending" role={comparisonError ? "alert" : "status"}>{comparisonError ? <><p>La comparaison n’a pas pu être chargée : {comparisonError}</p><Button variant="secondary" size="sm" onClick={refresh}>Réessayer la comparaison</Button></> : comparisonKey ? "Chargement de la comparaison…" : "Choisissez une autre campagne comme référence pour afficher la comparaison."}</div>}
         <div className="dashboard-kpis">
           {[
             { label: "Acceptés par le serveur mail", value: visible.activity.accepted, note: "Envois réels · réception en boîte principale non vérifiée", Icon: MailCheck },

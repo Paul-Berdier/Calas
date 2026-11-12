@@ -28,7 +28,7 @@ const git = (...args) => execFileSync('git', ['-c', 'safe.directory=' + resolve(
   cwd: repo, windowsHide: true, maxBuffer: 20 * 1024 * 1024,
 });
 if (git('rev-parse', '--verify', sha + '^{commit}').toString().trim() !== sha) throw new Error('Commit Git inconnu.');
-const source = ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'apps/web/package.json', ...job.files];
+const source = ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'apps/web/package.json', 'apps/mcp/package.json', ...job.files];
 const entries = git('ls-tree', '--full-tree', '-r', '-z', sha, '--', ...source).toString('utf8').split('\0').filter(Boolean);
 const temp = await realpath(tmpdir());
 const bundle = await mkdtemp(join(temp, 'calas-railway-job-'));

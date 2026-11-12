@@ -59,6 +59,7 @@ import {
 import "./admin.css";
 import { EditorialGuide } from "./EditorialGuide";
 import { DashboardInsights } from "./DashboardInsights";
+import { OperationsStatus } from "./OperationsStatus";
 
 const DocumentEditor = lazy(() =>
   import("./DocumentEditor").then((module) => ({
@@ -561,6 +562,7 @@ function Dashboard({
         }
       />
       <DashboardInsights />
+      <OperationsStatus />
       <div className="dashboard-editorial-heading">
         <h2>Contenus du site</h2>
         <p>L’état actuel de vos publications et de vos ressources.</p>

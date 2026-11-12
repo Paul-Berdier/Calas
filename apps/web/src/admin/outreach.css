@@ -7,8 +7,23 @@
 .outreach-space .admin-section-heading {
   margin-bottom: 0;
 }
+.outreach-space .admin-card-header {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.outreach-space .admin-card-header > div:first-child {
+  flex: 1 1 240px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .outreach-stack {
   gap: 16px;
+}
+.outreach-form-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
 }
 .outreach-tabs {
   display: flex;
@@ -34,6 +49,7 @@
 .outreach-list-row:first-child {
   border-top: 0;
 }
+.outreach-list-row h2,
 .outreach-list-row h3 {
   font-size: 15px;
 }
@@ -171,6 +187,31 @@
   background: var(--a-ivory);
   border-radius: 4px;
 }
+.outreach-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--a-muted);
+}
+.outreach-history .outreach-list-row { padding-inline: 0; }
+.outreach-preview-meta { margin: 0; display: grid; gap: 12px; }
+.outreach-preview-meta > div { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 12px; }
+.outreach-preview-meta dt { font-weight: 600; }
+.outreach-preview-meta dd { margin: 0; overflow-wrap: anywhere; }
+.outreach-final-message {
+  padding: 22px;
+  border: 1px solid var(--a-border);
+  background: white;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.outreach-space input[type="datetime-local"] { min-width: 0; max-width: 100%; }
 .oauth-consent { padding: 48px 24px; min-height: 100vh; background: var(--a-ivory); }
 .oauth-consent > .admin-card { max-width: 720px; margin: 24px auto; }
 .oauth-consent h1 { font-size: clamp(23px, 4vw, 30px); line-height: 1.25; }
@@ -182,6 +223,10 @@
   }
 }
 @media (max-width: 600px) {
+  .outreach-space .admin-card-header > div:first-child { flex-basis: 100%; }
+  .outreach-space .admin-card-header .admin-button { max-width: 100%; white-space: normal; }
+  .outreach-preview-meta > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .outreach-final-message { padding: 14px; }
   .outreach-grid {
     grid-template-columns: 1fr;
   }

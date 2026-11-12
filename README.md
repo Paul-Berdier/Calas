@@ -47,13 +47,17 @@ En production, Sara, Agnès et Paul utilisent leur e-mail vérifié et leur mot 
 
 Les courriels de développement arrivent dans [Mailpit local](http://localhost:18025/). Les autres collaborateurs sont invités depuis l’administration. Le [guide de Sara illustré](docs/GUIDE-SARA.md) présente la connexion, les pages, les images, l’import PDF, les brouillons, la publication et l’historique.
 
-Les écrans **Prospection** et **Connexions IA** ajoutent les contacts professionnels, les campagnes et l’accès délégué aux assistants. La prospection démarre en simulation. Son [guide d’exploitation](docs/PROSPECTION.md) décrit les imports Excel/CSV/TXT, la file persistante, les statistiques agrégées et son traitement intégré au service web. Le [guide MCP](docs/MCP.md) explique le raccordement distant avec OAuth pour ChatGPT, Claude et Codex, ainsi que le connecteur local, avec les droits du compte connecté. La connexion aux comptes personnels reste à effectuer après déploiement.
+Les écrans **Prospection** et **Connexions IA** ajoutent les contacts professionnels, les campagnes et l’accès délégué aux assistants. La simulation reste le mode par défaut d’une nouvelle installation ; la production existante utilise le SMTP OVH après raccordement explicite. Son [guide d’exploitation](docs/PROSPECTION.md) décrit les imports Excel/CSV/TXT, la file persistante, les statistiques agrégées et son traitement intégré au service web. Le [guide MCP](docs/MCP.md) explique le raccordement distant avec OAuth pour ChatGPT, Claude et Codex, ainsi que le connecteur local, avec les droits du compte connecté. Les tests de protocole ne prouvent pas un raccordement aux comptes personnels des clients IA.
+
+### Évolutions de l’administration du 12 novembre — déploiement en attente
+
+La version locale ajoute l’historique des envois paginé et recherchable, l’état du site et des sauvegardes, l’aperçu du texte final des courriels, les dates et comparaisons statistiques, les modèles réutilisables et la programmation des envois. La migration additive `0007_outreach_management.sql` est nécessaire pour les modèles et les dates programmées. L’état des sauvegardes nécessite un accès privé en lecture aux seuls marqueurs de supervision. [État de validation](docs/VALIDATION.md) · [Procédure de migration](docs/MIGRATION.md). Aucun nouveau service ni abonnement n’est ajouté.
 
 ## Commandes principales
 
 Le sélecteur **Campagne analysée** permet de consulter les résultats de chaque lien séparément, avec recherche et pagination. Le graphique, les pages, la file et l’export suivent la sélection ; **Toutes les campagnes** restaure la vue d’ensemble.
 
-Le **Tableau de bord** réunit le suivi éditorial et les résultats de prospection sur 7, 30 ou 90 jours : envois réels, simulations séparées, consultations attribuées aux liens, contacts, files en cours, campagnes et pages consultées. Un export CSV reprend les chiffres affichés. Ces consultations ne mesurent ni des personnes distinctes, ni toute l’audience du site. [Comprendre les indicateurs](docs/PROSPECTION.md#tableau-de-bord).
+Le **Tableau de bord** réunit le suivi éditorial et les résultats de prospection sur 7, 30 ou 90 jours, ou sur des dates UTC personnalisées (366 jours maximum). La comparaison porte sur la période précédente de même durée ou sur une autre campagne durant les mêmes dates. Un export CSV reprend les deux périmètres quand une comparaison est affichée. Les consultations ne mesurent ni des personnes distinctes, ni toute l’audience du site ; une acceptation SMTP ne prouve pas une réception en boîte principale. [Comprendre les indicateurs](docs/PROSPECTION.md#tableau-de-bord).
 
 | Commande | Effet |
 | --- | --- |
@@ -63,13 +67,17 @@ Le **Tableau de bord** réunit le suivi éditorial et les résultats de prospect
 | `pnpm test:cms-local` | Configuration, contenu initial, preview, rendu riche, médias/PDF |
 | `pnpm test:domain` | Modèles métier et validation des médias |
 | `pnpm test:integration` | PostgreSQL, médias S3, contact partagé et sauvegarde selon les variables de recette |
+| `pnpm test:dashboard` | Agrégats SQL, dates, comparaisons, export et interface du tableau de bord |
+| `pnpm test:outreach-management` | Historique, modèles, aperçu, programmation et contrats MCP ; `RUN_OUTREACH_INTEGRATION=1` pour les scénarios PostgreSQL isolés |
+| `pnpm test:operations` | États techniques, fraîcheur des sauvegardes, accès et absence de fuite de secrets |
+| `pnpm check:operations-ui` | États techniques dans le navigateur : erreurs, nouvelle tentative, dates Paris et accessibilité mobile/ordinateur |
 | `pnpm test` | Parcours publics Chromium/Firefox, accessibilité et budgets |
 | `pnpm db:generate` / `pnpm db:migrate --apply` | Générer / appliquer explicitement les migrations |
 | `pnpm cms:prepare` / `pnpm cms:check --services` | Configuration locale / vérification sans afficher les secrets |
 | `pnpm content:seed --dry-run` | Inventaire des contenus initiaux, aucune écriture |
 | `pnpm content:export` / `pnpm content:import … --confirm-empty` | Sauvegarde chiffrée complète / restauration isolée |
 
-La compilation, le démarrage et le déploiement ne lancent ni migration, ni seed, ni publication. Les ports 4322/4324/4325 servent aux tests publics ; 4336 à la recette authentifiée. Ne pas reconstruire `dist` pendant qu’un test utilise ses chunks.
+La compilation, le démarrage et le déploiement ne lancent ni migration, ni seed, ni publication. Les tests PostgreSQL de prospection et du tableau de bord exigent `RUN_OUTREACH_INTEGRATION=1` et les services locaux ; sans ce drapeau, leurs cas d’intégration sont sautés. La CI l’active. `node scripts/outreach-ui-check.mjs` complète les tests de gestion par une recette navigateur sur données fictives, sans SMTP. Les ports 4322/4324/4325 servent aux tests publics ; 4336 à la recette authentifiée. Ne pas reconstruire `dist` pendant qu’un test utilise ses chunks.
 
 ## Architecture et exploitation
 

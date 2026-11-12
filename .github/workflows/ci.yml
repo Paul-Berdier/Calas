@@ -43,6 +43,8 @@ jobs:
       - run: pnpm test:domain
       - run: pnpm test:integration
       - run: pnpm test:mcp
+      - run: pnpm test:outreach-management
+      - run: pnpm test:operations
       - run: pnpm --filter @calas/web exec tsx --test ../../tests/outreach.test.ts ../../tests/outreach-database.test.ts ../../tests/outreach-csv-ui.test.ts ../../tests/outreach-import-ui.test.ts ../../tests/outreach-notice.test.ts
       - run: pnpm --filter @calas/web exec tsx --test ../../tests/outreach-runner.test.ts ../../tests/auth-destination.test.ts
       - run: pnpm --filter @calas/web exec tsx --test --test-concurrency=1 ../../tests/dashboard-analytics.test.ts ../../tests/dashboard-export.test.ts
@@ -57,6 +59,7 @@ jobs:
       - run: pnpm --filter @calas/web exec tsx ../../scripts/outreach-http-check.ts
       - run: node scripts/outreach-ui-check.mjs
       - run: node scripts/dashboard-ui-check.mjs
+      - run: pnpm check:operations-ui
       - run: pnpm test
       - run: node scripts/pdf-cms-browser-check.mjs
       - run: node scripts/pdf-cms-ui-check.mjs
@@ -86,6 +89,7 @@ jobs:
             artifacts/outreach/
             artifacts/outreach-ui/
             artifacts/dashboard-ui/
+            artifacts/operations-ui/
             artifacts/logo-coil/report*.json
           retention-days: 7
       - if: always()

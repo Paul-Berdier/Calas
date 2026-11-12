@@ -28,7 +28,7 @@ export interface DashboardOutcomes {
 export interface DashboardMetrics {
   generatedAt: string;
   campaign: (DashboardCampaignOption & { linkPath: string; recipientCount: number }) | null;
-  period: { days: DashboardPeriod; from: string; to: string; timeZone: "UTC" };
+  period: { days: number; from: string; to: string; timeZone: "UTC" };
   current: {
     contacts: { total: number; eligible: number; responded: number; excluded: number } | null;
     campaigns: { total: number; drafts: number; active: number; paused: number };
@@ -59,4 +59,9 @@ export interface DashboardMetrics {
   campaignRowsTotal: number;
   pages: { path: string; title: string; arrivals: number; consultations: number }[];
   pageRowsTotal: number;
+}
+
+export interface DashboardComparison {
+  kind: "previous" | "campaign";
+  data: DashboardMetrics;
 }

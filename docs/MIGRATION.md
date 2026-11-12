@@ -1,5 +1,24 @@
 # Migration vers le CMS Calas Conseil
 
+## Administration complète de prospection et suivi technique — 12 novembre 2026
+
+**État : migration `0007` appliquée ; déploiement web et recette distante EN ATTENTE.** Les six évolutions demandées sont l’historique paginé/recherchable, le suivi technique, l’aperçu du mail final, les périodes et comparaisons, les modèles de message et la programmation. Les preuves des versions déjà publiées ci-dessous restent historiques et ne valident pas cette évolution.
+
+Le 12 novembre à 03 h 10 (Paris), après sauvegarde chiffrée vérifiée de la base et de 53 objets, l’opérateur applique uniquement `0007` via le tunnel privé PostgreSQL. Les huit migrations sont enregistrées ; la nouvelle table est vide et aucun envoi ancien n’a de date programmée. Les droits du rôle applicatif et de `calas_cloud_backup` sont attribués sur la table ajoutée. L’inventaire préalable est de 33 documents, 14 médias, 6 comptes et 2 envois. Preuves : `artifacts/management-release/pre-migration.json` et `migration.json`.
+
+La migration additive `drizzle/0007_outreach_management.sql` crée la table des modèles réutilisables, ajoute `scheduled_at` nullable aux envois et crée les index d’historique. Les anciens envois conservent leur état ; aucun destinataire n’est rejoué, aucun contenu éditorial n’est publié. Les modèles et dates programmées entreront ensuite dans les sauvegardes PostgreSQL complètes existantes.
+
+Procédure opérateur avant mise en service :
+
+1. Terminer typecheck, lint, compilation et recettes HTTP/standalone sur les services locaux. Les tests ne doivent envoyer aucun message externe.
+2. Capturer et vérifier une sauvegarde privée de la base et des médias, avec la référence du code avant changement. Conserver la version précédente pour retour applicatif.
+3. Appliquer explicitement les migrations avec le rôle opérateur, l’environnement cible vérifié et `pnpm db:migrate --apply --production-approved` en production. Ne jamais employer la commande de seed pour cette mise à jour. La migration n’est pas exécutée au démarrage.
+4. Raccorder la lecture des seuls marqueurs de sauvegarde au service web : `STATUS_S3_ENDPOINT`, `STATUS_S3_BUCKET`, `STATUS_S3_ACCESS_KEY_ID`, `STATUS_S3_SECRET_ACCESS_KEY`, éventuellement `STATUS_S3_REGION` et `STATUS_S3_FORCE_PATH_STYLE`. Utiliser les identifiants du bucket de suivi existant, distinct du bucket des archives. Le code web lit uniquement les deux marqueurs ; il ne faut lui injecter ni la clé de chiffrement ni les identifiants du stockage des archives. Sans raccordement, afficher « non configuré », jamais « sauvegarde réussie ».
+5. Déployer sur le service Railway Calas existant. Conserver le transport et les limites de débit autorisés ; la programmation réutilise le worker intégré et n’exige aucun service supplémentaire.
+6. Vérifier en lecture la disponibilité, les gardes API/MCP, la pagination, les comparaisons, le CSV, l’aperçu et les états techniques avec les données existantes. La recette distante prévoit aussi un modèle technique temporaire, créé puis modifié et supprimé pour vérifier les versions et les droits ; aucun destinataire, campagne ou envoi n’est créé. Les recettes de mise en file et de programmation restent isolées en simulation locale. Aucun test SMTP réel sans autorisation distincte. Consigner ensuite commit, migration appliquée, déploiement et preuves distantes dans ce document et `VALIDATION.md`.
+
+Retour arrière : la migration est additive et peut rester en place lors d’un retour au code précédent. L’ancien worker respecte déjà `next_attempt_at`, initialisé à la même date future que `scheduled_at` : un simple retour de version ne rend donc pas immédiatement éligible un envoi programmé. Il ne connaît toutefois pas la garde indépendante `scheduled_at`, qui protège aussi la date après les transitions de file. **Par précaution, désactiver le traitement et mettre en pause les campagnes ayant des envois programmés en attente avant ce retour**, puis contrôler leurs dates avant de réactiver le worker. Ne pas supprimer de table ou de colonne en production pour revenir à l’ancienne interface. Une restauration complète reste une opération explicite dans des destinations vides, conformément à `BACKUP.md`.
+
 ## Analyse de plusieurs campagnes — 12 novembre 2026
 
 Paul précise que chaque campagne possède un lien différent et doit avoir ses propres statistiques. Le tableau de bord reçoit un filtre de campagne, un sélecteur paginé/recherchable indépendant de la période et une fiche du lien partagé. L’API et MCP filtrent les agrégats en base par l’ID, y compris pour les campagnes anciennes sans activité. Les champs globaux non attribuables (contacts, réponses manuelles, exclusions) deviennent explicitement `null` dans ce périmètre. Le CSV porte le périmètre choisi. Aucun schéma, lien existant, publication ou paramètre SMTP ne change ; aucun envoi n’est nécessaire à la recette.

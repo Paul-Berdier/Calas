@@ -21,6 +21,8 @@ import {
 } from "./ui";
 import { type ImportContact } from "./outreach-csv";
 import { parseContactsFile, type ImportDefaults } from "./outreach-import";
+import { CampaignMailPreview, DeliveryHistory, OutreachPagination, PreviewButton, ScheduleChooser, TemplateLibrary, useOutreachPage, type ScheduleChoice } from "./OutreachManagement";
+import { formatParisSchedule, validateScheduledAt } from "./outreach-schedule";
 import "./outreach.css";
 
 interface Contact extends ImportContact {
@@ -41,23 +43,6 @@ interface Campaign {
   status: "draft" | "active" | "paused";
   createdAt: string;
 }
-interface Delivery {
-  id: string;
-  campaignId: string;
-  contactId: string;
-  email: string;
-  company: string;
-  status:
-    | "queued"
-    | "sending"
-    | "accepted"
-    | "simulated"
-    | "failed"
-    | "uncertain"
-    | "suppressed";
-  respondedAt: string | null;
-  createdAt: string;
-}
 interface Overview {
   stats: {
     contacts: number;
@@ -72,19 +57,9 @@ interface Overview {
     uncertain: number;
     failed: number;
   };
-  contacts: Contact[];
-  campaigns: Campaign[];
-  deliveries: Delivery[];
   transport: "simulation" | "local" | "smtp";
   maxBatch: number;
   targets: { path: string; title: string }[];
-  visits: {
-    campaignId: string;
-    path: string;
-    day: string;
-    visits: number;
-    arrivals: number;
-  }[];
 }
 interface CampaignOverview {
   campaign: Campaign;
@@ -104,15 +79,6 @@ type CampaignInput = Pick<
   Campaign,
   "title" | "subject" | "body" | "targetPath"
 >;
-const deliveryLabels: Record<Delivery["status"], string> = {
-  queued: "En file",
-  sending: "En cours",
-  accepted: "Accepté par le serveur mail",
-  simulated: "Simulé",
-  failed: "Échec",
-  uncertain: "À vérifier",
-  suppressed: "Exclu",
-};
 const contactLabels: Record<Contact["status"], string> = {
   active: "À contacter",
   responded: "Réponse reçue",
@@ -140,7 +106,13 @@ export function Outreach({
   onDirtyChange: (value: boolean) => void;
 }) {
   const [data, setData] = useState<Overview | null>(null);
-  const [tab, setTab] = useState<"campaigns" | "contacts">("campaigns");
+  const [tab, setTab] = useState<"campaigns" | "contacts" | "history" | "templates">(() => {
+    if (typeof window === "undefined") return "campaigns";
+    const search = new URLSearchParams(window.location.search);
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(search.get("campaign") ?? "")) return "campaigns";
+    const requested = search.get("tab");
+    return requested === "contacts" || requested === "history" || requested === "templates" ? requested : "campaigns";
+  });
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -148,6 +120,8 @@ export function Outreach({
   const [contactPage, setContactPage] = useState(0);
   const [recipientQuery, setRecipientQuery] = useState("");
   const [recipientPage, setRecipientPage] = useState(0);
+  const [campaignQuery, setCampaignQuery] = useState("");
+  const [campaignPage, setCampaignPage] = useState(0);
   const [campaignId, setCampaignId] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
     const value = new URLSearchParams(window.location.search).get("campaign");
@@ -170,6 +144,9 @@ export function Outreach({
     useState<CampaignInput>(emptyCampaign);
   const [duplicatingCampaign, setDuplicatingCampaign] = useState(false);
   const [confirmSend, setConfirmSend] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewReady, setPreviewReady] = useState(false);
+  const [schedule, setSchedule] = useState<ScheduleChoice>({enabled:false,scheduledAt:null,error:''});
   const [contactAction, setContactAction] = useState<{
     contact: Contact;
     action: "suppress" | "responded" | "delete";
@@ -191,7 +168,7 @@ export function Outreach({
 
   const reload = useCallback(async () => {
     try {
-      const result = await request<Overview>("/api/admin/outreach/overview/");
+      const result = await request<Overview>("/api/admin/outreach/overview/?summary=true");
       setData(result);
     } catch (cause) {
       setError((cause as Error).message);
@@ -202,10 +179,7 @@ export function Outreach({
   }, [reload]);
   useEffect(() => {
     if (
-      !data?.deliveries.some(
-        (delivery) =>
-          delivery.status === "queued" || delivery.status === "sending",
-      )
+      !data?.stats.queued
     )
       return;
     const timer = setInterval(() => {
@@ -215,11 +189,17 @@ export function Outreach({
   }, [data, reload]);
   useEffect(() => () => onDirtyChange(false), [onDirtyChange]);
   useEffect(() => {
-    const url = new URL(window.location.href);
-    if (campaignId) url.searchParams.set("campaign", campaignId);
-    else url.searchParams.delete("campaign");
-    window.history.replaceState(window.history.state, "", url);
+    setSchedule({enabled:false,scheduledAt:null,error:''});
+    setPreviewOpen(false); setConfirmSend(false); setPreviewReady(false);
   }, [campaignId]);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (campaignId && tab === "campaigns") url.searchParams.set("campaign", campaignId);
+    else url.searchParams.delete("campaign");
+    if (tab === "campaigns") url.searchParams.delete("tab");
+    else url.searchParams.set("tab", tab);
+    window.history.replaceState(window.history.state, "", url);
+  }, [campaignId, tab]);
   useEffect(() => {
     if (!campaignId) return;
     let active = true;
@@ -242,31 +222,14 @@ export function Outreach({
     campaignOverview?.campaign.id === campaignId
       ? campaignOverview.campaign
       : undefined;
-  const campaignDeliveries =
-    data?.deliveries.filter((item) => item.campaignId === campaignId) ?? [];
-  const alreadyIncluded = new Set(
-    campaign ? campaignOverview?.includedContactIds : [],
-  );
-  const available =
-    data?.contacts.filter(
-      (item) => item.status === "active" && !alreadyIncluded.has(item.id),
-    ) ?? [];
-  const availableIds = new Set(available.map((item) => item.id));
-  const matchingContacts =
-    data?.contacts.filter((item) =>
-      [item.name, item.email, item.company, item.jobTitle]
-        .join(" ")
-        .toLowerCase()
-        .includes(query.toLowerCase()),
-    ) ?? [];
-  const selectedEligible = selected.filter((id) => availableIds.has(id));
+  const contactsList = useOutreachPage<Contact>(tab === "contacts" ? "/api/admin/outreach/contacts/?" + new URLSearchParams({q:query,offset:String(contactPage*100),limit:"100"}) : null, data);
+  const recipientsList = useOutreachPage<Contact>(tab === "campaigns" && campaignId ? "/api/admin/outreach/contacts/?" + new URLSearchParams({q:recipientQuery,campaignId,eligibleOnly:"true",offset:String(recipientPage*100),limit:"100"}) : null, data);
+  const campaignsList = useOutreachPage<Campaign>(tab === "campaigns" && !campaignId ? "/api/admin/outreach/campaigns/?" + new URLSearchParams({q:campaignQuery,offset:String(campaignPage*25),limit:"25"}) : null, data);
+  const matchingContacts = contactsList.data?.items ?? [];
+  // Selection spans pages. Eligibility is checked again transactionally by the server.
+  const selectedEligible = selected;
   const selectedIds = new Set(selectedEligible);
-  const matchingAvailable = available.filter((contact) =>
-    [contact.name, contact.company, contact.email, contact.jobTitle]
-      .join(" ")
-      .toLowerCase()
-      .includes(recipientQuery.toLowerCase()),
-  );
+  const matchingAvailable = recipientsList.data?.items ?? [];
   const campaignVisits = campaign ? (campaignOverview?.visits ?? []) : [];
 
   function closeContact() {
@@ -361,7 +324,7 @@ export function Outreach({
           }),
         },
       );
-      if (duplicatingCampaign) {
+      if (!existing) {
         setCampaignId(saved.id);
         setCampaignOverview(null);
         setSelected([]);
@@ -382,7 +345,11 @@ export function Outreach({
     }
   }
   async function sendCampaign() {
-    if (!campaign || !selectedEligible.length) return;
+    if (!campaign || !selectedEligible.length || !previewReady) return;
+    const scheduleError = schedule.enabled
+      ? schedule.error || (schedule.scheduledAt ? validateScheduledAt(schedule.scheduledAt) : "Renseignez la date et l’heure de début.")
+      : "";
+    if (scheduleError) { setError(scheduleError); setConfirmSend(false); return; }
     setBusy(true);
     setError("");
     try {
@@ -390,18 +357,20 @@ export function Outreach({
         queued: number;
         skipped: number;
         simulation: boolean;
+        scheduledAt: string|null;
       }>(`/api/admin/outreach/campaigns/${campaign.id}/send/`, {
         method: "POST",
         body: JSON.stringify({
           version: campaign.version,
           contactIds: selectedEligible,
           confirmation: true,
+          ...(schedule.scheduledAt ? { scheduledAt: schedule.scheduledAt } : {}),
         }),
       });
       setConfirmSend(false);
       setSelected([]);
       setNotice(
-        `${result.queued} message(s) mis en file ${result.simulation ? "de simulation" : "d’envoi"}. ${result.skipped} contact(s) exclu(s) ou déjà présent(s).`,
+        `${result.queued} message(s) mis en file ${result.simulation ? "de simulation" : "d’envoi"}.${result.scheduledAt ? ` Début prévu le ${formatParisSchedule(result.scheduledAt)}.` : ""} ${result.skipped} contact(s) exclu(s) ou déjà présent(s).`,
       );
       await reload();
     } catch (cause) {
@@ -638,6 +607,8 @@ export function Outreach({
             >
               Contacts
             </Button>
+            <Button variant="secondary" aria-pressed={tab === "history"} onClick={() => setTab("history")}>Historique des envois</Button>
+            <Button variant="secondary" aria-pressed={tab === "templates"} onClick={() => setTab("templates")}>Modèles de messages</Button>
             <Button
               variant="ghost"
               size="icon"
@@ -647,7 +618,10 @@ export function Outreach({
               <RefreshCw size={17} />
             </Button>
           </div>
-          {tab === "contacts" ? (
+          {tab === "history" ? <DeliveryHistory refresh={data}/> : tab === "templates" ? <TemplateLibrary targets={data.targets} onDirtyChange={onDirtyChange} onUse={input => {
+            setTab("campaigns"); setEditingCampaign("new"); setDuplicatingCampaign(false); setCampaignInput(input); setError(""); onDirtyChange(true);
+            setNotice("Modèle repris dans un nouveau brouillon. Relisez le message et choisissez une page publiée avant d’enregistrer.");
+          }}/> : tab === "contacts" ? (
             <>
               <Field label="Rechercher un contact" className="outreach-filter">
                 {(id) => (
@@ -667,11 +641,9 @@ export function Outreach({
                 )}
               </Field>
               <section className="admin-card">
-                {matchingContacts.length ? (
+                {contactsList.error ? <div className="admin-card-body admin-error" role="alert"><p>{contactsList.error}</p><Button variant="secondary" onClick={contactsList.retry}>Réessayer les contacts</Button></div> : contactsList.loading ? <Loading label="Chargement des contacts…"/> : matchingContacts.length ? (
                   <div className="outreach-list">
-                    {matchingContacts
-                      .slice(contactPage * 100, contactPage * 100 + 100)
-                      .map((contact) => (
+                    {matchingContacts.map((contact) => (
                         <article key={contact.id} className="outreach-list-row">
                           <div className="outreach-grow">
                             <h3>{contact.name || contact.email}</h3>
@@ -745,28 +717,7 @@ export function Outreach({
                   />
                 )}
               </section>
-              <div className="admin-actions">
-                <span>
-                  {matchingContacts.length} contact(s) trouvé(s).{" "}
-                  {data.stats.contacts > data.contacts.length
-                    ? `La liste affiche les ${data.contacts.length} contacts les plus récents.`
-                    : ""}
-                </span>
-                <Button
-                  variant="secondary"
-                  disabled={contactPage === 0}
-                  onClick={() => setContactPage((value) => value - 1)}
-                >
-                  Précédents
-                </Button>
-                <Button
-                  variant="secondary"
-                  disabled={(contactPage + 1) * 100 >= matchingContacts.length}
-                  onClick={() => setContactPage((value) => value + 1)}
-                >
-                  Suivants
-                </Button>
-              </div>
+              <OutreachPagination data={contactsList.data} offset={contactPage*100} onOffset={offset=>setContactPage(offset/100)} label="Pagination des contacts" disabled={contactsList.loading}/>
             </>
           ) : campaignId && !campaign ? (
             campaignError ? (
@@ -870,6 +821,7 @@ export function Outreach({
                 </div>
                 <div className="admin-card-body outreach-stack">
                   <div className="outreach-message">{campaign.body}</div>
+                  <PreviewButton onClick={() => setPreviewOpen(true)}/>
                   <p className="admin-hint">
                     La page proposée est{" "}
                     <a
@@ -925,20 +877,12 @@ export function Outreach({
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() =>
-                      setSelected(
-                        selectedEligible.length
-                          ? []
-                          : matchingAvailable
-                              .slice(0, data.maxBatch)
-                              .map((contact) => contact.id),
-                      )
-                    }
+                    disabled={recipientsList.loading || !matchingAvailable.length || selectedEligible.length >= data.maxBatch}
+                    onClick={() => setSelected(values => [...new Set([...values, ...matchingAvailable.map(contact => contact.id)])].slice(0,data.maxBatch))}
                   >
-                    {selectedEligible.length
-                      ? "Tout désélectionner"
-                      : "Sélectionner les contacts trouvés"}
+                    Sélectionner cette page
                   </Button>
+                  {selectedEligible.length > 0 && <Button variant="ghost" size="sm" onClick={() => setSelected([])}>Tout désélectionner</Button>}
                 </div>
                 <div className="admin-card-body outreach-stack">
                   <Field label="Rechercher parmi les destinataires disponibles">
@@ -955,11 +899,9 @@ export function Outreach({
                       />
                     )}
                   </Field>
-                  {matchingAvailable.length ? (
+                  {recipientsList.error ? <div className="admin-error" role="alert"><p>{recipientsList.error}</p><Button variant="secondary" onClick={recipientsList.retry}>Réessayer les destinataires</Button></div> : recipientsList.loading ? <Loading label="Chargement des destinataires…"/> : matchingAvailable.length ? (
                     <div className="outreach-selection">
-                      {matchingAvailable
-                        .slice(recipientPage * 100, recipientPage * 100 + 100)
-                        .map((contact) => (
+                      {matchingAvailable.map((contact) => (
                           <label className="outreach-check" key={contact.id}>
                             <input
                               type="checkbox"
@@ -997,34 +939,15 @@ export function Outreach({
                       retrait.
                     </p>
                   )}
-                  <div className="admin-actions">
-                    <span>
-                      {matchingAvailable.length} destinataire(s) trouvé(s)
-                    </span>
-                    <Button
-                      variant="secondary"
-                      disabled={recipientPage === 0}
-                      onClick={() => setRecipientPage((value) => value - 1)}
-                    >
-                      Précédents
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      disabled={
-                        (recipientPage + 1) * 100 >= matchingAvailable.length
-                      }
-                      onClick={() => setRecipientPage((value) => value + 1)}
-                    >
-                      Suivants
-                    </Button>
-                  </div>
+                  <OutreachPagination data={recipientsList.data} offset={recipientPage*100} onOffset={offset=>setRecipientPage(offset/100)} label="Pagination des destinataires" disabled={recipientsList.loading}/>
+                  <ScheduleChooser key={campaign.id} onChange={setSchedule}/>
                   <Button
                     disabled={
                       !selectedEligible.length ||
                       busy ||
-                      campaign.status === "paused"
+                      campaign.status === "paused" || Boolean(schedule.error)
                     }
-                    onClick={() => setConfirmSend(true)}
+                    onClick={() => {setPreviewReady(false);setConfirmSend(true);}}
                   >
                     <Mail size={16} aria-hidden />
                     {data.transport === "simulation"
@@ -1033,56 +956,7 @@ export function Outreach({
                   </Button>
                 </div>
               </section>
-              <section className="admin-card">
-                <div className="admin-card-header">
-                  <div>
-                    <h2>Suivi récent des destinataires</h2>
-                    <p>
-                      Extrait des 1 000 dernières opérations toutes campagnes
-                      confondues. Les totaux ci-dessus couvrent toute cette
-                      campagne.
-                    </p>
-                  </div>
-                </div>
-                {campaignDeliveries.length ? (
-                  <div className="outreach-list">
-                    {campaignDeliveries.map((delivery) => (
-                      <article className="outreach-list-row" key={delivery.id}>
-                        <div className="outreach-grow">
-                          <h3>{delivery.company || delivery.email}</h3>
-                          <p>{delivery.email}</p>
-                          <small>{formatDate(delivery.createdAt)}</small>
-                        </div>
-                        <Badge
-                          status={
-                            delivery.status === "accepted"
-                              ? "published"
-                              : "draft"
-                          }
-                        >
-                          {deliveryLabels[delivery.status]}
-                        </Badge>
-                        {delivery.respondedAt && (
-                          <Badge>Réponse signalée</Badge>
-                        )}
-                      </article>
-                    ))}
-                  </div>
-                ) : (
-                  <EmptyState
-                    title={
-                      campaignOverview?.stats.total
-                        ? "Aucune opération récente dans cet extrait"
-                        : "Aucun destinataire en file"
-                    }
-                    description={
-                      campaignOverview?.stats.total
-                        ? "Les indicateurs ci-dessus conservent les totaux de la campagne."
-                        : "Sélectionnez les contacts pour préparer le premier envoi de cette campagne."
-                    }
-                  />
-                )}
-              </section>
+              <DeliveryHistory campaignId={campaign.id} refresh={data}/>
               {campaignVisits.length > 0 && (
                 <section className="admin-card">
                   <div className="admin-card-header">
@@ -1121,10 +995,12 @@ export function Outreach({
               )}
             </>
           ) : (
+            <>
+            <Field label="Rechercher une campagne">{id => <input id={id} className="admin-input" maxLength={100} value={campaignQuery} onChange={event => {setCampaignQuery(event.target.value);setCampaignPage(0);}} placeholder="Nom ou objet du message"/>}</Field>
             <section className="admin-card">
-              {data.campaigns.length ? (
+              {campaignsList.error ? <div className="admin-card-body admin-error" role="alert"><p>{campaignsList.error}</p><Button variant="secondary" onClick={campaignsList.retry}>Réessayer les campagnes</Button></div> : campaignsList.loading ? <Loading label="Chargement des campagnes…"/> : campaignsList.data?.items.length ? (
                 <div className="outreach-list">
-                  {data.campaigns.map((item) => (
+                  {campaignsList.data.items.map((item) => (
                     <article className="outreach-list-row" key={item.id}>
                       <div className="outreach-grow">
                         <h3>{item.title}</h3>
@@ -1154,7 +1030,7 @@ export function Outreach({
                 </div>
               ) : (
                 <EmptyState
-                  title="Préparer votre première campagne"
+                  title={campaignQuery ? "Aucune campagne trouvée" : "Préparer votre première campagne"}
                   description="Rédigez un message, choisissez la page du site à présenter, puis sélectionnez les contacts professionnels concernés."
                   action={
                     <Button onClick={() => startCampaign("new")}>
@@ -1164,6 +1040,8 @@ export function Outreach({
                 />
               )}
             </section>
+            <OutreachPagination data={campaignsList.data} offset={campaignPage*25} onOffset={offset=>setCampaignPage(offset/25)} label="Pagination des campagnes" disabled={campaignsList.loading}/>
+            </>
           )}
         </>
       )}
@@ -1583,7 +1461,10 @@ export function Outreach({
           )}
         </div>
       </Modal>
-      <ConfirmDialog
+      <Modal open={previewOpen && Boolean(campaign)} onOpenChange={setPreviewOpen} title="Aperçu du mail final" wide>
+        {campaign && <CampaignMailPreview campaignId={campaign.id} version={campaign.version}/>}
+      </Modal>
+      <Modal
         open={confirmSend}
         onOpenChange={(open) => {
           if (!busy) setConfirmSend(open);
@@ -1593,15 +1474,16 @@ export function Outreach({
             ? "Confirmer la simulation"
             : "Confirmer la mise en file"
         }
-        description={`Campagne « ${campaign?.title ?? ""} », objet « ${campaign?.subject ?? ""} », pour ${selectedEligible.length} contact(s) sélectionné(s). ${data?.transport === "smtp" ? "Les messages seront envoyés progressivement depuis la messagerie configurée." : "Le transport de recette configuré sera utilisé."}`}
-        confirmLabel={
-          data?.transport === "simulation"
-            ? "Mettre en file de simulation"
-            : "Mettre en file"
-        }
-        onConfirm={() => void sendCampaign()}
-        busy={busy}
-      />
+        description={`Campagne « ${campaign?.title ?? ""} », pour ${selectedEligible.length} contact(s) sélectionné(s).`}
+        wide
+      >
+        <div className="outreach-stack">
+          <p className="outreach-warning">{schedule.scheduledAt ? `Début des envois le ${formatParisSchedule(schedule.scheduledAt)}.` : "Début au prochain passage du serveur."} {data?.transport === "smtp" ? "Les messages seront envoyés progressivement depuis la messagerie configurée." : "Le transport de recette configuré sera utilisé."}</p>
+          <p className="admin-hint">Relisez ci-dessous le message destiné au premier contact sélectionné. Seuls la provenance et le lien personnel de désinscription peuvent varier d’un destinataire à l’autre.</p>
+          {campaign && <CampaignMailPreview campaignId={campaign.id} contactId={selectedEligible[0]} version={campaign.version} onReady={setPreviewReady}/>}
+          <div className="admin-actions"><Button disabled={!previewReady || Boolean(schedule.error)} loading={busy} onClick={()=>void sendCampaign()}>{data?.transport === "simulation" ? "Mettre en file de simulation" : schedule.scheduledAt ? "Confirmer la programmation" : "Mettre en file"}</Button><Button variant="secondary" disabled={busy} onClick={()=>setConfirmSend(false)}>Revenir aux destinataires</Button></div>
+        </div>
+      </Modal>
       <ConfirmDialog
         open={Boolean(contactAction)}
         onOpenChange={(open) => {

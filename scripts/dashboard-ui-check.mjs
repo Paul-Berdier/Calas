@@ -97,6 +97,11 @@ await page.route("**/api/**", async route => {
     if (scenario === "editorial-error") { status = 503; data = { error: "Contenus momentanément indisponibles (recette)." }; }
     else data = editorial;
   }
+  else if (path === "/api/admin/operations/") data = {
+    checkedAt: "2026-11-12T12:00:00Z", site: {status:"ok",checkedAt:"2026-11-12T12:00:00Z"},
+    backup: {status:"ok",capturedAt:"2026-11-12T06:00:00Z",verifiedAt:"2026-11-12T06:02:00Z",failedAt:null,expectedDay:"2026-11-12"},
+    mail: {mode:"simulation",configured:true,workerEnabled:false,lastAcceptedAt:null,lastFailedAt:null,failed24h:0,uncertain:0,waiting:0},
+  };
   else if (path === "/api/admin/outreach/analytics-campaigns/") {
     const query = url.searchParams.get("q") || "";
     const offset = Number(url.searchParams.get("offset") || 0);
@@ -105,9 +110,11 @@ await page.route("**/api/**", async route => {
     data = dashboardCampaignOptionsFixture(query, offset, limit);
   }
   else if (path === "/api/admin/outreach/analytics/") {
-    const days = Number(url.searchParams.get("days"));
+    const from = url.searchParams.get("from"), to = url.searchParams.get("to");
+    const custom = from !== null && to !== null;
+    const days = custom ? (Date.parse(to + "T00:00:00Z") - Date.parse(from + "T00:00:00Z"))/86400000+1 : Number(url.searchParams.get("days"));
     const campaignId = url.searchParams.get("campaignId");
-    assert.ok([7, 30, 90].includes(days), "Only supported analytics periods requested");
+    assert.ok(custom ? !url.searchParams.has("days") && days >= 1 && days <= 366 : [7, 30, 90].includes(days), "Valid presets or explicit UTC date ranges requested");
     if (campaignId && campaignId === campaignFailureId) { status = 404; data = { error: "Les chiffres de cette campagne sont indisponibles (recette)." }; }
     else if (scenario === "error") { status = 503; data = { error: "Statistiques momentanément indisponibles (recette)." }; }
     else if (scenario === "zero" || scenario === "simulation" || scenario === "local") {
@@ -116,6 +123,10 @@ await page.route("**/api/**", async route => {
       if (scenario === "local") { data.activity.localAccepted = 8; data.current.workerEnabled = false; }
     } else {
       data = campaignId ? campaignDashboardFixture(campaignId, days) : dashboardFixture(days);
+      if (custom) {
+        data.period={days,from,to,timeZone:"UTC"};
+        data.daily=data.daily.map((day,index)=>({...day,day:new Date(Date.parse(from+"T00:00:00Z")+index*86400000).toISOString().slice(0,10)}));
+      }
       if (fresh) { data.activity.accepted = 88; data.generatedAt = "2026-11-12T13:00:00.000Z"; }
       if (scenario === "long") {
         data.campaigns[0].title = "Diagnostic; équipe \"Calas\" et accompagnement du management ".repeat(5);
@@ -134,6 +145,10 @@ await page.route("**/api/**", async route => {
         await new Promise(resolve => { releaseCampaignResponse = resolve; });
       }
     }
+  } else if (["/api/admin/outreach/contacts/", "/api/admin/outreach/campaigns/", "/api/admin/outreach/deliveries/", "/api/admin/outreach/templates/"].includes(path)) {
+    const source = path.endsWith('/contacts/') ? [contact] : path.endsWith('/campaigns/') ? [campaign] : [];
+    const offset = Number(url.searchParams.get('offset') || 0), limit = Number(url.searchParams.get('limit') || 25);
+    data = {items:source.slice(offset,offset+limit),total:source.length,offset,limit};
   } else if (path === "/api/admin/outreach/overview/") data = overview;
   else if (path === `/api/admin/outreach/campaigns/${dashboardCampaignId}/overview/`) data = {
     campaign, stats: { total: 0, queued: 0, accepted: 0, simulated: 0, failed: 0, uncertain: 0, suppressed: 0 },
@@ -163,6 +178,7 @@ async function inspect(name) {
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.screenshot({ path: resolve(output, `${name}-viewport-${width}.png`) });
     }
+    if (name === "dashboard-two-campaigns") await page.locator('.dashboard-comparison-card').screenshot({path:resolve(output,`comparison-${width}.png`)});
     await page.screenshot({ path: resolve(output, `${name}-${width}.png`), fullPage: true });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, `${name}: page overflow at ${width}`);
     const violations = (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations;
@@ -200,7 +216,7 @@ try {
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Exporter les chiffres", exact: true }).click();
   const download = await downloadPromise;
-  assert.equal(download.suggestedFilename(), "calas-statistiques-30-jours.csv");
+  assert.equal(download.suggestedFilename(), "calas-statistiques-2026-10-14-2026-11-12.csv");
   await download.saveAs(resolve(output, "dashboard-export.csv"));
   const csv = await readFile(resolve(output, "dashboard-export.csv"), "utf8");
   assert.ok(csv.includes('"Messages acceptés par SMTP";"37"'));
@@ -336,7 +352,7 @@ try {
   const campaignDownloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Exporter les chiffres", exact: true }).click();
   const campaignDownload = await campaignDownloadPromise;
-  assert.equal(campaignDownload.suggestedFilename(), `calas-statistiques-30-jours-${secondDashboardCampaignId}.csv`);
+  assert.equal(campaignDownload.suggestedFilename(), `calas-statistiques-2026-10-14-2026-11-12-${secondDashboardCampaignId}.csv`);
   await campaignDownload.saveAs(resolve(output, "dashboard-campaign-export.csv"));
   const campaignCsv = await readFile(resolve(output, "dashboard-campaign-export.csv"), "utf8");
   assert.ok(campaignCsv.includes('"Messages acceptés par SMTP";"26"'));
@@ -398,6 +414,78 @@ try {
   await expect(selectedCampaign).toHaveCount(0);
   await expect(kpi("Réponses signalées")).toHaveText("6");
   checks.push({ name: "campaign-selector-pagination-and-search-include-inactive-campaigns-outside-top-ten", result: "passed" });
+
+  scenario = "normal"; await page.goto(base + "/admin/"); await ready();
+  await page.getByRole("button",{name:"Dates personnalisées",exact:true}).click();
+  await page.getByLabel("Du (UTC)",{exact:true}).fill("2026-10-25");
+  await page.getByLabel("Au (UTC)",{exact:true}).fill("2026-11-05");
+  await page.getByRole("button",{name:"Appliquer les dates",exact:true}).click();
+  await ready();
+  await expect(page.locator('.dashboard-period-caption')).toContainText('5 nov.');
+  await expect(page.getByRole('button',{name:'30 jours',exact:true})).toHaveAttribute('aria-pressed','false');
+  assert(requests.some(r=>r.path.endsWith('/analytics/')&&new URLSearchParams(r.query).get('from')==='2026-10-25'&&new URLSearchParams(r.query).get('to')==='2026-11-05'&&!new URLSearchParams(r.query).has('days')));
+  await page.getByLabel('Du (UTC)',{exact:true}).fill('2025-01-01');
+  await page.getByRole('button',{name:'Appliquer les dates',exact:true}).click();
+  await expect(page.locator('.dashboard-custom-dates [role="alert"]')).toContainText('1 à 366 jours');
+  await expect(page.locator('.dashboard-period-caption')).toContainText('25 oct. 2026');
+  await ready();
+  await page.getByLabel('Du (UTC)',{exact:true}).fill('2026-10-25');
+  await page.getByRole('button',{name:'Appliquer les dates',exact:true}).click();
+  await ready();
+  await page.getByLabel('Comparer avec',{exact:true}).selectOption('previous');
+  await expect(page.locator('.dashboard-comparison-card')).toBeVisible();
+  await expect(page.locator('.dashboard-comparison-scopes')).toContainText('2026-10-13');
+  await expect(page.locator('.dashboard-comparison-scopes')).toContainText('2026-10-24');
+  await expect(page.locator('.dashboard-comparison-card')).toContainText('12 jours par période');
+  await inspect('dashboard-custom-previous');
+  await page.getByLabel('Campagne analysée',{exact:true}).selectOption(dashboardCampaignId);
+  await ready('11');
+  await page.getByLabel('Comparer avec',{exact:true}).selectOption('campaign');
+  const referenceSelect=page.getByLabel('Campagne de référence',{exact:true});
+  await expect(referenceSelect.locator('option[value="'+secondDashboardCampaignId+'"]')).toHaveCount(1);
+  await expect(referenceSelect.locator('option[value="'+dashboardCampaignId+'"]')).toBeDisabled();
+  await referenceSelect.selectOption(secondDashboardCampaignId);
+  await expect(page.locator('.dashboard-comparison-scopes')).toContainText('Entreprises de Toulouse');
+  await expect(page.locator('.dashboard-comparison-table tbody tr').filter({hasText:'Acceptés par le serveur mail'})).toContainText('-15');
+  const comparisonDownloadPromise=page.waitForEvent('download');
+  await page.getByRole('button',{name:'Exporter les chiffres',exact:true}).click();
+  const comparisonDownload=await comparisonDownloadPromise;
+  assert(comparisonDownload.suggestedFilename().includes('2026-10-25-2026-11-05'));
+  assert(comparisonDownload.suggestedFilename().endsWith('-comparaison.csv'));
+  await comparisonDownload.saveAs(resolve(output,'dashboard-comparison-export.csv'));
+  const comparisonCsv=await readFile(resolve(output,'dashboard-comparison-export.csv'),'utf8');
+  assert(comparisonCsv.includes('Autre campagne sur la même période')&&comparisonCsv.includes('c_first_fixture')&&comparisonCsv.includes('c_second_fixture'));
+  await inspect('dashboard-two-campaigns');
+  await page.getByLabel('Rechercher une campagne de référence',{exact:true}).fill('Ancienne');
+  await expect(referenceSelect.locator('option[value="'+inactiveDashboardCampaignId+'"]')).toHaveCount(1);
+  await referenceSelect.selectOption(inactiveDashboardCampaignId);
+  await expect(page.locator('.dashboard-comparison-table tbody tr').filter({hasText:'Acceptés par le serveur mail'})).toContainText('Base nulle');
+  await page.getByLabel('Rechercher une campagne de référence',{exact:true}).fill('');
+  await expect(referenceSelect.locator('option[value="'+secondDashboardCampaignId+'"]')).toHaveCount(1);
+  await referenceSelect.selectOption(secondDashboardCampaignId);
+  await expect(page.locator('.dashboard-comparison-scopes')).toContainText('Entreprises de Toulouse');
+  campaignFailureId=secondDashboardCampaignId;
+  await page.getByRole('button',{name:'Actualiser les chiffres',exact:true}).click();
+  await ready('11');
+  await expect(page.locator('.dashboard-comparison-pending')).toContainText('La comparaison n’a pas pu être chargée');
+  await expect(page.getByRole('button',{name:'Exporter les chiffres',exact:true})).toBeDisabled();
+  campaignFailureId=null;
+  await page.getByRole('button',{name:'Réessayer la comparaison',exact:true}).click();
+  await expect(page.locator('.dashboard-comparison-scopes')).toContainText('Entreprises de Toulouse');
+  await page.getByLabel('Comparer avec',{exact:true}).selectOption('none');
+  holdCampaignId=secondDashboardCampaignId;heldCampaignResponse=null;heldCampaignCompleted=false;
+  await page.getByLabel('Comparer avec',{exact:true}).selectOption('campaign');
+  await expect.poll(()=>Boolean(heldCampaignResponse)).toBe(true);
+  await page.getByLabel('Comparer avec',{exact:true}).selectOption('previous');
+  await expect(page.locator('.dashboard-comparison-card')).toContainText('Comparaison avec la période précédente');
+  holdCampaignId=null;releaseCampaignResponse();
+  await expect.poll(()=>heldCampaignCompleted).toBe(true);
+  await expect(page.locator('.dashboard-comparison-scopes')).not.toContainText('Entreprises de Toulouse');
+  await page.getByRole('button',{name:'7 jours',exact:true}).click();
+  await ready('2');
+  await expect(page.locator('.dashboard-comparison-card')).toContainText('7 jours par période');
+  await expect(page.locator('.dashboard-custom-dates')).toHaveCount(0);
+  checks.push({name:'custom-dates-comparison-export-errors-and-late-reference-cancellation',result:'passed'});
 
   scenario = "normal"; await page.goto(base + "/admin/"); await ready();
   await page.getByRole("link", { name: campaign.title, exact: true }).click();

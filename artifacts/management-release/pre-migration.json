@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-12T01:56:13.029Z",
+  "mode": "--backup",
+  "deployedRevision": "96ac034a8668e698b7f19fe3e8dabca40508a09d",
+  "migrationCount": 7,
+  "roles": [
+    "calas_app",
+    "calas_cloud_backup"
+  ],
+  "counts": {
+    "documents": 33,
+    "media": 14,
+    "users": 6,
+    "deliveries": 2
+  },
+  "backup": {
+    "path": "C:\\Users\\Paul\\Documents\\Codage\\Calas\\backups\\calas-before-management-2026-11-12T01-56-13-031Z.calas-backup",
+    "sha256": "24b4085834eaa6de5e471a4de390b59bd05b44b52725550629e7d6fd2b946aeb",
+    "bytes": 7207495,
+    "objects": 53,
+    "verifiedAt": "2026-11-12T01:56:27.003Z"
+  }
+}

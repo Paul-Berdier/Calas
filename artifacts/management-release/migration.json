@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-11-12T02:10:18.682Z",
+  "mode": "--migrate",
+  "deployedRevision": "96ac034a8668e698b7f19fe3e8dabca40508a09d",
+  "migrationCount": 7,
+  "roles": [
+    "calas_app",
+    "calas_cloud_backup"
+  ],
+  "counts": {
+    "documents": 33,
+    "media": 14,
+    "users": 6,
+    "deliveries": 2
+  },
+  "applied": "0007_outreach_management",
+  "checks": {
+    "app_access": true,
+    "migrations": 8,
+    "templates": 0,
+    "scheduled": 0
+  },
+  "completedAt": "2026-11-12T02:10:19.664Z"
+}

@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-12T00:29:55.766Z",
+  "at": "2026-11-12T01:55:05.622Z",
   "checks": [
     {
       "name": "outreach-overview",
@@ -34,6 +34,30 @@
       "width": 1440
     },
     {
+      "name": "outreach-history-complete",
+      "width": 390
+    },
+    {
+      "name": "outreach-history-complete",
+      "width": 1440
+    },
+    {
+      "name": "outreach-templates",
+      "width": 390
+    },
+    {
+      "name": "outreach-templates",
+      "width": 1440
+    },
+    {
+      "name": "outreach-final-mail-scheduled",
+      "width": 390
+    },
+    {
+      "name": "outreach-final-mail-scheduled",
+      "width": 1440
+    },
+    {
       "name": "integrations-token",
       "width": 390
     },
@@ -50,8 +74,17 @@
       "width": 1440
     }
   ],
-  "queued": 2,
-  "duplicated": 1,
+  "queued": 4,
+  "duplicated": 2,
   "imported": 1,
+  "management": {
+    "historyRows": 1002,
+    "historySearchBeyond1000": true,
+    "templatesCrud": true,
+    "crossPageRecipients": true,
+    "previewRequests": 6,
+    "scheduledConfirmations": 1,
+    "timeZone": "Europe/Paris"
+  },
   "errors": []
 }

@@ -53,6 +53,7 @@ const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({
   viewport: { width: 1440, height: 1000 },
+  timezoneId: "America/New_York",
 });
 const page = await context.newPage();
 const errors = [],
@@ -86,6 +87,9 @@ const campaign = {
 const contacts = [contact];
 const campaigns = [campaign];
 const campaignCreations = [];
+const templates = [], deliveryItems = [], scheduledRequests = [], previewRequests = [], deliveryRequests = [];
+let previewFailure = false;
+let templateSaveGate = null;
 let queued = 0,
   transport = "simulation",
   tokens = [],
@@ -108,8 +112,32 @@ await page.route("**/api/admin/**", async (route) => {
   const request = route.request(),
     path = new URL(request.url()).pathname;
   const body = request.method() === "GET" ? {} : request.postDataJSON();
+  if (templateSaveGate && path.startsWith('/api/admin/outreach/templates/') && ['POST','PATCH'].includes(request.method())) await templateSaveGate;
   let result = {};
-  if (path === "/api/admin/outreach/overview/")
+  const search=new URL(request.url()).searchParams;
+  const pageItems=items=>{const offset=Number(search.get('offset')||0),limit=Number(search.get('limit')||25);return {items:items.slice(offset,offset+limit),total:items.length,offset,limit};};
+  if (request.method()==='GET'&&path==='/api/admin/outreach/contacts/') {
+    const q=(search.get('q')||'').toLowerCase();
+    result=pageItems(contacts.filter(item=>(!search.get('eligibleOnly')||!(queued&&search.get('campaignId')===campaign.id))&&[item.name,item.company,item.email].join(' ').toLowerCase().includes(q)));
+  }
+  else if (request.method()==='GET'&&path==='/api/admin/outreach/campaigns/') result=pageItems(campaigns.filter(item=>[item.title,item.subject].join(' ').toLowerCase().includes((search.get('q')||'').toLowerCase())));
+  else if (request.method()==='GET'&&path==='/api/admin/outreach/deliveries/') {
+    deliveryRequests.push(Object.fromEntries(search));
+    const q=(search.get('q')||'').toLowerCase();
+    result=pageItems(deliveryItems.filter(item=>(!search.get('campaignId')||item.campaignId===search.get('campaignId'))&&(!search.get('status')||item.status===search.get('status'))&&[item.email,item.company,item.campaignTitle].join(' ').toLowerCase().includes(q)));
+  }
+  else if (path==='/api/admin/outreach/templates/'&&request.method()==='GET') result=pageItems(templates.filter(item=>item.title.toLowerCase().includes((search.get('q')||'').toLowerCase())));
+  else if (path==='/api/admin/outreach/templates/'&&request.method()==='POST') {result={...body,id:'template-'+(templates.length+1),version:0,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};templates.push(result);}
+  else if (path.startsWith('/api/admin/outreach/templates/')&&request.method()==='PATCH') {const item=templates.find(item=>path.includes('/'+item.id+'/'));assert.equal(body.version,item.version);Object.assign(item,body,{version:item.version+1});result=item;}
+  else if (path.startsWith('/api/admin/outreach/templates/')&&request.method()==='DELETE') {const index=templates.findIndex(item=>path.includes('/'+item.id+'/'));assert.equal(body.version,templates[index].version);templates.splice(index,1);result={ok:true};}
+  else if (path.endsWith('/preview/')) {
+    previewRequests.push(body);
+    if(previewFailure){previewFailure=false;await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Aperçu momentanément indisponible (recette).'})});return;}
+    const selectedCampaign=campaigns.find(item=>path.includes(`/${item.id}/`));
+    result={subject:selectedCampaign.subject,text:selectedCampaign.body+'\n\nCalas Conseil — La voie de la qualité relationnelle\nContact : contact@calas-conseil.fr\nNe plus recevoir : lien exemple inactif',campaignLink:selectedCampaign.linkPath,recipient:body.contactId?contacts.find(item=>item.id===body.contactId):null,unsubscribeIsExample:true,sourceIsExample:!body.contactId};
+  }
+  else if (path === "/api/admin/outreach/overview/") {
+    assert.equal(search.get('summary'),'true','The UI requests only aggregate metadata, never capped legacy lists');
     result = {
       stats: {
         contacts: contacts.length,
@@ -124,14 +152,11 @@ await page.route("**/api/admin/**", async (route) => {
         uncertain: 0,
         failed: 0,
       },
-      contacts,
-      campaigns,
-      deliveries: [],
       transport,
       maxBatch: 1000,
       targets: [{ path: "/diagnostic-rps/", title: "Diagnostic" }],
-      visits: [],
     };
+  }
   else if (/\/campaigns\/[^/]+\/overview\/$/.test(path)) {
     const selectedCampaign = campaigns.find((item) => path.includes(`/${item.id}/`));
     assert.ok(selectedCampaign, "Campaign detail must use a known campaign");
@@ -167,9 +192,11 @@ await page.route("**/api/admin/**", async (route) => {
   } else if (path.endsWith("/send/")) {
     assert.equal(body.confirmation, true);
     queued += body.contactIds.length;
-    campaign.status = "active";
-    campaign.version++;
-    result = { queued: body.contactIds.length, skipped: 0, simulation: true };
+    const target=campaigns.find(item=>path.includes('/'+item.id+'/'));
+    target.status = "active";
+    target.version++;
+    if(body.scheduledAt)scheduledRequests.push(body);
+    result = { queued: body.contactIds.length, skipped: 0, simulation: true,scheduledAt:body.scheduledAt??null };
   } else if (path.endsWith("/pause/")) {
     campaign.status = body.paused ? "paused" : "active";
     campaign.version++;
@@ -256,6 +283,7 @@ async function inspect(name) {
       false,
       `${name} overflows ${width}`,
     );
+    assert.equal(await page.locator('.outreach-space .admin-card-header .admin-button').evaluateAll(buttons=>buttons.every(button=>{const r=button.getBoundingClientRect(),card=button.closest('.admin-card').getBoundingClientRect();return r.left>=card.left&&r.right<=card.right;})),true,`${name}: header actions are not clipped at ${width}`);
     const violations = (
       await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
@@ -272,7 +300,48 @@ async function inspect(name) {
     checks.push({ name, width });
   }
 }
+async function checkDelayedTemplateSave() {
+  await page.goto(base+'/?tab=templates');
+  await page.getByRole('button',{name:'Créer un modèle',exact:true}).click();
+  await page.getByLabel('Nom du modèle').fill('Modèle enregistrement protégé');
+  await page.getByLabel('Objet du message').fill('Objet conservé pendant la sauvegarde');
+  await page.getByLabel('Texte du modèle').fill('Bonjour, ce message vérifie la conservation de la saisie pendant une sauvegarde lente.');
+  for (const phase of ['creation','edition']) {
+    if (phase === 'edition') {
+      await page.getByRole('button',{name:'Modifier',exact:true}).click();
+      await page.getByLabel('Nom du modèle').fill('Modèle modifié sans perte');
+    }
+    const submittedTitle = await page.getByLabel('Nom du modèle').inputValue();
+    let release;
+    templateSaveGate = new Promise(resolveGate => { release = resolveGate; });
+    await page.getByRole('button',{name:'Enregistrer le modèle',exact:true}).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.locator('fieldset')).toHaveAttribute('disabled','');
+    for (const name of ['Nom du modèle','Objet du message','Texte du modèle','Page proposée par le modèle']) await expect(page.getByLabel(name)).toBeDisabled();
+    await expect(page.getByRole('button',{name:'Enregistrer le modèle',exact:true})).toBeDisabled();
+    await expect(dialog.getByRole('button',{name:'Annuler',exact:true})).toBeDisabled();
+    await page.getByLabel('Nom du modèle').evaluate(input => input.focus());
+    await page.keyboard.type('texte parasite pendant la requête');
+    await expect(page.getByLabel('Nom du modèle')).toHaveValue(submittedTitle);
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeVisible();
+    await inspect(`template-${phase}-saving`);
+    release();
+    templateSaveGate = null;
+    await expect(dialog).toHaveCount(0);
+    await expect(page.getByRole('heading',{name:submittedTitle,exact:true})).toBeVisible();
+    assert.equal(templates[0].title,submittedTitle);
+  }
+  assert.equal(templates.length,1);
+  assert.equal(templates[0].version,1);
+  assert.deepEqual(errors,[]);
+  await writeFile(resolve(output,'template-save-report.json'),JSON.stringify({checks:checks.filter(item=>item.name.startsWith('template-')),blockedInputDuringCreate:true,blockedInputDuringUpdate:true,preservedSubmittedData:true,realEmails:0,errors},null,2));
+  templates.length = 0;
+  console.log('PASS: delayed template creation/update block further input and preserve submitted data; 4 layout/accessibility checks. No real API or SMTP.');
+}
 try {
+  await checkDelayedTemplateSave();
+  if (!process.argv.includes('--template-save-only')) {
   await page.goto(base);
   await expect(
     page.getByRole("heading", { name: "Campagne de recette" }),
@@ -300,7 +369,7 @@ try {
   await page.getByRole("button", { name: "Campagnes", exact: true }).click();
   await page.getByRole("button", { name: "Ouvrir", exact: true }).click();
   await page
-    .getByRole("button", { name: "Sélectionner les contacts trouvés" })
+    .getByRole("button", { name: "Sélectionner cette page" })
     .click();
   await page.getByRole("button", { name: "Vérifier la simulation" }).click();
   assert.equal(queued, 0, "No queue before the explicit confirmation");
@@ -382,6 +451,88 @@ try {
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   assert.equal(imported, 1);
+  // The visible history is served independently from the legacy overview's capped arrays.
+  deliveryItems.push(...Array.from({length:1002},(_,index)=>({
+    id:'delivery-'+index,campaignId:campaign.id,campaignTitle:campaign.title,contactId:contact.id,
+    email:index===1001?'ancien@example.test':`recette${index}@example.test`,company:index===1001?'Ancienne entreprise':'Entreprise '+index,
+    status:index===1001?'failed':'accepted',transport:'smtp',attempts:1,createdAt:'2026-11-10T12:00:00Z',finishedAt:'2026-11-10T12:01:00Z',scheduledAt:null,
+  })));
+  await page.goto(base+'/?tab=history&view=fixture');
+  await expect(page.getByRole('button',{name:'Historique des envois',exact:true})).toHaveAttribute('aria-pressed','true');
+  await expect(page).toHaveURL(base+'/?tab=history&view=fixture');
+  await expect(page.getByText('1–25 sur 1002',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Suivants',exact:true}).click();
+  await expect(page.getByText('26–50 sur 1002',{exact:true})).toBeVisible();
+  await page.getByLabel('Rechercher un envoi',{exact:true}).fill('Ancienne');
+  await expect(page.getByRole('heading',{name:'Ancienne entreprise',exact:true})).toBeVisible();
+  assert.equal(deliveryRequests.at(-1).offset,'0');
+  await page.getByLabel('État de l’envoi',{exact:true}).selectOption('accepted');
+  await expect(page.getByRole('heading',{name:'Aucun envoi trouvé'})).toBeVisible();
+  await page.getByLabel('État de l’envoi',{exact:true}).selectOption('failed');
+  await expect(page.getByRole('heading',{name:'Ancienne entreprise',exact:true})).toBeVisible();
+  await inspect('outreach-history-complete');
+  await page.getByRole('button',{name:'Modèles de messages',exact:true}).click();
+  await page.getByRole('button',{name:'Créer un modèle',exact:true}).click();
+  await page.getByLabel('Nom du modèle').fill('Premier échange RH');
+  await page.getByLabel('Objet du message').fill('Faire connaissance');
+  await page.getByLabel('Texte du modèle').fill('Bonjour, échangeons sur la qualité relationnelle dans votre organisation.');
+  await page.getByRole('button',{name:'Enregistrer le modèle',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Premier échange RH',exact:true})).toBeVisible();
+  assert.equal(templates.length,1);assert.equal(queued,2);
+  await page.getByRole('button',{name:'Modifier',exact:true}).click();
+  await page.getByLabel('Nom du modèle').fill('Premier échange professionnel');
+  await page.getByRole('button',{name:'Enregistrer le modèle',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Premier échange professionnel',exact:true})).toBeVisible();
+  assert.equal(templates[0].version,1);
+  await inspect('outreach-templates');
+  contacts.push(...Array.from({length:101},(_,index)=>({...contact,id:`extra-${index}`,email:`extra${index}@example.test`,company:`Entreprise supplémentaire ${index}`})));
+  await page.getByRole('button',{name:'Utiliser',exact:true}).click();
+  await expect(page.getByLabel('Nom interne')).toHaveValue('Premier échange professionnel');
+  assert.equal(campaignCreations.length,1,'Choosing a template does not create or queue a campaign');
+  await page.getByRole('button',{name:'Enregistrer le brouillon',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Premier échange professionnel',exact:true})).toBeVisible();
+  assert.equal(campaignCreations.length,2);assert.equal(queued,2);
+  await expect(page.getByText('1–100 sur 103',{exact:true})).toBeVisible();
+  await page.locator('.outreach-selection input[type="checkbox"]').first().check();
+  await page.locator('[aria-label="Pagination des destinataires"]').getByRole('button',{name:'Suivants'}).click();
+  await expect(page.getByText('101–103 sur 103',{exact:true})).toBeVisible();
+  await page.locator('.outreach-selection input[type="checkbox"]').first().check();
+  await page.locator('[aria-label="Pagination des destinataires"]').getByRole('button',{name:'Précédents'}).click();
+  await expect(page.locator('.outreach-selection input[type="checkbox"]').first()).toBeChecked();
+  await expect(page.getByText('2 sélectionné(s), jusqu’à 1000 par mise en file.',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Aperçu du mail final',exact:true}).click();
+  await expect(page.getByLabel('Contenu final du courriel')).toContainText('Calas Conseil — La voie de la qualité relationnelle');
+  await expect(page.getByText('La provenance affichée est un exemple',{exact:false})).toBeVisible();
+  assert.equal(queued,2);
+  await page.getByRole('button',{name:'Fermer la fenêtre'}).click();
+  await page.getByLabel('À une date et une heure choisies',{exact:true}).check();
+  await page.getByLabel('Début des envois — heure de Paris',{exact:true}).fill('2000-01-01T09:30');
+  await expect(page.getByText('Choisissez une date et une heure futures.',{exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Relire et mettre en file',exact:true})).toBeDisabled();
+  const futureDate=new Date(Date.now()+2*86400000).toISOString().slice(0,10);
+  const futureWall=futureDate+'T09:30';
+  await page.getByLabel('Début des envois — heure de Paris',{exact:true}).fill(futureWall);
+  previewFailure=true;
+  await page.getByRole('button',{name:'Relire et mettre en file',exact:true}).click();
+  await expect(page.getByText('Aperçu momentanément indisponible (recette).',{exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Confirmer la programmation',exact:true})).toBeDisabled();
+  await page.getByRole('button',{name:'Réessayer l’aperçu',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Confirmer la programmation',exact:true})).toBeEnabled();
+  await expect(page.getByLabel('Contenu final du courriel')).toContainText('Ne plus recevoir');
+  assert.equal(previewRequests.at(-1).contactId,contact.id);
+  assert.equal(queued,2,'Preview and changing schedule cannot send or queue');
+  await inspect('outreach-final-mail-scheduled');
+  await page.getByRole('button',{name:'Confirmer la programmation',exact:true}).click();
+  await expect(page.getByRole('status').filter({hasText:'Début prévu le'})).toHaveCount(2);
+  assert.equal(scheduledRequests.length,1);assert.equal(scheduledRequests[0].contactIds.length,2);
+  const scheduledWall=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(scheduledRequests[0].scheduledAt)).replace(' ','T');
+  assert.equal(scheduledWall,futureWall);assert.equal(queued,4);
+  await page.getByRole('button',{name:'Modèles de messages',exact:true}).click();
+  await page.getByRole('button',{name:'Supprimer',exact:true}).click();
+  assert.equal(templates.length,1,'Delete requires explicit confirmation');
+  await page.getByRole('button',{name:'Supprimer le modèle',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Votre premier modèle',exact:true})).toBeVisible();
+  assert.equal(templates.length,0);assert.equal(campaigns.length,3,'Deleting a template preserves its campaigns');
   await page.goto(`${base}?panel=integrations`);
   await page
     .getByRole("button", { name: "Révoquer la connexion", exact: true })
@@ -463,14 +614,15 @@ try {
   await writeFile(
     resolve(output, "report.json"),
     JSON.stringify(
-      { at: new Date().toISOString(), checks, queued, duplicated: campaignCreations.length, imported, errors },
+      { at: new Date().toISOString(), checks, queued, duplicated: campaignCreations.length, imported, management:{historyRows:deliveryItems.length,historySearchBeyond1000:true,templatesCrud:true,crossPageRecipients:true,previewRequests:previewRequests.length,scheduledConfirmations:scheduledRequests.length,timeZone:'Europe/Paris'}, errors },
       null,
       2,
     ),
   );
   console.log(
-    `PASS: ${checks.length} layout/accessibility checks; contact, explicit queue, duplicate draft without recipients or send, TXT import, scoped token and revocation paths.`,
+    `PASS: ${checks.length} layout/accessibility checks; complete history, templates, final preview, Paris schedule, cross-page recipients, contact/import/duplicate and scoped access. No real SMTP or database.`,
   );
+  }
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));

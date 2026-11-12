@@ -1,0 +1,166 @@
+{
+  "checks": [
+    {
+      "name": "healthy",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "backup-late",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "backup-failed",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "backup-unknown",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "backup-unconfigured",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "site-and-delivery-failures",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "unavailable-counts",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "mail-smtp",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "mail-simulation",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "mail-local",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "initial-request-failure",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "stale-results-after-failure",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "successful-retry",
+      "width": 1440,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "healthy",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "backup-late",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "backup-failed",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "backup-unknown",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "backup-unconfigured",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "site-and-delivery-failures",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "unavailable-counts",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "mail-smtp",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "mail-simulation",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "mail-local",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "initial-request-failure",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "stale-results-after-failure",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    },
+    {
+      "name": "successful-retry",
+      "width": 390,
+      "accessibilityViolations": 0,
+      "overflow": false
+    }
+  ],
+  "requests": 28,
+  "browserTimeZone": "America/New_York",
+  "displayTimeZone": "Europe/Paris",
+  "externalRequests": 0,
+  "mutationRequests": 0,
+  "browserErrors": []
+}

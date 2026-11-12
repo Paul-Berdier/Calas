@@ -1,6 +1,10 @@
 {
   "passed": [
     "Vraie connexion et vérification via Mailpit ; aucun TOTP artificiel",
+    "Aperçu privé du mail final : authentification/origine, absence de cache et aucune création de jeton ou mesure",
+    "Modèles HTTP : création, recherche, modification versionnée, conflit, suppression et origine protégée",
+    "Historique et listes paginés sans cache ; programmation future persistée, confirmation et filtres invalides contrôlés",
+    "Dates personnalisées UTC et état technique HTTP : réponses privées, sonde locale réussie et aucun secret exposé",
     "API protégée et campagne traitée automatiquement en simulation dans le service web",
     "Lien direct, arrivées/consultations distinctes, arrêt, zéro stockage navigateur, navigation sans JavaScript",
     "Désinscription explicite, GET sans effet et POST externe refusé",

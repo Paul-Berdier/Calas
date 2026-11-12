@@ -4,6 +4,16 @@ Pour les statistiques, appeler `calas_outreach_analytics` avec `days: 7`, `30` (
 
 Pour distinguer les campagnes, `calas_outreach_campaigns` fournit le sélecteur complet avec recherche `q`, pagination `offset` et `limit` (20 par défaut, 50 maximum), indépendamment de la période statistique. Passer ensuite `campaignId` à `calas_outreach_analytics` pour ne lire que cette campagne. Sa fiche contient le lien public partagé et le nombre de destinataires encore conservés ; les réponses manuelles, contacts et exclusions non attribuables sont `null`, pas zéro. Sans `campaignId`, la vue reste globale. Ces opérations sont en lecture seule et ne suivent pas les liens.
 
+Les périodes libres utilisent `from` et `to` au format `YYYY-MM-DD`, ensemble et sans `days` (366 jours maximum, bornes UTC incluses). Une comparaison utilise deux lectures avec les mêmes dates pour deux campagnes, ou deux périodes contiguës de même durée. Une référence nulle ne permet pas de calculer une variation en pourcentage.
+
+Les outils de gestion complémentaires sont disponibles sur les deux transports :
+
+- `calas_list_outreach` : pagination serveur des envois, contacts et campagnes, recherche `q` et filtre `status` ; `campaignId` filtre les envois. La collection historique `visits` reste un extrait : utiliser les statistiques pour les totaux complets.
+- `calas_preview_campaign` : rendu final en lecture seule, avec signature, provenance et lien de campagne. La désinscription affichée est un exemple inactif ; aucun destinataire n’est mis en file.
+- `calas_message_templates` : modèles paginés en lecture ; `calas_create_message_template`, `calas_update_message_template` et `calas_delete_message_template` exigent `outreach`. Modification et suppression utilisent la version relue ; la suppression exige une confirmation.
+- `calas_queue_campaign` accepte `scheduledAt`, un instant ISO UTC futur, après validation explicite du message, des destinataires et de l’heure (à présenter en heure de Paris). Le droit `send` et la confirmation restent nécessaires. L’heure fixe un début au plus tôt, selon disponibilité et cadence.
+- `calas_operations_status` : état du site, marqueurs de sauvegarde et résultats d’envoi, avec le droit `read`. Aucun test SMTP, lancement de sauvegarde ou accès aux secrets.
+
 Le connecteur permet aux applications IA de travailler avec le compte de Sara, Agnès ou Paul. Il utilise le SDK MCP officiel (`@modelcontextprotocol/server` 2.4.0) et propose deux transports : **Streamable HTTP distant avec OAuth**, pour ChatGPT et Claude sur le web ainsi que leurs clients compatibles ; **stdio local**, pour un poste configuré avec Codex ou Claude Desktop. L’IA ne reçoit ni mot de passe administrateur, ni clé SMTP, ni accès à PostgreSQL ou au stockage.
 
 L’URL du serveur distant est **https://www.calas-conseil.fr/mcp/**. `/api/agent/tools/` reste une API privée pour le pont local : ce n’est pas l’URL à saisir dans les applications web. Le serveur, les migrations et le domaine HTTPS doivent être déployés avant la connexion externe. Les tests locaux ne constituent pas une connexion effective aux comptes personnels ChatGPT/Claude.

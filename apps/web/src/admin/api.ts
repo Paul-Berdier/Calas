@@ -222,4 +222,7 @@ export const actionLabels: Record<string, string> = {
   "outreach.campaign.queued": "Campagne mise en file",
   "outreach.campaign.paused": "Campagne mise en pause",
   "outreach.campaign.resumed": "Campagne reprise",
+  "outreach.template.created": "Modèle de message créé",
+  "outreach.template.updated": "Modèle de message modifié",
+  "outreach.template.deleted": "Modèle de message supprimé",
 };
