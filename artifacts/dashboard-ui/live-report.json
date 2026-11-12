@@ -1,0 +1,44 @@
+{
+  "at": "2026-11-12T00:37:28.985Z",
+  "status": "passed",
+  "checks": [
+    "Anonymous analytics request is denied with JSON and no-store",
+    "Dedicated administrator session established without persisting credentials",
+    "7/30/90-day and default analytics have consistent daily totals, UTC bounds and private responses",
+    "Invalid and duplicate periods return 422; editorial dashboard remains available",
+    "Live dashboard renders all four indicators, five editorial counts, periods, refresh and daily table",
+    "desktop layout has no page overflow; aggregate screenshot captured with labels masked",
+    "mobile layout has no page overflow; aggregate screenshot captured with labels masked",
+    "Existing campaign link opens its detail with no recipient selected; return to list works",
+    "Unknown campaign returns 404 and offers a safe return; no browser mutation or page error"
+  ],
+  "periods": [
+    {
+      "days": 7,
+      "dailyRows": 7,
+      "accepted": 1,
+      "arrivals": 1,
+      "consultations": 1
+    },
+    {
+      "days": 30,
+      "dailyRows": 30,
+      "accepted": 1,
+      "arrivals": 1,
+      "consultations": 1
+    },
+    {
+      "days": 90,
+      "dailyRows": 90,
+      "accepted": 1,
+      "arrivals": 1,
+      "consultations": 1
+    }
+  ],
+  "emailsSentByCheck": 0,
+  "adminMutationsByCheck": 0,
+  "browserMutationAttemptsBlocked": 0,
+  "externalRequestsBlocked": 0,
+  "pageErrors": 0,
+  "sessionSignedOut": true
+}
