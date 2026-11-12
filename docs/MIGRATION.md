@@ -1,5 +1,9 @@
 # Migration vers le CMS Calas Conseil
 
+## Analyse de plusieurs campagnes — 12 novembre 2026
+
+Paul précise que chaque campagne possède un lien différent et doit avoir ses propres statistiques. Le tableau de bord reçoit un filtre de campagne, un sélecteur paginé/recherchable indépendant de la période et une fiche du lien partagé. L’API et MCP filtrent les agrégats en base par l’ID, y compris pour les campagnes anciennes sans activité. Les champs globaux non attribuables (contacts, réponses manuelles, exclusions) deviennent explicitement `null` dans ce périmètre. Le CSV porte le périmètre choisi. Aucun schéma, lien existant, publication ou paramètre SMTP ne change ; aucun envoi n’est nécessaire à la recette.
+
 ## Tableau de bord des statistiques — 12 novembre 2026
 
 La demande de Paul complète le tableau de bord avec les résultats de prospection et conserve le suivi éditorial. La nouvelle API privée et l’outil MCP en lecture seule partagent les agrégats SQL sans les limites de pagination des listes. Périodes 7/30/90 jours UTC, séries quotidiennes, résultats réels séparés des simulations/local, files actuelles, contacts disponibles, campagnes/pages et export CSV. Aucun schéma ne change, aucune donnée n’est migrée ou publiée, aucun courriel n’est nécessaire à la recette. Le lien vers une campagne ouvre seulement son détail.

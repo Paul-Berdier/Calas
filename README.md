@@ -51,6 +51,8 @@ Les écrans **Prospection** et **Connexions IA** ajoutent les contacts professio
 
 ## Commandes principales
 
+Le sélecteur **Campagne analysée** permet de consulter les résultats de chaque lien séparément, avec recherche et pagination. Le graphique, les pages, la file et l’export suivent la sélection ; **Toutes les campagnes** restaure la vue d’ensemble.
+
 Le **Tableau de bord** réunit le suivi éditorial et les résultats de prospection sur 7, 30 ou 90 jours : envois réels, simulations séparées, consultations attribuées aux liens, contacts, files en cours, campagnes et pages consultées. Un export CSV reprend les chiffres affichés. Ces consultations ne mesurent ni des personnes distinctes, ni toute l’audience du site. [Comprendre les indicateurs](docs/PROSPECTION.md#tableau-de-bord).
 
 | Commande | Effet |

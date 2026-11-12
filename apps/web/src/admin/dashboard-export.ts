@@ -14,7 +14,16 @@ export function dashboardCsv(data: DashboardMetrics): string {
     ["Calas Conseil — chiffres agrégés"],
     ["Période UTC", data.period.from, data.period.to],
     ["Actualisé le", data.generatedAt],
-    ["Périmètre", "Données conservées ; visites issues des liens de campagne seulement"],
+    ["Périmètre", data.campaign ? `Campagne : ${data.campaign.title}` : "Toutes les campagnes"],
+    ["Données", "Données conservées ; visites issues des liens de campagne seulement"],
+    ...(data.campaign ? [
+      ["Identifiant de campagne", data.campaign.id],
+      ["État de la campagne", data.campaign.status],
+      ["Campagne créée le", data.campaign.createdAt],
+      ["Lien propre à la campagne", data.campaign.linkPath],
+      ["Page de destination", data.campaign.targetPath],
+      ["Destinataires inclus depuis la création (données conservées)", data.campaign.recipientCount],
+    ] : []),
     ["Limites", "Ni visiteurs uniques, ni ouvertures, ni classement en boîte de réception mesurés"],
     [], ["Activité sur la période", "Valeur"],
     ["Messages réels mis en file", data.activity.requested],
@@ -24,17 +33,19 @@ export function dashboardCsv(data: DashboardMetrics): string {
     ["Envois réels exclus", data.activity.suppressed],
     ["Simulations", data.activity.simulated],
     ["Acceptés par la messagerie de recette locale", data.activity.localAccepted],
-    ["Nouveaux contacts", data.activity.newContacts],
+    ["Nouveaux contacts", data.activity.newContacts ?? "Non attribuable à une campagne"],
     ["Nouvelles campagnes", data.activity.newCampaigns],
-    ["Contacts avec une réponse signalée", data.activity.responsesRecorded],
-    ["Nouvelles adresses exclues", data.activity.exclusionsAdded],
+    ["Contacts avec une réponse signalée", data.activity.responsesRecorded ?? "Non attribuable à une campagne"],
+    ["Nouvelles adresses exclues", data.activity.exclusionsAdded ?? "Non attribuable à une campagne"],
     ["Arrivées depuis les liens", data.activity.arrivals],
     ["Consultations attribuées", data.activity.consultations],
     [], ["Situation actuelle", "Valeur"],
-    ["Contacts conservés", data.current.contacts.total],
-    ["Contacts disponibles", data.current.contacts.eligible],
-    ["Contacts avec réponse signalée", data.current.contacts.responded],
-    ["Adresses exclues", data.current.contacts.excluded],
+    ...(data.current.contacts ? [
+      ["Contacts conservés", data.current.contacts.total],
+      ["Contacts disponibles", data.current.contacts.eligible],
+      ["Contacts avec réponse signalée", data.current.contacts.responded],
+      ["Adresses exclues", data.current.contacts.excluded],
+    ] : []),
     ["Campagnes", data.current.campaigns.total],
     ["Brouillons", data.current.campaigns.drafts],
     ["Campagnes ouvertes", data.current.campaigns.active],
@@ -61,7 +72,7 @@ export function downloadDashboardCsv(data: DashboardMetrics) {
   const url = URL.createObjectURL(new Blob([dashboardCsv(data)], { type: "text/csv;charset=utf-8" }));
   const link = document.createElement("a");
   link.href = url;
-  link.download = `calas-statistiques-${data.period.days}-jours.csv`;
+  link.download = `calas-statistiques-${data.period.days}-jours${data.campaign ? `-${data.campaign.id}` : ""}.csv`;
   document.body.append(link);
   link.click();
   link.remove();

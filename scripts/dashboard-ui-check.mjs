@@ -6,7 +6,7 @@ import { createServer } from "node:http";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve, basename } from "node:path";
 import assert from "node:assert/strict";
-import { dashboardFixture, emptyDashboardFixture, dashboardCampaignId, missingCampaignId } from "../tests/fixtures/dashboard-metrics.mjs";
+import { dashboardFixture, emptyDashboardFixture, campaignDashboardFixture, dashboardCampaignOptionsFixture, dashboardCampaignId, secondDashboardCampaignId, inactiveDashboardCampaignId, missingCampaignId } from "../tests/fixtures/dashboard-metrics.mjs";
 
 const output = resolve("artifacts/dashboard-ui");
 await mkdir(output, { recursive: true });
@@ -48,10 +48,14 @@ const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true, serviceWorkers: "block" });
 const page = await context.newPage();
-const checks = [], errors = [], externalRequests = [], requests = [], writes = [];
+const checks = [], errors = [], externalRequests = [], requests = [], writes = [], measurementRequests = [];
+await page.addInitScript(() => {
+  Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async text => { window.__copiedCampaignLink = text; } } });
+});
 page.on("pageerror", error => errors.push(error.message));
 await context.route("**/*", route => {
   const url = route.request().url();
+  if (url.startsWith(base + "/r/")) { measurementRequests.push(url); return route.abort("blockedbyclient"); }
   if (url.startsWith(base + "/") || url.startsWith("blob:") || url.startsWith("data:")) return route.continue();
   externalRequests.push(url); return route.abort("blockedbyclient");
 });
@@ -79,6 +83,7 @@ const overview = {
   targets: [{ path: "/diagnostic-rps/", title: "Diagnostic" }],
 };
 let scenario = "normal", fresh = false, heldResponse, releaseResponse, heldCompleted = false;
+let campaignFailureId = null, holdCampaignId = null, heldCampaignResponse, releaseCampaignResponse, heldCampaignCompleted = false;
 await page.route("**/api/**", async route => {
   const request = route.request(), url = new URL(request.url());
   const path = url.pathname;
@@ -87,21 +92,30 @@ await page.route("**/api/**", async route => {
     writes.push({ path, method: request.method() });
     return route.fulfill({ status: 405, contentType: "application/json", body: JSON.stringify({ error: "No mutation permitted during dashboard acceptance checks" }) });
   }
-  let data, status = 200, isHeld = false;
+  let data, status = 200, isHeld = false, isCampaignHeld = false;
   if (path === "/api/admin/content/dashboard/") {
     if (scenario === "editorial-error") { status = 503; data = { error: "Contenus momentanément indisponibles (recette)." }; }
     else data = editorial;
   }
+  else if (path === "/api/admin/outreach/analytics-campaigns/") {
+    const query = url.searchParams.get("q") || "";
+    const offset = Number(url.searchParams.get("offset") || 0);
+    const limit = Number(url.searchParams.get("limit") || 20);
+    assert.equal(limit, 20, "Campaign choices paginate independently of top ten analytics");
+    data = dashboardCampaignOptionsFixture(query, offset, limit);
+  }
   else if (path === "/api/admin/outreach/analytics/") {
     const days = Number(url.searchParams.get("days"));
+    const campaignId = url.searchParams.get("campaignId");
     assert.ok([7, 30, 90].includes(days), "Only supported analytics periods requested");
-    if (scenario === "error") { status = 503; data = { error: "Statistiques momentanément indisponibles (recette)." }; }
+    if (campaignId && campaignId === campaignFailureId) { status = 404; data = { error: "Les chiffres de cette campagne sont indisponibles (recette)." }; }
+    else if (scenario === "error") { status = 503; data = { error: "Statistiques momentanément indisponibles (recette)." }; }
     else if (scenario === "zero" || scenario === "simulation" || scenario === "local") {
       data = emptyDashboardFixture(days, scenario === "zero" ? "smtp" : scenario);
       if (scenario === "simulation") data.activity.simulated = 19;
       if (scenario === "local") { data.activity.localAccepted = 8; data.current.workerEnabled = false; }
     } else {
-      data = dashboardFixture(days);
+      data = campaignId ? campaignDashboardFixture(campaignId, days) : dashboardFixture(days);
       if (fresh) { data.activity.accepted = 88; data.generatedAt = "2026-11-12T13:00:00.000Z"; }
       if (scenario === "long") {
         data.campaigns[0].title = "Diagnostic; équipe \"Calas\" et accompagnement du management ".repeat(5);
@@ -113,6 +127,11 @@ await page.route("**/api/**", async route => {
         isHeld = true;
         heldResponse = data;
         await new Promise(resolve => { releaseResponse = resolve; });
+      }
+      if (campaignId && campaignId === holdCampaignId) {
+        isCampaignHeld = true;
+        heldCampaignResponse = data;
+        await new Promise(resolve => { releaseCampaignResponse = resolve; });
       }
     }
   } else if (path === "/api/admin/outreach/overview/") data = overview;
@@ -126,6 +145,7 @@ await page.route("**/api/**", async route => {
   }
   await route.fulfill({ status, contentType: "application/json", body: JSON.stringify(data) });
   if (isHeld) heldCompleted = true;
+  if (isCampaignHeld) heldCampaignCompleted = true;
 });
 
 const kpi = label => page.locator(".dashboard-kpi").filter({ has: page.getByText(label, { exact: true }) }).locator("strong");
@@ -270,6 +290,116 @@ try {
   checks.push({ name: "displayed-versus-total-campaigns-pages-and-long-titles", result: "passed" });
 
   scenario = "normal"; await page.goto(base + "/admin/"); await ready();
+  const campaignSelect = page.getByRole("combobox", { name: "Campagne analysée", exact: true });
+  const campaignSearch = page.getByRole("searchbox", { name: "Rechercher une campagne", exact: true });
+  const selectedCampaign = page.locator(".dashboard-selected-campaign");
+  await expect(campaignSelect.locator("option")).toHaveCount(21);
+  await page.getByRole("button", { name: `Analyser ${campaign.title}`, exact: true }).click();
+  await ready("11");
+  await expect(campaignSelect).toHaveValue(dashboardCampaignId);
+  await expect(selectedCampaign).toContainText(campaign.title);
+  await expect(kpi("Arrivées depuis les liens")).toHaveText("4");
+  await expect(kpi("Consultations attribuées")).toHaveText("9");
+  await expect(kpi("Destinataires inclus")).toHaveText("14");
+  await expect(kpi("Réponses signalées")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /Les contacts maintenant/ })).toHaveCount(0);
+  await expect(page.getByRole("textbox", { name: "Lien unique de cette campagne", exact: true })).toHaveValue(`${base}/r/c_first_fixture`);
+  await expect(page.getByRole("region", { name: "Consultations par page", exact: true }).locator("tbody tr").first().locator("td")).toHaveText(["4", "5"]);
+  await inspect("dashboard-campaign-first");
+
+  await campaignSelect.selectOption(secondDashboardCampaignId);
+  await ready("26");
+  await expect(selectedCampaign).toContainText("Entreprises de Toulouse");
+  await expect(selectedCampaign).not.toContainText(campaign.title);
+  await expect(kpi("Arrivées depuis les liens")).toHaveText("8");
+  await expect(kpi("Consultations attribuées")).toHaveText("12");
+  await expect(kpi("Destinataires inclus")).toHaveText("30");
+  await expect(page.getByRole("textbox", { name: "Lien unique de cette campagne", exact: true })).toHaveValue(`${base}/r/c_second_fixture`);
+  await expect(page.getByRole("region", { name: "Consultations par page", exact: true }).locator("tbody tr").first().locator("td")).toHaveText(["8", "8"]);
+  const beforeCopyUrl = page.url();
+  await page.getByRole("button", { name: "Copier le lien", exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__copiedCampaignLink)).toBe(`${base}/r/c_second_fixture`);
+  assert.equal(page.url(), beforeCopyUrl);
+  assert.deepEqual(measurementRequests, [], "Copying a unique link cannot count a visit");
+  await page.getByText("Voir les valeurs jour par jour", { exact: true }).click();
+  await expect(daily.locator("tbody tr").last().locator("td")).toHaveText(["26", "8", "12"]);
+  await inspect("dashboard-campaign-second");
+  checks.push({ name: "two-campaigns-same-destination-keep-links-counts-daily-series-and-pages-separate", result: "passed" });
+  checks.push({ name: "copy-campaign-link-does-not-navigate-or-collect-an-arrival", result: "passed" });
+
+  for (const [days, accepted] of [[7, "5"], [90, "66"], [30, "26"]]) {
+    await page.getByRole("button", { name: `${days} jours`, exact: true }).click();
+    await ready(accepted);
+    await expect(campaignSelect).toHaveValue(secondDashboardCampaignId);
+    assert.ok(requests.some(request => request.path.endsWith("/analytics/") && new URLSearchParams(request.query).get("campaignId") === secondDashboardCampaignId && new URLSearchParams(request.query).get("days") === String(days)));
+  }
+  const campaignDownloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Exporter les chiffres", exact: true }).click();
+  const campaignDownload = await campaignDownloadPromise;
+  assert.equal(campaignDownload.suggestedFilename(), `calas-statistiques-30-jours-${secondDashboardCampaignId}.csv`);
+  await campaignDownload.saveAs(resolve(output, "dashboard-campaign-export.csv"));
+  const campaignCsv = await readFile(resolve(output, "dashboard-campaign-export.csv"), "utf8");
+  assert.ok(campaignCsv.includes('"Messages acceptés par SMTP";"26"'));
+  assert.ok(campaignCsv.includes('"Lien propre à la campagne";"/r/c_second_fixture"'));
+  assert.ok(campaignCsv.includes('"Contacts avec une réponse signalée";"Non attribuable à une campagne"'));
+  assert.ok(!campaignCsv.includes("c_first_fixture") && !campaignCsv.includes('"Contacts conservés"'));
+  checks.push({ name: "period-changes-and-csv-preserve-selected-campaign-without-global-fake-zeros", result: "passed" });
+
+  holdCampaignId = dashboardCampaignId;
+  await campaignSelect.selectOption(dashboardCampaignId);
+  await expect.poll(() => Boolean(releaseCampaignResponse)).toBe(true);
+  await expect(page.locator(".dashboard-kpi")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Exporter les chiffres", exact: true })).toBeDisabled();
+  await campaignSelect.selectOption(secondDashboardCampaignId);
+  await ready("26");
+  assert.equal(heldCampaignResponse.campaign.id, dashboardCampaignId);
+  releaseCampaignResponse();
+  await expect.poll(() => heldCampaignCompleted).toBe(true);
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await ready("26");
+  await expect(campaignSelect).toHaveValue(secondDashboardCampaignId);
+  await expect(selectedCampaign).toContainText("Entreprises de Toulouse");
+  holdCampaignId = null;
+  checks.push({ name: "late-first-campaign-response-cannot-overwrite-second-campaign", result: "passed" });
+
+  campaignFailureId = dashboardCampaignId;
+  const globalRequestsBefore = requests.filter(request => request.path.endsWith("/analytics/") && !new URLSearchParams(request.query).has("campaignId")).length;
+  await campaignSelect.selectOption(dashboardCampaignId);
+  await expect(page.getByRole("alert")).toContainText("Les chiffres de cette campagne sont indisponibles");
+  await expect(campaignSelect).toHaveValue(dashboardCampaignId);
+  await expect(page.locator(".dashboard-kpi")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Exporter les chiffres", exact: true })).toBeDisabled();
+  await expect(page.getByRole("heading", { name: "Contenus du site", exact: true })).toBeVisible();
+  assert.equal(requests.filter(request => request.path.endsWith("/analytics/") && !new URLSearchParams(request.query).has("campaignId")).length, globalRequestsBefore, "A scoped error cannot silently fall back to global totals");
+  await inspect("dashboard-campaign-error");
+  campaignFailureId = null;
+  await page.getByRole("button", { name: "Réessayer les statistiques", exact: true }).click();
+  await ready("11");
+  checks.push({ name: "campaign-error-keeps-scope-no-global-fallback-and-retry", result: "passed" });
+
+  await page.getByRole("button", { name: "Campagnes suivantes", exact: true }).click();
+  await expect(campaignSelect.locator(`option[value="${inactiveDashboardCampaignId}"]`)).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Campagnes précédentes", exact: true })).toBeEnabled();
+  assert.ok(requests.some(request => request.path.endsWith("/analytics-campaigns/") && new URLSearchParams(request.query).get("offset") === "20"));
+  await campaignSearch.fill("Ancienne");
+  await expect.poll(() => requests.some(request => request.path.endsWith("/analytics-campaigns/") && new URLSearchParams(request.query).get("q") === "Ancienne" && new URLSearchParams(request.query).get("offset") === "0")).toBe(true);
+  await expect(campaignSelect.locator(`option[value="${inactiveDashboardCampaignId}"]`)).toHaveCount(1);
+  await ready("11");
+  await campaignSelect.selectOption(inactiveDashboardCampaignId);
+  await ready("0");
+  await expect(selectedCampaign).toContainText("Ancienne campagne sans activité");
+  await expect(kpi("Destinataires inclus")).toHaveText("0");
+  await expect(kpi("Arrivées depuis les liens")).toHaveText("0");
+  await expect(page.getByRole("textbox", { name: "Lien unique de cette campagne", exact: true })).toHaveValue(`${base}/r/c_inactive_fixture`);
+  await expect(page.getByText("Aucune consultation attribuée sur cette période.", { exact: true })).toBeVisible();
+  await inspect("dashboard-campaign-inactive");
+  await page.getByRole("button", { name: "Toutes les campagnes", exact: true }).click();
+  await ready("37");
+  await expect(selectedCampaign).toHaveCount(0);
+  await expect(kpi("Réponses signalées")).toHaveText("6");
+  checks.push({ name: "campaign-selector-pagination-and-search-include-inactive-campaigns-outside-top-ten", result: "passed" });
+
+  scenario = "normal"; await page.goto(base + "/admin/"); await ready();
   await page.getByRole("link", { name: campaign.title, exact: true }).click();
   await expect(page).toHaveURL(`${base}/admin/outreach/?campaign=${dashboardCampaignId}`);
   await expect(page.getByRole("heading", { name: campaign.title, exact: true })).toBeVisible();
@@ -295,13 +425,15 @@ try {
   await expect(page.getByRole("button", { name: "Ouvrir", exact: true })).toBeVisible();
   assert.ok(!requests.some(request => request.path.includes("not-a-uuid")));
   assert.deepEqual(writes, [], "Browsing statistics and campaign detail cannot enqueue or mutate");
+  assert.deepEqual(measurementRequests, [], "Viewing/copying analytics links does not measure visits");
   assert.deepEqual(externalRequests, [], "No external service used by this suite");
   assert.deepEqual(errors, []);
   checks.push({ name: "invalid-campaign-id-ignored-and-no-mutations-or-external-requests", result: "passed" });
-  await writeFile(resolve(output, "report.json"), JSON.stringify({ at: new Date().toISOString(), scope: "Actual AdminApp, DashboardInsights and Outreach; unrelated lazy screens stubbed; synthetic HTTP APIs", checks, writes, externalRequests, errors, requests }, null, 2));
+  await writeFile(resolve(output, "report.json"), JSON.stringify({ at: new Date().toISOString(), scope: "Actual AdminApp, DashboardInsights and Outreach; unrelated lazy screens stubbed; synthetic HTTP APIs", checks, writes, measurementRequests, externalRequests, errors, requests }, null, 2));
   console.log(`PASS: ${checks.length} checks; real/simulated/local totals, periods, refresh, cancellation, isolated errors, CSV, accessible responsive UI and campaign deep links. No SMTP/database used.`);
 } finally {
   releaseResponse?.();
+  releaseCampaignResponse?.();
   await browser.close();
   await new Promise(resolve => server.close(resolve));
 }

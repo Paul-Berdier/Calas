@@ -1,7 +1,7 @@
 import type {APIRoute} from 'astro';
 import {z} from 'zod';
 import {requireEditor} from '../../../../server/auth/permissions';
-import {getDashboardMetrics} from '../../../../server/outreach/analytics';
+import {getDashboardCampaignOptions,getDashboardMetrics} from '../../../../server/outreach/analytics';
 import {consumeRateLimit} from '../../../../server/auth/rate-limit';
 import {assertSameOrigin,HttpError,json,jsonError,readJson} from '../../../../server/http';
 import {createCampaign,createProspect,deleteProspect,getCampaignOverview,getOutreachOverview,importProspects,markProspectResponded,queueCampaign,setCampaignPaused,suppressProspect,updateCampaign,updateProspect} from '../../../../server/outreach/service';
@@ -11,11 +11,13 @@ export const ALL:APIRoute=async({request,params})=>{try{
  const actor=await requireEditor(request);const parts=(params.path||'').split('/').filter(Boolean),[collection,id,action]=parts;
  if(parts.length>3)throw new HttpError(404,'NOT_FOUND','Action introuvable.');
  if(request.method==='GET'&&collection==='overview'&&parts.length===1)return json(await getOutreachOverview(actor));
- if(request.method==='GET'&&collection==='analytics'&&parts.length===1){
-  const periods=new URL(request.url).searchParams.getAll('days');
-  if(periods.length>1)throw new HttpError(422,'PERIOD','Choisissez une seule période.');
+ if(request.method==='GET'&&['analytics','analytics-campaigns'].includes(collection)&&parts.length===1){
+  const search=new URL(request.url).searchParams;
+  const keys=collection==='analytics'?['days','campaignId']:['q','offset','limit'];
+  if(keys.some(key=>search.getAll(key).length>1))throw new HttpError(422,'QUERY','Chaque filtre doit être indiqué une seule fois.');
   if(!await consumeRateLimit('outreach:analytics:'+actor.id,60,60))throw new HttpError(429,'RATE_LIMIT','Trop d’actualisations rapprochées. Patientez une minute.');
-  return json(await getDashboardMetrics(actor,periods[0]??30));
+  if(collection==='analytics-campaigns')return json(await getDashboardCampaignOptions(actor,{q:search.get('q')??undefined,offset:search.get('offset')??undefined,limit:search.get('limit')??undefined}));
+  return json(await getDashboardMetrics(actor,search.get('days')??30,search.get('campaignId')??undefined));
  }
  if(request.method==='GET'&&collection==='campaigns'&&id&&action==='overview')return json(await getCampaignOverview(id,actor));
  assertSameOrigin(request);

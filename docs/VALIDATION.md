@@ -1,5 +1,11 @@
 # Revue éditoriale et autorisation de publication
 
+## Statistiques distinctes par campagne — 12 novembre 2026
+
+La demande complémentaire de Paul ajoute une analyse individuelle de chaque campagne et de son lien. La suite finale passe 22 tests : agrégats SQL, pagination/recherche littérale, filtres, campagne inconnue, campagne inactive, null explicites pour les mesures non attribuables, outils MCP des deux transports et huit contrôles CSV. Deux vrais tokens de recette visant la même page sont résolus puis comptés par `recordCampaignVisit` : leurs arrivées et consultations restent distinctes. Aucun SMTP n’est appelé.
+
+La recette navigateur passe 42 contrôles, dont 26 vues à 390/1440 px sans violation Axe ni débordement. Elle couvre la sélection de deux campagnes, leurs liens différents, copie sans navigation ou mesure, période conservant le filtre, export ciblé, réponse réseau tardive ignorée, erreur sans repli global, pagination/recherche et ancienne campagne inactive. Aucune mutation API ni requête de mesure. Rapport : `artifacts/dashboard-ui/report.json`. Astro check, TypeScript MCP, ESLint et compilation standalone passent (27 indications de dépréciation préexistantes).
+
 ## Tableau de bord analytique — 12 novembre 2026
 
 La demande de Paul ajoute les statistiques de prospection à l’administration sans modifier les pages publiques. La recette SQL finale passe dix contrôles sur PostgreSQL isolé : 1 001 envois sans troncature, dates UTC même avec un autre fuseau de connexion, résultats terminaux sans compter les reprises, séparation SMTP/simulation/local, contacts et exclusions, classements plafonnés mais totaux complets, droits et arguments MCP. Cinq tests vérifient l’export CSV et la neutralisation des formules. La régression campagnes/permissions/MCP et les premiers tests du tableau passent 46 contrôles sans saut ; les deux nouveaux contrôles MCP du tableau ont ensuite été exécutés dans la suite SQL finale.

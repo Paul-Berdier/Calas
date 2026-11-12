@@ -10,6 +10,34 @@
 .dashboard-periods button[aria-pressed="true"] { background: var(--a-navy); color: #fffdfa; }
 .dashboard-periods button:not([aria-pressed="true"]):hover { background: var(--a-ivory); color: var(--a-navy); }
 .dashboard-toolbar-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.dashboard-campaign-filter { padding: 18px 20px 12px; margin-bottom: 15px; background: #f1eee7; border: 1px solid var(--a-border); border-radius: 8px; }
+.dashboard-filter-fields { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+.dashboard-filter-select { flex: 1.3 1 270px; min-width: 0; }
+.dashboard-filter-search { flex: 1 1 200px; min-width: 0; }
+.dashboard-filter-fields label, .dashboard-selected-campaign > label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 7px; }
+.dashboard-filter-fields .admin-input { width: 100%; min-width: 0; font-size: 12px; }
+.dashboard-filter-fields select { text-overflow: ellipsis; padding-right: 28px; }
+.dashboard-campaign-filter > p { font-size: 11px; color: var(--a-muted); margin-top: 10px; }
+.dashboard-filter-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 6px; }
+.dashboard-filter-footer > p { font-size: 11px; color: var(--a-muted); }
+.dashboard-filter-footer > div { display: flex; gap: 6px; }
+.dashboard-filter-error { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-top: 1px solid var(--a-border); margin-top: 9px; padding-top: 10px; font-size: 12px; color: #842a2f; }
+.dashboard-scope { font-size: 12px; margin: 0 0 13px !important; overflow-wrap: anywhere; }
+.dashboard-selected-campaign { background: var(--a-paper); border: 1px solid var(--a-border); border-left: 3px solid var(--a-bronze); border-radius: 8px; padding: 20px; margin-top: 20px; }
+.dashboard-selected-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; }
+.dashboard-selected-heading > div { min-width: 0; }
+.dashboard-selected-heading h3 { font: 24px/1.25 Georgia, serif; overflow-wrap: anywhere; }
+.dashboard-selected-campaign > dl { display: flex; gap: 14px 30px; flex-wrap: wrap; margin: 18px 0; }
+.dashboard-selected-campaign > dl > div { min-width: 0; }
+.dashboard-selected-campaign dt { font-size: 10px; color: var(--a-muted); margin-bottom: 3px; }
+.dashboard-selected-campaign dd { margin: 0; font-size: 12px; font-weight: 600; overflow-wrap: anywhere; }
+.dashboard-copy-link { display: flex; gap: 10px; align-items: center; }
+.dashboard-copy-link .admin-input { min-width: 0; flex: 1; font-size: 12px; }
+.dashboard-copy-link button { flex-shrink: 0; }
+.dashboard-copy-status { margin-top: 7px !important; font-size: 11px; color: var(--a-green); }
+.dashboard-copy-status:empty { display: none; }
+.dashboard-scope-note { padding: 13px 17px; margin: 0 0 17px !important; font-size: 11px; color: var(--a-muted); background: #f1eee7; border-left: 2px solid var(--a-bronze); line-height: 1.7; }
+.dashboard-current-grid.dashboard-current-filtered { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .dashboard-period-caption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px 18px; font-size: 10px; color: var(--a-muted); margin: 14px 0; }
 .dashboard-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 17px; }
 .dashboard-kpi { position: relative; min-width: 0; padding: 20px; border: 1px solid var(--a-border); border-top: 3px solid var(--a-bronze); border-radius: 8px; background: var(--a-paper); }
@@ -60,7 +88,7 @@
 .dashboard-table tbody tr:hover { background: #faf8f3; }
 .dashboard-table a { text-underline-offset: 3px; }
 .dashboard-table small { display: block; margin-top: 4px; font-size: 10px; color: var(--a-muted); font-weight: 400; overflow-wrap: anywhere; }
-.dashboard-campaign-table { min-width: 790px; }
+.dashboard-campaign-table { min-width: 900px; }
 .dashboard-campaign-table th:first-child { width: 31%; min-width: 215px; max-width: 350px; overflow-wrap: anywhere; }
 .dashboard-page-table { min-width: 410px; }
 .dashboard-page-table th:first-child { width: 66%; overflow-wrap: anywhere; }
@@ -85,4 +113,5 @@
 @media (max-width: 1200px) { .dashboard-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dashboard-analysis-grid { grid-template-columns: minmax(0, 1fr); } .dashboard-current-grid { gap: 12px; } .dashboard-current-card { padding: 16px; } .admin-metrics.dashboard-editorial-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 720px) { .dashboard-insights-heading { align-items: flex-start; flex-direction: column; gap: 12px; } .dashboard-insights-heading h2 { font-size: 25px; } .dashboard-toolbar { align-items: flex-start; } .dashboard-current-grid { grid-template-columns: minmax(0, 1fr); } .dashboard-kpi { padding: 16px; } .dashboard-kpi > svg { top: 16px; right: 12px; width: 16px; } .dashboard-kpi > strong { font-size: 32px; } .dashboard-kpi > p { min-height: 50px; } .dashboard-trend-card .admin-card-body { padding: 15px; } .dashboard-table th, .dashboard-table td { padding-inline: 15px; } .admin-metrics.dashboard-editorial-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dashboard-insights .admin-card-header { align-items: flex-start; gap: 13px; } }
 @media (max-width: 360px) { .dashboard-kpis { grid-template-columns: minmax(0, 1fr); } .dashboard-kpi > p { min-height: 0; } .dashboard-periods { width: 100%; } .dashboard-periods button { flex: 1; padding-inline: 10px; } }
+@media (max-width: 720px) { .dashboard-campaign-filter, .dashboard-selected-campaign { padding: 15px; } .dashboard-filter-select, .dashboard-filter-search { flex-basis: 100%; } .dashboard-filter-footer { gap: 4px; } .dashboard-selected-heading { flex-direction: column; gap: 10px; } .dashboard-selected-heading h3 { font-size: 22px; } .dashboard-copy-link { align-items: stretch; flex-direction: column; } .dashboard-copy-link button { align-self: flex-start; } .dashboard-current-grid.dashboard-current-filtered { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .dashboard-insights *, .dashboard-insights *::before, .dashboard-insights *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }

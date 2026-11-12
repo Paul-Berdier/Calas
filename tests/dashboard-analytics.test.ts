@@ -6,11 +6,13 @@ import { loadEnvFile } from 'node:process';
 import { resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { closeDatabase, getDb, getPool } from '../apps/web/src/server/db';
-import { dashboardPeriod, getDashboardMetrics } from '../apps/web/src/server/outreach/analytics';
+import { dashboardCampaignId, dashboardPeriod, getDashboardCampaignOptions, getDashboardMetrics } from '../apps/web/src/server/outreach/analytics';
+import { getCampaignLanding, recordCampaignVisit } from '../apps/web/src/server/outreach/service';
+import { digest, makeToken, seal } from '../apps/web/src/server/outreach/tokens';
 import { availableAgentTools, callAgentTool } from '../apps/web/src/server/agent/tools';
 import type { AgentAccess } from '../apps/web/src/server/agent/access';
 import type { Actor } from '../apps/web/src/server/auth/permissions';
-import type { DashboardMetrics } from '../apps/web/src/lib/dashboard-metrics';
+import type { DashboardCampaignOptions, DashboardMetrics } from '../apps/web/src/lib/dashboard-metrics';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(resolve(root, 'apps/web/package.json'));
@@ -31,6 +33,16 @@ test('dashboard periods are strict and unauthorized roles cannot access aggregat
   await assert.rejects(() => getDashboardMetrics({ ...actor, role: 'reader' } as unknown as Actor), { status: 403 });
   await assert.rejects(() => getDashboardMetrics(undefined as unknown as Actor), { status: 403 });
   await assert.rejects(() => getDashboardMetrics(actor, 'invalid'), { status: 422 });
+  assert.equal(dashboardCampaignId(), undefined);
+  const validId = randomUUID();
+  assert.equal(dashboardCampaignId(validId), validId);
+  for (const invalid of ['', null, 'all', 'invalid', [], 1, `${validId} `]) {
+    await assert.rejects(() => getDashboardMetrics(actor, 7, invalid), { status: 422, code: 'CAMPAIGN' });
+  }
+  await assert.rejects(() => getDashboardCampaignOptions({ ...actor, role: 'reader' } as unknown as Actor), { status: 403 });
+  for (const options of [{ offset: -1 }, { offset: '1.0' }, { offset: ' 1' }, { offset: '01' }, { offset: 1.5 }, { offset: 2147483648 }, { limit: 0 }, { limit: 51 }, { limit: '1e1' }, { q: [] }, { q: 'a'.repeat(101) }]) {
+    await assert.rejects(() => getDashboardCampaignOptions(actor, options), { status: 422 });
+  }
 });
 
 test('analytics MCP catalogue is read-only and rejects missing scope or invalid periods before execution', async () => {
@@ -45,8 +57,15 @@ test('analytics MCP catalogue is read-only and rejects missing scope or invalid 
   let executions = 0;
   const beforeExecution = async () => { executions++; };
   await assert.rejects(() => callAgentTool({ ...access, scopes: ['outreach'] }, tool.name, { days: 7 }, beforeExecution), { status: 403, code: 'AGENT_SCOPE' });
-  for (const args of [{ days: 8 }, { days: '7' }, { days: null }, { days: 30, recipient: 'private@example.test' }]) {
+  for (const args of [{ days: 8 }, { days: '7' }, { days: null }, { days: 30, recipient: 'private@example.test' }, { campaignId: 'invalid' }]) {
     await assert.rejects(() => callAgentTool(access, tool.name, args, beforeExecution), { status: 422, code: 'VALIDATION' });
+  }
+  const selector = availableAgentTools(access).find(item => item.name === 'calas_outreach_campaigns');
+  assert(selector?.annotations.readOnlyHint);
+  assert.deepEqual(selector._meta.securitySchemes, [{ type: 'oauth2', scopes: ['read'] }]);
+  await assert.rejects(() => callAgentTool({ ...access, scopes: ['outreach'] }, selector.name, {}, beforeExecution), { status: 403 });
+  for (const args of [{ limit: 51 }, { offset: -1 }, { offset: '0' }, { q: 'a'.repeat(101) }]) {
+    await assert.rejects(() => callAgentTool(access, selector.name, args, beforeExecution), { status: 422 });
   }
   assert.equal(executions, 0, 'Rejected MCP requests must never execute an aggregate or its audit hook');
 });
@@ -57,17 +76,20 @@ test('dashboard aggregates use complete, isolated PostgreSQL data', { skip: proc
   const name = `calas_dashboard_test_${randomUUID().replaceAll('-', '')}`;
   const control = new Pool({ connectionString: source.href, max: 1 });
   await control.query(`CREATE DATABASE "${name}"`);
-  const previous = Object.fromEntries(['DATABASE_URL', 'DATABASE_POOL_MAX', 'OUTREACH_MAIL_TRANSPORT', 'OUTREACH_RUNNER_ENABLED', 'OUTREACH_MAX_PER_HOUR'].map(key => [key, process.env[key]]));
+  const previous = Object.fromEntries(['DATABASE_URL', 'DATABASE_POOL_MAX', 'OUTREACH_MAIL_TRANSPORT', 'OUTREACH_RUNNER_ENABLED', 'OUTREACH_MAX_PER_HOUR', 'OUTREACH_LINK_SECRET'].map(key => [key, process.env[key]]));
   const isolated = new URL(source); isolated.pathname = `/${name}`;
   process.env.DATABASE_URL = isolated.href;
   process.env.DATABASE_POOL_MAX = '1';
   process.env.OUTREACH_MAIL_TRANSPORT = 'smtp';
   process.env.OUTREACH_RUNNER_ENABLED = 'true';
   process.env.OUTREACH_MAX_PER_HOUR = '40';
+  process.env.OUTREACH_LINK_SECRET = randomUUID() + randomUUID();
+  const campaignTokens = new Map<string, string>();
   const campaign = async (title: string, status = 'active', recent = false) => {
-    const id = randomUUID();
+    const id = randomUUID(), token = makeToken('c');
+    campaignTokens.set(id, token);
     await getPool().query(`INSERT INTO outreach_campaigns(id,title,subject,body,target_path,status,link_hash,link_encrypted,created_by,created_at)
-      VALUES($1::uuid,$2,'Sujet privé','Corps privé','/contact/',$3,$1::text,'private-campaign-token',$4,now()-CASE WHEN $5 THEN interval '0 days' ELSE interval '100 days' END)`, [id, title, status, actor.id, recent]);
+      VALUES($1::uuid,$2,'Sujet privé','Corps privé','/contact/',$3,$6,$7,$4,now()-CASE WHEN $5 THEN interval '0 days' ELSE interval '100 days' END)`, [id, title, status, actor.id, recent, digest(token), seal(token)]);
     return id;
   };
   const contact = async () => {
@@ -93,6 +115,7 @@ test('dashboard aggregates use complete, isolated PostgreSQL data', { skip: proc
         assert(data.daily.every(day => day.accepted === 0 && day.arrivals === 0 && day.consultations === 0));
         assert.equal(data.period.timeZone, 'UTC');
         assert.equal(data.activity.accepted, 0);
+        assert.equal(data.campaign, null);
         assert.deepEqual(data.campaigns, []);
         assert.deepEqual(data.pages, []);
         assert.deepEqual(data.current.queue, { waiting: 0, sending: 0, paused: 0 });
@@ -219,6 +242,119 @@ test('dashboard aggregates use complete, isolated PostgreSQL data', { skip: proc
         assert.equal(defaults.period.days, 30);
       }
       assert.equal(executions, 6, 'Each valid invocation executes its permission/audit hook once');
+    });
+    await t.test('campaign filter isolates outcomes, queues, calendar, pages and retained recipients', async () => {
+      const one = await getDashboardMetrics(actor, 7, bulk);
+      const two = await getDashboardMetrics(actor, 7, boundary);
+      const three = await getDashboardMetrics(actor, 7, paused);
+      assert.equal(one.campaign?.id, bulk);
+      assert.equal(one.campaign?.linkPath, '/r/' + campaignTokens.get(bulk));
+      assert.equal(two.campaign?.linkPath, '/r/' + campaignTokens.get(boundary));
+      assert.notEqual(one.campaign?.linkPath, two.campaign?.linkPath);
+      assert.equal(one.campaign?.targetPath, two.campaign?.targetPath, 'Separate campaign links can share a destination');
+      assert.equal(one.campaign?.recipientCount, 1001);
+      assert.equal(two.campaign?.recipientCount, 14);
+      assert.equal(one.activity.accepted, 1001);
+      assert.equal(two.activity.accepted, 2);
+      assert.equal(one.activity.requested, 0);
+      assert.equal(two.activity.requested, 7);
+      assert.equal(one.activity.arrivals, 8);
+      assert.equal(two.activity.arrivals, 2);
+      assert.equal(two.activity.consultations, 4);
+      assert.deepEqual(one.current.queue, { waiting: 0, sending: 0, paused: 0 });
+      assert.deepEqual(two.current.queue, { waiting: 1, sending: 1, paused: 0 });
+      assert.deepEqual(three.current.queue, { waiting: 0, sending: 1, paused: 1 });
+      assert.deepEqual(three.current.campaigns, { total: 1, drafts: 0, active: 0, paused: 1 });
+      assert.deepEqual(two.pages, [{ path: '/contact/', title: 'Contact', arrivals: 2, consultations: 4 }]);
+      assert.equal(two.daily.reduce((sum, day) => sum + day.accepted, 0), 2);
+      assert.equal(two.daily.reduce((sum, day) => sum + day.consultations, 0), 4);
+      for (const selected of [one, two, three]) {
+        assert.equal(selected.campaignRowsTotal, 1);
+        assert.equal(selected.campaigns.length, 1);
+        assert.equal(selected.campaigns[0].id, selected.campaign?.id);
+        assert.equal(selected.activity.newCampaigns, 0);
+        assert.equal(selected.current.contacts, null);
+        assert.equal(selected.activity.newContacts, null);
+        assert.equal(selected.activity.responsesRecorded, null);
+        assert.equal(selected.activity.exclusionsAdded, null);
+        const serialized = JSON.stringify(selected);
+        for (const privateValue of ['@example.test', 'private-unsubscribe-token', 'Nom privé', 'Sujet privé', 'email_hash', 'linkEncrypted', 'unsubscribe']) assert(!serialized.includes(privateValue));
+      }
+    });
+    const inactive = await campaign('Archive ancienne sans activité', 'draft');
+    const literal = await campaign('Littéral 100%_!', 'draft');
+    await campaign('Littéral 100xy!', 'draft');
+    await t.test('campaign selector paginates all campaigns and searches wildcard characters literally', async () => {
+      const defaults = await getDashboardCampaignOptions(actor);
+      assert.equal(defaults.total, 18);
+      assert.equal(defaults.offset, 0);
+      assert.equal(defaults.limit, 20);
+      assert.equal(defaults.items.length, 18);
+      assert(defaults.items.some(item => item.id === inactive), 'Old inactive campaigns remain selectable');
+      const first = await getDashboardCampaignOptions(actor, { offset: '0', limit: '5' });
+      const next = await getDashboardCampaignOptions(actor, { offset: 5, limit: 5 });
+      assert.equal(first.total, 18);
+      assert.equal(next.total, 18);
+      assert.deepEqual([...first.items, ...next.items].map(item => item.id), defaults.items.slice(0, 10).map(item => item.id));
+      const beyond = await getDashboardCampaignOptions(actor, { offset: 100 });
+      assert.equal(beyond.total, 18);
+      assert.deepEqual(beyond.items, []);
+      for (const q of ['%', '_', '100%_!', 'littéral 100%_!', '  Littéral 100%_!  ']) {
+        const found = await getDashboardCampaignOptions(actor, { q });
+        assert.equal(found.total, 1);
+        assert.equal(found.items[0].id, literal);
+      }
+      assert.equal((await getDashboardCampaignOptions(actor, { q: 'nonexistent-title' })).total, 0);
+      assert(defaults.items.every(item => !('linkPath' in item) && !('linkEncrypted' in item) && !('recipientCount' in item)));
+    });
+    await t.test('inactive campaign returns explicit zero data while an unknown campaign is 404', async () => {
+      const data = await getDashboardMetrics(actor, 90, inactive);
+      assert.equal(data.campaign?.id, inactive);
+      assert.equal(data.campaign?.recipientCount, 0);
+      assert.equal(data.activity.accepted, 0);
+      assert.equal(data.activity.newCampaigns, 0);
+      assert.deepEqual(data.current.campaigns, { total: 1, drafts: 1, active: 0, paused: 0 });
+      assert.equal(data.campaignRowsTotal, 1);
+      assert.equal(data.campaigns.length, 1);
+      assert(data.daily.every(day => !day.accepted && !day.arrivals && !day.consultations));
+      assert.deepEqual(data.pages, []);
+      await assert.rejects(() => getDashboardMetrics(actor, 7, randomUUID()), { status: 404, code: 'NOT_FOUND' });
+    });
+    await t.test('two real campaign tokens attribute arrivals to separate campaigns on the same page', async () => {
+      await getPool().query("SET TIME ZONE 'UTC'");
+      const campaignA = await campaign('Lien A réel', 'active', true), campaignB = await campaign('Lien B réel', 'active', true);
+      const tokenA = campaignTokens.get(campaignA)!, tokenB = campaignTokens.get(campaignB)!;
+      assert.notEqual(tokenA, tokenB);
+      assert.equal((await getCampaignLanding(tokenA))?.campaignId, campaignA);
+      assert.equal((await getCampaignLanding(tokenB))?.campaignId, campaignB);
+      await recordCampaignVisit(tokenA, '/contact/', true);
+      await recordCampaignVisit(tokenA, '/contact/', true);
+      await recordCampaignVisit(tokenA, '/reflexions/');
+      await recordCampaignVisit(tokenB, '/contact/', true);
+      const a = await getDashboardMetrics(actor, 7, campaignA), b = await getDashboardMetrics(actor, 7, campaignB);
+      assert.deepEqual(a.pages, [{ path: '/contact/', title: 'Contact', arrivals: 2, consultations: 2 }, { path: '/reflexions/', title: 'Réflexions', arrivals: 0, consultations: 1 }]);
+      assert.deepEqual(b.pages, [{ path: '/contact/', title: 'Contact', arrivals: 1, consultations: 1 }]);
+      assert.equal(a.activity.arrivals, 2);
+      assert.equal(a.activity.consultations, 3);
+      assert.equal(b.activity.arrivals, 1);
+      assert.equal(b.activity.consultations, 1);
+      assert.equal(a.activity.newCampaigns, 1);
+      assert.equal(b.activity.newCampaigns, 1);
+      assert.equal(a.daily.at(-1)?.arrivals, 2);
+      assert.equal(b.daily.at(-1)?.arrivals, 1);
+      for (const transport of [undefined, 'oauth'] as const) {
+        const access: AgentAccess = { actor, tokenId: randomUUID(), scopes: ['read'], transport };
+        const options = await callAgentTool(access, 'calas_outreach_campaigns', { q: 'Lien', limit: 1 }) as DashboardCampaignOptions;
+        assert.equal(options.total, 2);
+        assert.equal(options.items.length, 1);
+        const selected = await callAgentTool(access, 'calas_outreach_analytics', { days: 7, campaignId: campaignB }) as DashboardMetrics;
+        assert.equal(selected.campaign?.id, campaignB);
+        assert.equal(selected.campaign?.linkPath, '/r/' + tokenB);
+        assert.equal(selected.activity.arrivals, 1);
+        assert.equal(selected.activity.consultations, 1);
+        assert.equal(selected.current.contacts, null);
+        await assert.rejects(() => callAgentTool(access, 'calas_outreach_analytics', { campaignId: randomUUID() }), { status: 404 });
+      }
     });
   } finally {
     await closeDatabase();
