@@ -1,0 +1,319 @@
+{
+  "at": "2026-11-12T00:30:22.263Z",
+  "scope": "Actual AdminApp, DashboardInsights and Outreach; unrelated lazy screens stubbed; synthetic HTTP APIs",
+  "checks": [
+    {
+      "name": "dashboard-real",
+      "width": 390,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-real",
+      "width": 1440,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-daily-table",
+      "width": 390,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-daily-table",
+      "width": 1440,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "real-simulation-local-separation-and-accessible-daily-values",
+      "result": "passed"
+    },
+    {
+      "name": "csv-download-displayed-period-and-aggregates-only",
+      "result": "passed"
+    },
+    {
+      "name": "7-30-90-days-refresh-and-updated-time",
+      "result": "passed"
+    },
+    {
+      "name": "late-30-day-response-cannot-replace-selected-7-days",
+      "result": "passed"
+    },
+    {
+      "name": "dashboard-error",
+      "width": 390,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-error",
+      "width": 1440,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "analytics-error-isolated-from-editorial-and-retry",
+      "result": "passed"
+    },
+    {
+      "name": "editorial-error-isolated-from-analytics-and-retry",
+      "result": "passed"
+    },
+    {
+      "name": "dashboard-zero",
+      "width": 390,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-zero",
+      "width": 1440,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-simulation",
+      "width": 390,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-simulation",
+      "width": 1440,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-local",
+      "width": 390,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-local",
+      "width": 1440,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-long-titles",
+      "width": 390,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-long-titles",
+      "width": 1440,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "displayed-versus-total-campaigns-pages-and-long-titles",
+      "result": "passed"
+    },
+    {
+      "name": "campaign-deep-link",
+      "width": 390,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "campaign-deep-link",
+      "width": 1440,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "dashboard-campaign-link-loads-specific-campaign-with-empty-selection-and-no-send",
+      "result": "passed"
+    },
+    {
+      "name": "campaign-missing",
+      "width": 390,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "campaign-missing",
+      "width": 1440,
+      "overflow": false,
+      "axeViolations": 0
+    },
+    {
+      "name": "missing-campaign-error-and-safe-return-preserving-other-query",
+      "result": "passed"
+    },
+    {
+      "name": "invalid-campaign-id-ignored-and-no-mutations-or-external-requests",
+      "result": "passed"
+    }
+  ],
+  "writes": [],
+  "externalRequests": [],
+  "errors": [],
+  "requests": [
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/content/dashboard/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=7",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=90",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/content/dashboard/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=7",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/content/dashboard/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/content/dashboard/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/content/dashboard/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/content/dashboard/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/content/dashboard/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/content/dashboard/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/content/dashboard/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/analytics/",
+      "query": "?days=30",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/content/dashboard/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/overview/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/campaigns/11111111-1111-4111-8111-111111111111/overview/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/campaigns/11111111-1111-4111-8111-111111111111/overview/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/overview/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/campaigns/22222222-2222-4222-8222-222222222222/overview/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/campaigns/22222222-2222-4222-8222-222222222222/overview/",
+      "query": "",
+      "method": "GET"
+    },
+    {
+      "path": "/api/admin/outreach/overview/",
+      "query": "",
+      "method": "GET"
+    }
+  ]
+}

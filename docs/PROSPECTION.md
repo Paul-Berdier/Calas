@@ -23,6 +23,19 @@ Les visites sont enregistrées par jour et par page après affichage visible ave
 
 Aucun cookie de mesure, stockage local, empreinte du navigateur ni association d’un clic à un destinataire. Le code partagé est propagé uniquement entre pages publiques du même site ; le visiteur peut l’enlever via « Arrêter cette mesure ». Les URL canoniques n’incluent pas le code. Les API restent limitées contre les abus ; cette protection technique est distincte des statistiques.
 
+## Tableau de bord
+
+Ouvrir **Administration → Tableau de bord**, choisir **7, 30 ou 90 jours**, puis **Actualiser** pour obtenir un nouvel instantané. Le filtre porte sur l’activité ; les contacts disponibles et les files reflètent toujours la situation actuelle. Les jours sont comptés en UTC, comme les compteurs enregistrés ; l’heure d’actualisation est affichée à Paris.
+
+- Les messages réels mis en file sont datés par leur création. Les acceptations SMTP, échecs, résultats incertains et exclusions utilisent la date de leur résultat final. Un message créé avant la période peut donc être accepté pendant celle-ci : ne pas calculer un taux à partir de ces deux totaux.
+- Les simulations et la recette locale sont présentées séparément. Une acceptation SMTP ne prouve pas l’arrivée en boîte principale : le test Hotmail du 12 novembre est arrivé dans les indésirables.
+- Le graphique et sa table accessible montrent les acceptations SMTP, arrivées et consultations quotidiennes. Ils mesurent seulement les visites attribuées aux liens de campagne ; aucune audience globale ni personne unique n’est déduite.
+- Les dix premières campagnes et pages sont affichées avec le nombre total de lignes concernées. Cliquer sur une campagne ouvre son détail sans sélectionner de destinataire ni lancer d’envoi.
+- Les réponses sont signalées manuellement sur les fiches. Les adresses exclues comprennent les oppositions et exclusions opérateur, même après effacement d’un contact. Les statistiques portent sur les données encore conservées.
+- **Exporter CSV** télécharge les agrégats affichés et les séries quotidiennes, sans adresses e-mail ni jetons. Les chaînes pouvant être interprétées comme formules sont neutralisées.
+
+Les indicateurs éditoriaux, publications récentes et tâches à relire restent disponibles sous ces statistiques. Un échec de chargement est affiché comme une erreur à réessayer, jamais comme une absence d’activité.
+
 ## Installation et exploitation
 
 1. Sauvegarder la base et les secrets. Appliquer explicitement les nouvelles migrations : `pnpm db:migrate --apply`. Le démarrage ne les applique jamais.

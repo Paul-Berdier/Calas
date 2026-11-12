@@ -58,6 +58,7 @@ import {
 } from "./ui";
 import "./admin.css";
 import { EditorialGuide } from "./EditorialGuide";
+import { DashboardInsights } from "./DashboardInsights";
 
 const DocumentEditor = lazy(() =>
   import("./DocumentEditor").then((module) => ({
@@ -532,20 +533,7 @@ function Dashboard({
   const openPage = (id?: string) => {
     onNavigate(id ? `/admin/pages/${id}/` : "/admin/pages/");
   };
-  if (error)
-    return (
-      <>
-        <SectionHeading title="Votre atelier éditorial" />
-        <p className="admin-error" role="alert">
-          {error}
-        </p>
-        <Button onClick={() => setRetry((value) => value + 1)}>
-          Réessayer
-        </Button>
-      </>
-    );
-  if (!data) return <Loading label="Chargement de votre espace…" />;
-  const pending = reviewOnly ? data.pending.filter(item => item.review) : data.pending;
+  const pending = data ? (reviewOnly ? data.pending.filter(item => item.review) : data.pending) : [];
   return (
     <>
       <SectionHeading
@@ -562,7 +550,16 @@ function Dashboard({
           </>
         }
       />
-      <div className="admin-metrics">
+      <DashboardInsights />
+      <div className="dashboard-editorial-heading">
+        <h2>Contenus du site</h2>
+        <p>L’état actuel de vos publications et de vos ressources.</p>
+      </div>
+      {error ? <>
+        <p className="admin-error" role="alert">{error}</p>
+        <Button onClick={() => { setError(""); setRetry((value) => value + 1); }}>Réessayer les contenus</Button>
+      </> : !data ? <Loading label="Chargement de vos contenus…" /> : <>
+      <div className="admin-metrics dashboard-editorial-metrics">
         {[
           {
             label: "Pages du site",
@@ -591,6 +588,13 @@ function Dashboard({
             href: "#travail-editorial",
             note: "PDF à relire et sources à vérifier",
             Icon: CheckCheck,
+          },
+          {
+            label: "Médias disponibles",
+            value: data.counts.media,
+            href: "/admin/media/",
+            note: "Images et documents accessibles à votre compte",
+            Icon: Images,
           },
         ].map(({ label, value, note, href, Icon }) => (
           <a
@@ -715,6 +719,7 @@ function Dashboard({
         <ShieldCheck size={14} />
         Les brouillons et leurs médias restent privés jusqu’à leur publication.
       </p>
+      </>}
     </>
   );
 }

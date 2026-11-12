@@ -1,5 +1,7 @@
 # Connexion IA à l’administration Calas Conseil
 
+Pour les statistiques, appeler `calas_outreach_analytics` avec `days: 7`, `30` (défaut) ou `90`. Cet outil en lecture seule partage les agrégats complets du tableau de bord, les séries quotidiennes et les dix premières campagnes/pages ; les simulations sont séparées du SMTP réel. Les jours sont UTC et les consultations ne sont pas des personnes distinctes. `calas_dashboard` conserve le suivi éditorial. Les deux outils exigent le droit `read` et les gardes du compte connecté, sur les deux transports.
+
 Le connecteur permet aux applications IA de travailler avec le compte de Sara, Agnès ou Paul. Il utilise le SDK MCP officiel (`@modelcontextprotocol/server` 2.4.0) et propose deux transports : **Streamable HTTP distant avec OAuth**, pour ChatGPT et Claude sur le web ainsi que leurs clients compatibles ; **stdio local**, pour un poste configuré avec Codex ou Claude Desktop. L’IA ne reçoit ni mot de passe administrateur, ni clé SMTP, ni accès à PostgreSQL ou au stockage.
 
 L’URL du serveur distant est **https://www.calas-conseil.fr/mcp/**. `/api/agent/tools/` reste une API privée pour le pont local : ce n’est pas l’URL à saisir dans les applications web. Le serveur, les migrations et le domaine HTTPS doivent être déployés avant la connexion externe. Les tests locaux ne constituent pas une connexion effective aux comptes personnels ChatGPT/Claude.

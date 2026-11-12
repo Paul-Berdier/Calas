@@ -19,6 +19,7 @@
     "test:unit": "playwright test tests/cms.spec.ts tests/contact-unit.spec.ts --project=chromium",
     "test:cms-local": "node scripts/run-local-tests.mjs",
     "test:visual": "playwright test tests/visual.spec.ts",
+    "test:dashboard": "pnpm --filter @calas/web exec tsx --test --test-concurrency=1 ../../tests/dashboard-analytics.test.ts ../../tests/dashboard-export.test.ts && node scripts/dashboard-ui-check.mjs",
     "cms:prepare": "node scripts/local-prepare.mjs",
     "cms:check": "pnpm --filter @calas/web exec tsx ../../scripts/cms-check.ts",
     "content:seed": "node scripts/content-seed.mjs",

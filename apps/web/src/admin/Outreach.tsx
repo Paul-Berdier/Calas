@@ -148,7 +148,14 @@ export function Outreach({
   const [contactPage, setContactPage] = useState(0);
   const [recipientQuery, setRecipientQuery] = useState("");
   const [recipientPage, setRecipientPage] = useState(0);
-  const [campaignId, setCampaignId] = useState<string | null>(null);
+  const [campaignId, setCampaignId] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    const value = new URLSearchParams(window.location.search).get("campaign");
+    return value && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
+      ? value
+      : null;
+  });
+  const [campaignError, setCampaignError] = useState("");
   const [campaignOverview, setCampaignOverview] =
     useState<CampaignOverview | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
@@ -208,8 +215,15 @@ export function Outreach({
   }, [data, reload]);
   useEffect(() => () => onDirtyChange(false), [onDirtyChange]);
   useEffect(() => {
+    const url = new URL(window.location.href);
+    if (campaignId) url.searchParams.set("campaign", campaignId);
+    else url.searchParams.delete("campaign");
+    window.history.replaceState(window.history.state, "", url);
+  }, [campaignId]);
+  useEffect(() => {
     if (!campaignId) return;
     let active = true;
+    setCampaignError("");
     request<CampaignOverview>(
       `/api/admin/outreach/campaigns/${campaignId}/overview/`,
     )
@@ -217,7 +231,7 @@ export function Outreach({
         if (active) setCampaignOverview(result);
       })
       .catch((cause) => {
-        if (active) setError((cause as Error).message);
+        if (active) setCampaignError((cause as Error).message);
       });
     return () => {
       active = false;
@@ -552,6 +566,11 @@ export function Outreach({
           {error}
         </p>
       )}
+      {campaignError && campaign && (
+        <p className="admin-error" role="alert">
+          {campaignError}
+        </p>
+      )}
       {notice && (
         <p className="admin-notice" role="status">
           {notice}
@@ -750,7 +769,15 @@ export function Outreach({
               </div>
             </>
           ) : campaignId && !campaign ? (
-            <Loading label="Chargement de la campagne…" />
+            campaignError ? (
+              <section className="admin-card admin-card-body">
+                <p className="admin-error" role="alert">{campaignError}</p>
+                <Button variant="secondary" onClick={() => {
+                  setCampaignId(null);
+                  setSelected([]);
+                }}>Revenir aux campagnes</Button>
+              </section>
+            ) : <Loading label="Chargement de la campagne…" />
           ) : campaign ? (
             <>
               <Button
