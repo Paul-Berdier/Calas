@@ -1,0 +1,27 @@
+{
+  "at": "2026-11-12T02:20:05.467Z",
+  "status": "passed",
+  "checks": [
+    "Connexion nominative e-mail et mot de passe",
+    "Routes protégées et sans cache",
+    "Résumé léger, pagination, recherche et validation des paramètres",
+    "Statistiques par dates et campagne",
+    "Aperçu final serveur en lecture seule, lien de désinscription inactif",
+    "Modèle temporaire créé, modifié et supprimé ; aucune campagne créée",
+    "Accueil, disponibilité, sauvegarde récente et traitement des campagnes",
+    "Admin mobile et bureau, accès direct historique et modèles, sans erreur JavaScript",
+    "Pages publiques et disponibilité après déploiement"
+  ],
+  "emailsSentByCheck": 0,
+  "sessionSignedOut": true,
+  "operations": {
+    "site": "ok",
+    "backup": "ok",
+    "capturedAt": "2026-11-11T06:03:22.136Z",
+    "verifiedAt": "2026-11-11T06:03:23.419Z",
+    "mailConfigured": true,
+    "workerEnabled": true
+  },
+  "pageErrors": 0,
+  "blockedWrites": 0
+}

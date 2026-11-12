@@ -46,7 +46,7 @@ Sauvegarde PostgreSQL+S3 chiffrée et restauration dans des destinations vides :
 
 ### Gestion, comparaison et état technique — version locale du 12 novembre
 
-Le déploiement de cette évolution est **en attente**. La migration additive `0007_outreach_management.sql` ajoute `outreach_message_templates`, la date nullable `outreach_deliveries.scheduled_at` et les index de lecture de l’historique. Elle ne retire aucune table ni donnée et ne programme aucun envoi existant. Le démarrage n’applique pas la migration.
+Cette évolution est déployée depuis `d6e6981ddf13d8d0ab815d1d05a5901b29f1af16`. La migration additive `0007_outreach_management.sql`, appliquée explicitement avant la bascule, ajoute `outreach_message_templates`, la date nullable `outreach_deliveries.scheduled_at` et les index de lecture de l’historique. Elle ne retire aucune table ni donnée et ne programme aucun envoi existant. Le démarrage n’applique pas la migration.
 
 Les listes de contacts, campagnes, modèles et envois utilisent des requêtes paginées avec total et ordre déterministe, indépendantes des classements analytiques. La recherche littérale échappe les caractères spéciaux SQL. Les historiques conservés au-delà des 1 000 derniers envois deviennent accessibles par pagination, avec filtres de campagne et de statut. L’interface charge le résumé sans les anciennes listes avec `overview?summary=true`, puis les pages nécessaires ; les réponses tardives ne remplacent pas une sélection plus récente. Le contrat historique reste compatible pour les autres clients.
 

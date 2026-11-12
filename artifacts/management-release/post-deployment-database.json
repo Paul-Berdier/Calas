@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-11-12T02:21:45.214Z",
+  "mode": "--inspect",
+  "deployedRevision": "d6e6981ddf13d8d0ab815d1d05a5901b29f1af16",
+  "migrationCount": 8,
+  "roles": [
+    "calas_app",
+    "calas_cloud_backup"
+  ],
+  "counts": {
+    "documents": 33,
+    "media": 14,
+    "users": 6,
+    "deliveries": 2
+  },
+  "permissions": {
+    "app_access": true,
+    "backup_access": true,
+    "templates": 0,
+    "scheduled": 0
+  }
+}

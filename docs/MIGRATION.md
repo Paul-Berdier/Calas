@@ -2,9 +2,13 @@
 
 ## Administration complète de prospection et suivi technique — 12 novembre 2026
 
-**État : migration `0007` appliquée ; déploiement web et recette distante EN ATTENTE.** Les six évolutions demandées sont l’historique paginé/recherchable, le suivi technique, l’aperçu du mail final, les périodes et comparaisons, les modèles de message et la programmation. Les preuves des versions déjà publiées ci-dessous restent historiques et ne valident pas cette évolution.
+**État : migration `0007`, déploiement web et recette distante réussis.** Les six évolutions demandées sont l’historique paginé/recherchable, le suivi technique, l’aperçu du mail final, les périodes et comparaisons, les modèles de message et la programmation. Les preuves des versions déjà publiées ci-dessous restent historiques et ne valident pas cette évolution.
 
 Le 12 novembre à 03 h 10 (Paris), après sauvegarde chiffrée vérifiée de la base et de 53 objets, l’opérateur applique uniquement `0007` via le tunnel privé PostgreSQL. Les huit migrations sont enregistrées ; la nouvelle table est vide et aucun envoi ancien n’a de date programmée. Les droits du rôle applicatif et de `calas_cloud_backup` sont attribués sur la table ajoutée. L’inventaire préalable est de 33 documents, 14 médias, 6 comptes et 2 envois. Preuves : `artifacts/management-release/pre-migration.json` et `migration.json`.
+
+La version `d6e6981ddf13d8d0ab815d1d05a5901b29f1af16` est en ligne à 03 h 19 (Paris), déploiement `78fa5808-d249-413e-86e6-413b0c7f0227`. La recette distante passe neuf groupes, dont un modèle temporaire créé/modifié/supprimé, sans nouveau contact, campagne ou envoi. La relecture PostgreSQL après recette confirme les mêmes 33 documents, 14 médias, 6 comptes et 2 envois ; les modèles temporaires sont absents et les deux rôles ont les droits attendus. Rapports : `live-report.json` et `post-deployment-database.json` dans le même dossier.
+
+Le job de sauvegarde existant est reconstruit depuis ce commit, avec la migration `0007` et `BACKUP_SOURCE_REVISION` actualisée ; déploiement `137cfc25-10d5-4190-b193-ebdb8f46dbef` prêt. La prochaine capture reste prévue à 06 h UTC. Cette reconstruction n’est pas présentée comme une nouvelle capture : le panneau affichait honnêtement celle du 11 novembre à 06 h 03 UTC lors de la recette. Les six références `STATUS_S3_*` du web pointent vers le bucket de marqueurs du moniteur ; aucune clé d’archive n’a été ajoutée au web.
 
 La migration additive `drizzle/0007_outreach_management.sql` crée la table des modèles réutilisables, ajoute `scheduled_at` nullable aux envois et crée les index d’historique. Les anciens envois conservent leur état ; aucun destinataire n’est rejoué, aucun contenu éditorial n’est publié. Les modèles et dates programmées entreront ensuite dans les sauvegardes PostgreSQL complètes existantes.
 

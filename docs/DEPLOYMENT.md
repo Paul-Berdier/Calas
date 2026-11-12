@@ -2,6 +2,16 @@
 
 Le projet Railway **Calas** héberge l’application Astro SSR, PostgreSQL et le bucket privé. Le service web historique `Calas-Web-Test` porte la production sous `www.calas-conseil.fr`. Le domaine est géré chez OVH, qui héberge également la boîte de contact. Les étapes de recette datées ci-dessous documentent les versions précédentes.
 
+## Gestion complète de prospection et état technique — 12 novembre 2026
+
+Le service web existant est épinglé à `d6e6981ddf13d8d0ab815d1d05a5901b29f1af16`, branche `codex/prospection-mcp` ; déploiement `78fa5808-d249-413e-86e6-413b0c7f0227` réussi à 03 h 19 (Paris). L’historique complet, les modèles, l’aperçu final, la programmation Paris, les comparaisons et l’état technique sont en production. Aucun changement d’offre, de région ou de capacité ; les quatre services sont conservés.
+
+Avant bascule, une archive chiffrée PostgreSQL + 53 objets est vérifiée, puis la migration additive `0007` est appliquée explicitement via le tunnel privé. Les droits de `calas_app` et `calas_cloud_backup` sur les modèles sont contrôlés. Les six variables `STATUS_S3_*` du web référencent celles de `Calas-Monitor`, limitées au stockage des marqueurs, distinct des archives. Le transport SMTP, ses secrets et ses limites sont inchangés.
+
+Le paquet du job de sauvegarde inclut désormais le manifeste workspace MCP requis par son Dockerfile. Reconstruit depuis le même commit, il est prêt sous `137cfc25-10d5-4190-b193-ebdb8f46dbef`, avec `BACKUP_SOURCE_REVISION` actualisée et cron `0 6 * * *` conservé. La reconstruction ne force pas une capture ni ne remplace une archive du jour. La recette du site confirme les marqueurs existants et le périmètre de lecture.
+
+Neuf groupes distants passent, dont un modèle temporaire créé, modifié puis supprimé. Aucun contact, campagne, programmation ni mail réel n’est créé par la recette ; session fermée, données éditoriales et comptes conservés. Voir `artifacts/management-release/` et [VALIDATION.md](VALIDATION.md). Les validations locales et le build Railway passent ; aucun workflow GitHub ne se déclenche sur cette branche sans pull request. Les commits documentaires suivants ne redéploient pas automatiquement le service épinglé.
+
 ## Navigation compacte de l’administration — 12 novembre 2026
 
 Le service web existant est épinglé à `96ac034a8668e698b7f19fe3e8dabca40508a09d` sur `codex/prospection-mcp` ; déploiement réussi `be24b560-15da-4e0e-bda1-dd115a63eb97` à 02 h 25 (Paris). Cette correction ajuste uniquement la navigation d’administration et son focus clavier. Elle inclut le tableau de bord avec filtres par campagne précédemment publié. Aucun changement de schéma, de contenu, de droits, d’offre ou de ressources. Les contrôles locaux et distants sont consignés dans [VALIDATION.md](VALIDATION.md#barre-latérale-sans-défilement-interne--12-novembre-2026).

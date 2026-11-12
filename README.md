@@ -49,9 +49,9 @@ Les courriels de développement arrivent dans [Mailpit local](http://localhost:1
 
 Les écrans **Prospection** et **Connexions IA** ajoutent les contacts professionnels, les campagnes et l’accès délégué aux assistants. La simulation reste le mode par défaut d’une nouvelle installation ; la production existante utilise le SMTP OVH après raccordement explicite. Son [guide d’exploitation](docs/PROSPECTION.md) décrit les imports Excel/CSV/TXT, la file persistante, les statistiques agrégées et son traitement intégré au service web. Le [guide MCP](docs/MCP.md) explique le raccordement distant avec OAuth pour ChatGPT, Claude et Codex, ainsi que le connecteur local, avec les droits du compte connecté. Les tests de protocole ne prouvent pas un raccordement aux comptes personnels des clients IA.
 
-### Évolutions de l’administration du 12 novembre — déploiement en attente
+### Évolutions de l’administration du 12 novembre — en production
 
-La version locale ajoute l’historique des envois paginé et recherchable, l’état du site et des sauvegardes, l’aperçu du texte final des courriels, les dates et comparaisons statistiques, les modèles réutilisables et la programmation des envois. La migration additive `0007_outreach_management.sql` est nécessaire pour les modèles et les dates programmées. L’état des sauvegardes nécessite un accès privé en lecture aux seuls marqueurs de supervision. [État de validation](docs/VALIDATION.md) · [Procédure de migration](docs/MIGRATION.md). Aucun nouveau service ni abonnement n’est ajouté.
+La version déployée ajoute l’historique des envois paginé et recherchable, l’état du site et des sauvegardes, l’aperçu du texte final des courriels, les dates et comparaisons statistiques, les modèles réutilisables et la programmation des envois. La migration additive `0007_outreach_management.sql` est appliquée ; l’état des sauvegardes lit les marqueurs privés de supervision. La recette distante passe sur mobile et ordinateur, sans courriel de prospection. [État de validation](docs/VALIDATION.md) · [Procédure de migration](docs/MIGRATION.md). Aucun nouveau service ni abonnement n’est ajouté.
 
 ## Commandes principales
 

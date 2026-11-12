@@ -1,6 +1,6 @@
 # Prospection et attribution des consultations
 
-Les évolutions du 12 novembre ci-dessous sont présentes dans la version locale ; leur déploiement de production est **en attente**. Voir [la validation](VALIDATION.md) et [la migration additive requise](MIGRATION.md).
+Les évolutions du 12 novembre ci-dessous sont **en production**, avec la migration additive `0007` appliquée et la recette distante réussie. Voir [la validation](VALIDATION.md) et [la migration](MIGRATION.md).
 
 ## Utilisation
 

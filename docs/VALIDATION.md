@@ -1,8 +1,8 @@
 # Revue éditoriale et autorisation de publication
 
-## Six évolutions d’administration — 12 novembre 2026, validation locale
+## Six évolutions d’administration — 12 novembre 2026, validation et production
 
-**Production : EN ATTENTE.** Les résultats ci-dessous concernent le code local. Ils ne prouvent ni application de la migration `0007`, ni raccordement des marqueurs privés, ni mise en ligne. Les déploiements historiques documentés plus bas restent distincts. Aucun courriel externe n’a été envoyé pour cette recette.
+**Production validée** depuis `d6e6981ddf13d8d0ab815d1d05a5901b29f1af16` : migration `0007` appliquée, marqueurs privés raccordés, déploiement et recette distante réussis. Les preuves locales et distantes sont distinguées ci-dessous. Aucun courriel externe n’a été envoyé pour cette recette.
 
 | Périmètre | Preuves locales obtenues |
 | --- | --- |
@@ -23,7 +23,11 @@ Limites vérifiées : l’aperçu utilise un lien de désinscription inactif et 
 
 La recette HTTP du serveur recompilé passe dix groupes, avec PostgreSQL/MinIO/Mailpit locaux, authentification réelle, worker simulé et OAuth PKCE/SDK MCP. Le stockage local initialement indisponible a été reconstruit avant cette réussite ; aucune protection n’a été contournée. Le verrouillage des champs pendant l’enregistrement des modèles est vérifié par quatre contrôles supplémentaires avec réponses retardées (création et modification). Preuves : `artifacts/outreach/http.json` et `artifacts/outreach-ui/template-save-report.json`.
 
-La sauvegarde préalable chiffrée et vérifiée couvre la base et 53 objets. La migration additive `0007` est appliquée via tunnel privé le 12 novembre à 03 h 10 (Paris), avec les droits applicatifs et du rôle de sauvegarde. Aucun contenu, compte ou envoi existant n’est modifié. Rapports : `artifacts/management-release/pre-migration.json` et `migration.json`. Le déploiement web et sa recette distante restent en attente à cette étape.
+La sauvegarde préalable chiffrée et vérifiée couvre la base et 53 objets. La migration additive `0007` est appliquée via tunnel privé le 12 novembre à 03 h 10 (Paris), avec les droits applicatifs et du rôle de sauvegarde. Aucun contenu, compte ou envoi existant n’est modifié. Rapports : `artifacts/management-release/pre-migration.json` et `migration.json`.
+
+Le déploiement Railway `78fa5808-d249-413e-86e6-413b0c7f0227` réussit à 03 h 19 (Paris). Neuf groupes de recette distante passent : connexion nominative sans TOTP, refus anonyme/no-store, résumé/pagination/recherche, dates et campagne, aperçu privé, CRUD d’un modèle temporaire, disponibilité et marqueurs, affichage 390/1440 px, accueil/Diagnostic/readiness. Aucun contact, campagne ou envoi créé ; modèle temporaire supprimé, session fermée, zéro erreur JavaScript. Les 33 documents, 14 médias, 6 comptes et 2 envois sont conservés. Preuves : `artifacts/management-release/live-report.json`, `post-deployment-database.json` et deux captures du panneau technique.
+
+Le job de sauvegarde existant est reconstruit avec la migration et la référence du code, déploiement `137cfc25-10d5-4190-b193-ebdb8f46dbef` prêt ; prochaine exécution à 06 h UTC. La dernière capture affichée à la recette date du 11 novembre, encore à jour avant l’échéance du 12 novembre à 07 h UTC. La recette ne revendique pas une nouvelle sauvegarde distante ni une restauration. Les quatre services Railway sont sains, aucun service ajouté. La CI GitHub n’a pas été déclenchée sur cette branche (déclencheurs : `main` et pull requests) ; les contrôles locaux et le build Railway constituent les validations de cette livraison.
 
 ## Barre latérale sans défilement interne — 12 novembre 2026
 
