@@ -1,0 +1,41 @@
+{
+  "at": "2026-11-12T01:26:00.545Z",
+  "status": "passed",
+  "checks": [
+    {
+      "width": 1366,
+      "height": 768,
+      "links": 13,
+      "scrollHeight": 768,
+      "clientHeight": 768,
+      "overflow": "visible",
+      "allVisible": true
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "links": 13,
+      "scrollHeight": 720,
+      "clientHeight": 720,
+      "overflow": "visible",
+      "allVisible": true
+    },
+    {
+      "width": 1024,
+      "height": 600,
+      "links": 13,
+      "scrollHeight": 600,
+      "clientHeight": 600,
+      "overflow": "visible",
+      "allVisible": true
+    },
+    {
+      "name": "mobile-keyboard-and-focus",
+      "passed": true
+    }
+  ],
+  "sessionSignedOut": true,
+  "pageErrors": 0,
+  "blockedWrites": 0,
+  "emailsSentByCheck": 0
+}

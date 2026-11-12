@@ -2,6 +2,10 @@
 
 Le projet Railway **Calas** héberge l’application Astro SSR, PostgreSQL et le bucket privé. Le service web historique `Calas-Web-Test` porte la production sous `www.calas-conseil.fr`. Le domaine est géré chez OVH, qui héberge également la boîte de contact. Les étapes de recette datées ci-dessous documentent les versions précédentes.
 
+## Navigation compacte de l’administration — 12 novembre 2026
+
+Le service web existant est épinglé à `96ac034a8668e698b7f19fe3e8dabca40508a09d` sur `codex/prospection-mcp` ; déploiement réussi `be24b560-15da-4e0e-bda1-dd115a63eb97` à 02 h 25 (Paris). Cette correction ajuste uniquement la navigation d’administration et son focus clavier. Elle inclut le tableau de bord avec filtres par campagne précédemment publié. Aucun changement de schéma, de contenu, de droits, d’offre ou de ressources. Les contrôles locaux et distants sont consignés dans [VALIDATION.md](VALIDATION.md#barre-latérale-sans-défilement-interne--12-novembre-2026).
+
 ## Version prospection et MCP — 11 novembre 2026
 
 À la demande de Paul, le service web existant est épinglé au commit `9383df6b725f6da4eefef4905842de9d421a2bd1`, branche `codex/prospection-mcp`, déploiement réussi `9f5673cf-ec74-4e4f-bb14-6eb75596fc4d`. Aucun nouveau service, changement d’offre, changement de région, hausse de ressources ou achat. Les quatre services existants restent présents. Les modifications documentaires ultérieures ne redéploient pas automatiquement le site.
