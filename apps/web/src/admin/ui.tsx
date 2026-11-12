@@ -117,6 +117,7 @@ export function Modal({
   description,
   children,
   wide = false,
+  onCloseAutoFocus,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -124,6 +125,7 @@ export function Modal({
   description?: string;
   children: ReactNode;
   wide?: boolean;
+  onCloseAutoFocus?: (event: Event) => void;
 }) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -132,6 +134,7 @@ export function Modal({
         <Dialog.Content
           className={cn("admin-modal", wide && "admin-modal-wide")}
           aria-describedby={description ? undefined : ""}
+          onCloseAutoFocus={onCloseAutoFocus}
         >
           <div className="admin-modal-heading">
             <div>

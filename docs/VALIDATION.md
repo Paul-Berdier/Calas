@@ -1,5 +1,11 @@
 # Revue éditoriale et autorisation de publication
 
+## Barre latérale sans défilement interne — 12 novembre 2026
+
+La navigation conserve ses 13 liens administrateur (11 pour une éditrice), ses libellés à 13 px et les accès au site public et à la déconnexion. Les marges s’adaptent à la hauteur : cibles de 36 px, puis 32 px sur les petits écrans. Aucun lien n’est masqué et la barre n’a plus de zone de défilement propre. Sous 591 px de hauteur sur ordinateur, elle rejoint le flux du document pour préserver tous les accès ; sur mobile, le menu modal conserve son défilement de secours. Sa fermeture restitue désormais le focus au bouton d’ouverture.
+
+La recette du véritable `AdminApp` sur données fictives passe 28 contrôles : les deux rôles à onze résolutions de 1 024 × 591 à 1 920 × 1 080, position fixe pendant le défilement du contenu, clavier, petites hauteurs et menu mobile/zoom. La navigation vers une rubrique conserve le focus sur son titre, y compris après changement de largeur. Tous les liens tiennent notamment à 1 366 × 768, 1 280 × 720 et 1 024 × 600. Aucun débordement interne ni violation Axe de la barre ; aucune écriture de contenu, mesure ou requête externe. Rapport : `artifacts/sidebar-ui/report.json` et trois captures. Astro check (zéro erreur, zéro avertissement, 27 indications préexistantes), TypeScript MCP, ESLint et compilation Astro passent.
+
 ## Statistiques distinctes par campagne — 12 novembre 2026
 
 La demande complémentaire de Paul ajoute une analyse individuelle de chaque campagne et de son lien. La suite finale passe 22 tests : agrégats SQL, pagination/recherche littérale, filtres, campagne inconnue, campagne inactive, null explicites pour les mesures non attribuables, outils MCP des deux transports et huit contrôles CSV. Deux vrais tokens de recette visant la même page sont résolus puis comptés par `recordCampaignVisit` : leurs arrivées et consultations restent distinctes. Aucun SMTP n’est appelé.

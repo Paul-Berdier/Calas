@@ -409,6 +409,8 @@ export default function AdminApp({
             size="icon"
             className="admin-mobile-menu"
             aria-label="Ouvrir le menu d’administration"
+            aria-haspopup="dialog"
+            aria-expanded={mobileNav}
             onClick={() => setMobileNav(true)}
           >
             <Menu size={21} />
@@ -456,6 +458,14 @@ export default function AdminApp({
         onOpenChange={setMobileNav}
         title="Calas Conseil"
         description="Votre atelier éditorial."
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          const main = document.querySelector<HTMLElement>(".admin-main");
+          if (main?.contains(document.activeElement)) return;
+          const trigger = document.querySelector<HTMLButtonElement>(".admin-mobile-menu");
+          if (trigger?.getClientRects().length) trigger.focus();
+          else main?.querySelector<HTMLElement>("h1")?.focus();
+        }}
       >
         {nav(true)}
         <div className="admin-actions">
